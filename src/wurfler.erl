@@ -20,7 +20,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0]).
 -export([start/0]).
--export([parse_wurfl/1]).
+-export([parse_wurfl/1, searchByUA/1, searchByCapabilities/1]).
 -compile([export_all]).
 
 -record(state, {devices=[]}).
@@ -30,8 +30,10 @@
 %% ====================================================================
 parse_wurfl(Filename) ->
 	gen_server:cast(?MODULE, {parse, Filename}).
-search(Capabilities) ->
-	gen_server:cast(?MODULE, {search, Capabilities}).
+searchByCapabilities(Capabilities) ->
+	gen_server:cast(?MODULE, {search_by_capabilities, Capabilities}).
+searchByUA(UserAgent)->
+	gen_server:cast(?MODULE, {search_by_ua, UserAgent}).
 %% ====================================================================
 %% Server functions
 %% ====================================================================
@@ -53,7 +55,7 @@ start() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-    {ok, #state{devices=create_model("test/wurfl.xml")}}.
+    {ok, #state{devices=create_model("priv/wurfl.xml")}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -65,8 +67,11 @@ init([]) ->
 %%          {stop, Reason, Reply, State}   | (terminate/2 is called)
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_call({search, Capabilities}, _From, State) ->
-	Result=search(Capabilities),
+handle_call({search_by_capabilities, Capabilities}, _From, State) ->
+	Result=search_by_capabilities(Capabilities),
+    {reply, Result, State};
+handle_call({search_by_ua, Capabilities}, _From, State) ->
+	Result=search_by_ua(Capabilities),
     {reply, Result, State}.
 
 %% --------------------------------------------------------------------
@@ -109,12 +114,18 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
-search(Capabilities)->
+search_by_capabilities(Capabilities)->
+	ok.
+search_by_ua(UserAgent)->
+	ok.
+
+get_all_capabilities(Device) ->
 	ok.
 
 create_model(Filename)->
 	Xml = parse(Filename),
 	get_devices(Xml).
+
 
 parse(Filename) ->
 	case xmerl_scan:file(Filename) of
@@ -178,7 +189,8 @@ process_device(Device) ->
 	Groups = get_groups(Device),
 	{xmlElement,device,_,[],_,[_,_],_,Attributes,_,_,_,_} = Device,
 	Device_Attributes=process_device_attributes(Attributes),
-	create_device(Device_Attributes, Groups).
+	Device = create_device(Device_Attributes, Groups),
+	{Device#device.id, Device}.
 	
 process_device_attributes(Attributes)->
 	[process_device_attribute(Attribute) || Attribute <- Attributes].

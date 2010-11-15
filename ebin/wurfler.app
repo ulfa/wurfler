@@ -1,15 +1,17 @@
 {application, wurfler,
  [
-  {description, ""},
+  {description, "A Wurfl file service"},
   {vsn, "1"},
   {modules, [
-             wurfler
+             wurfler,
+             wurfler_service,
+             wurfler_deps
             ]},
-  {registered, []},
+  {registered, [wurfler_service]},
   {applications, [
                   kernel,
                   stdlib
                  ]},
-  {mod, { wurfler_app, []}},
+  {mod, { wurfler_service, []}},
   {env, []}
  ]}.

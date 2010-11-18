@@ -24,7 +24,7 @@
 %% ====================================================================
 %% Record definition
 %% ====================================================================
--record(state, {}).
+-record(state, {capabilities}).
 %% ====================================================================
 %% External functions
 %% ====================================================================
@@ -61,10 +61,9 @@ start() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-	io:format("1... : ~p~n",[self()]),
 	ets:new(deviceTbl, [named_table,public,{keypos, #device.id}]),
 	wurfler:parse_wurfl("test/wurfltest.xml"),
-    {ok, #state{}}.
+    {ok, #state{capabilities=[]}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -86,7 +85,7 @@ handle_call({search_by_device_id, DeviceName}, _From, State) ->
 	Result=search_by_device_id(DeviceName),
     {reply, Result, State};
 handle_call({get_all_capabilities, DeviceName}, _From, State) ->
-	Result=get_all_capabilities(DeviceName),
+	Result=get_all_capabilities(DeviceName, State),
     {reply, Result, State};
 handle_call({version}, _From, State) ->
     {reply, "0.1", State}.
@@ -138,11 +137,40 @@ search_by_ua(UserAgent)->
 		[] -> []
 	end.
 
-get_all_capabilities(DeviceName) ->
-	case ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}) of
-		[Result] -> [Result];
-		[] -> []
-	end.
+	
+get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
+	Result = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),	
+	Capabilities = get_all_capabilities(Result, #state{capabilities=[]}),
+	case extract_fall_back(Result) of
+		[] -> Capabilities;
+		"root" -> Capabilities;
+		Fall_Back -> get_all_capabilities(Fall_Back, #state{capabilities=[Caps|Capabilities]})
+	end;
+
+get_all_capabilities([], #state{capabilities=Caps})->
+	#state{capabilities=Caps};
+get_all_capabilities([Result], #state{capabilities=Caps})->	
+	Capabilities = extract_capabilities(Result, []),
+	NewAcc = extract_capabilities(Caps, Capabilities),
+	#state{capabilities=NewAcc}.
+	
+handle_device(Device)->
+	Fall_back = extract_fall_back(Device),	
+	Capabilities = extract_capabilities(Device, []),
+	{Fall_back, Capabilities}.
+
+extract_fall_back([]) ->
+	[];
+extract_fall_back(Device) ->
+	lists:nth(1, Device).
+
+extract_capabilities([], Acc) ->
+	Acc;
+extract_capabilities(Device, Acc) ->
+	Groups = lists:nth(2, Device),
+	[concat_capabilites(Acc, Group#group.capabilites) || Group <- Groups].
+concat_capabilites(Acc, List2)->
+	lists:append(Acc, List2).
 	
 search_by_capabilities(Capabilities)->
 	ok.

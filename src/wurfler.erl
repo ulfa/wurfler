@@ -5,7 +5,6 @@
 %%% Created : 
 %%% -------------------------------------------------------------------
 -module(wurfler).
-
 -behaviour(gen_server).
 %% --------------------------------------------------------------------
 %% Include files
@@ -20,20 +19,28 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0]).
 -export([start/0]).
--export([parse_wurfl/1, searchByUA/1, searchByCapabilities/1]).
--compile([export_all]).
-
--record(state, {devices=[]}).
-
+-export([parse_wurfl/1, searchByUA/1, searchByCapabilities/1, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
+%%-compile([export_all]).
+%% ====================================================================
+%% Record definition
+%% ====================================================================
+-record(state, {}).
 %% ====================================================================
 %% External functions
 %% ====================================================================
 parse_wurfl(Filename) ->
-	gen_server:cast(?MODULE, {parse, Filename}).
+	gen_server:cast(?MODULE, {parse_wurfl, Filename}).
+
 searchByCapabilities(Capabilities) ->
-	gen_server:cast(?MODULE, {search_by_capabilities, Capabilities}).
+	gen_server:call(?MODULE, {search_by_capabilities, Capabilities}).
 searchByUA(UserAgent)->
-	gen_server:cast(?MODULE, {search_by_ua, UserAgent}).
+	gen_server:call(?MODULE, {search_by_ua, UserAgent}).
+searchByDeviceName(DeviceName) ->
+	gen_server:call(?MODULE, {search_by_device_id, DeviceName}).
+getAllCapabilities(DeviceName)->
+	gen_server:call(?MODULE, {get_all_capabilities, DeviceName}).
+getVersion() ->
+	gen_server:call(?MODULE, {version}).
 %% ====================================================================
 %% Server functions
 %% ====================================================================
@@ -43,7 +50,6 @@ searchByUA(UserAgent)->
 %%--------------------------------------------------------------------
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
-
 start() ->
 	start_link().
 %% --------------------------------------------------------------------
@@ -55,7 +61,10 @@ start() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-    {ok, #state{devices=create_model("priv/wurfl.xml")}}.
+	io:format("1... : ~p~n",[self()]),
+	ets:new(deviceTbl, [named_table,public,{keypos, #device.id}]),
+	wurfler:parse_wurfl("test/wurfltest.xml"),
+    {ok, #state{}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -72,8 +81,15 @@ handle_call({search_by_capabilities, Capabilities}, _From, State) ->
     {reply, Result, State};
 handle_call({search_by_ua, Capabilities}, _From, State) ->
 	Result=search_by_ua(Capabilities),
-    {reply, Result, State}.
-
+    {reply, Result, State};
+handle_call({search_by_device_id, DeviceName}, _From, State) ->
+	Result=search_by_device_id(DeviceName),
+    {reply, Result, State};
+handle_call({get_all_capabilities, DeviceName}, _From, State) ->
+	Result=get_all_capabilities(DeviceName),
+    {reply, Result, State};
+handle_call({version}, _From, State) ->
+    {reply, "0.1", State}.
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages
@@ -81,10 +97,9 @@ handle_call({search_by_ua, Capabilities}, _From, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_cast({parse, Filename}, _State) ->
-	NewState = #state{devices=create_model(Filename)},
-    {noreply, NewState}.
-
+handle_cast({parse_wurfl, Filename}, State) ->
+	create_model(Filename),
+    {noreply, State}.
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
 %% Description: Handling all non call/cast messages
@@ -94,7 +109,6 @@ handle_cast({parse, Filename}, _State) ->
 %% --------------------------------------------------------------------
 handle_info(_Info, State) ->
     {noreply, State}.
-
 %% --------------------------------------------------------------------
 %% Function: terminate/2
 %% Description: Shutdown the server
@@ -102,7 +116,6 @@ handle_info(_Info, State) ->
 %% --------------------------------------------------------------------
 terminate(_Reason, _State) ->
     ok.
-
 %% --------------------------------------------------------------------
 %% Func: code_change/3
 %% Purpose: Convert process state when code is changed
@@ -110,22 +123,36 @@ terminate(_Reason, _State) ->
 %% --------------------------------------------------------------------
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
-
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
-search_by_capabilities(Capabilities)->
-	ok.
-search_by_ua(UserAgent)->
-	ok.
+search_by_device_id(DeviceName)->	
+	case ets:lookup(deviceTbl, DeviceName) of
+		[Device] -> Device;
+		[] -> []
+	end.
 
-get_all_capabilities(Device) ->
+search_by_ua(UserAgent)->
+	case ets:match_object(deviceTbl, #device{id='_',user_agent=UserAgent, _='_'}) of
+		[Device] -> Device;
+		[] -> []
+	end.
+
+get_all_capabilities(DeviceName) ->
+	case ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}) of
+		[Result] -> [Result];
+		[] -> []
+	end.
+	
+search_by_capabilities(Capabilities)->
 	ok.
 
 create_model(Filename)->
 	Xml = parse(Filename),
-	get_devices(Xml).
-
+	XPath = "/wurfl/devices/device",
+	DevicesXml = xmerl_xpath:string (XPath, Xml),
+	Devices=process_devices(DevicesXml),
+	store_devices(Devices).
 
 parse(Filename) ->
 	case xmerl_scan:file(Filename) of
@@ -149,16 +176,8 @@ process_capabilities(Capabilities)->
 
 process_capability(Capability)->
 	{xmlElement,capability,_,_,_,_,_,Attributes,_,_,_,_} = Capability,
-	process_capability_attributes(Attributes).
-
-process_capability_attributes(Attributes)->
-	[process_capability_attribute(Attribute) || Attribute <-Attributes].
-
-process_capability_attribute(Attribute)->
-	case Attribute of
-		{xmlAttribute,name,_,_,_,_,_,_,Name,_} -> {name, Name};
-		{xmlAttribute,value,_,_,_,_,_,_,Value,_} -> {value, Value}
-	end.
+	Capability_Attributes=process_attributes(capability, Attributes),
+	create_capability(Capability_Attributes).
 
 get_groups(Device)->
 	XPath = "group",
@@ -167,40 +186,42 @@ get_groups(Device)->
 
 process_groups(Groups)->
 	[process_group(Group) || Group <- Groups].
+process_devices(Devices) ->
+	[process_device(Device)|| Device <- Devices].
 
 process_group(Group)->	
 	Capabilities = get_capabilities(Group),
 	{xmlElement,group,_,_,_,_,_,Attributes,_,_,_,_} = Group,
-	Group_Attributes = process_group_attributes(Attributes),
+	Group_Attributes = process_attributes(group,Attributes),
 	create_group(Group_Attributes, Capabilities).
-
-process_group_attributes(Attributes)->
-	[process_group_attribute(Attribute) || Attribute <- Attributes].
-
-process_group_attribute(Attribute)->
-	case Attribute of
-		{xmlAttribute,id,_,_,_,_,_,_,Id,_} -> {id, Id}
-	end.
-  
-process_devices(Devices) ->
-	[process_device(Device)|| Device <- Devices].
-
 process_device(Device) ->
 	Groups = get_groups(Device),
 	{xmlElement,device,_,[],_,[_,_],_,Attributes,_,_,_,_} = Device,
-	Device_Attributes=process_device_attributes(Attributes),
-	Device = create_device(Device_Attributes, Groups),
-	{Device#device.id, Device}.
-	
-process_device_attributes(Attributes)->
-	[process_device_attribute(Attribute) || Attribute <- Attributes].
+	Device_Attributes=process_attributes(device, Attributes),
+	create_device(Device_Attributes, Groups).
 
-process_device_attribute(Attribute)->
+process_attributes(group, Attributes)->
+	[process_attribute(group, Attribute) || Attribute <- Attributes];
+process_attributes(device, Attributes)->
+	[process_attribute(device, Attribute) || Attribute <- Attributes];
+process_attributes(capability, Attributes)->
+	[process_attribute(capability,Attribute) || Attribute <-Attributes].
+
+process_attribute(group, Attribute) ->
+	case Attribute of
+		{xmlAttribute,id,_,_,_,_,_,_,Id,_} -> {id, Id}
+	end;
+process_attribute(device, Attribute)->
 	case Attribute of
 		{xmlAttribute,id,_,_,_,_,_,_,Id,_} -> {id, Id};
 		{xmlAttribute,user_agent,_,_,_,_,_,_,User_agent,_} -> {user_agent, User_agent};
 		{xmlAttribute,fall_back,_,_,_,_,_,_,Fall_back,_} -> {fall_back, Fall_back};
 		{xmlAttribute,actual_device_root,_,_,_,_,_,_,Fall_back,_} -> {actual_device_root, Fall_back}
+	end;
+process_attribute(capability, Attribute)->
+	case Attribute of
+		{xmlAttribute,name,_,_,_,_,_,_,Name,_} -> {name, Name};
+		{xmlAttribute,value,_,_,_,_,_,_,Value,_} -> {value, Value}
 	end.
 
 create_device(Attributes, Groups)->
@@ -209,48 +230,62 @@ create_device(Attributes, Groups)->
 			actual_device_root=proplists:get_value(actual_device_root, Attributes),
 			fall_back=proplists:get_value(fall_back, Attributes),
 			groups=Groups}.
+
 create_group(Attributes, Capabilities) ->
 	#group{id=proplists:get_value(id, Attributes), capabilites=Capabilities}.
+
 create_capability(Attributes) ->
-	#capability{name=proplists:get_value(name, Attributes), value=proplistes:get_value(value, Attributes)}.
+	#capability{name=proplists:get_value(name, Attributes), value=proplists:get_value(value, Attributes)}.
+	
+store_devices(Devices) ->
+	ets:insert(deviceTbl, Devices).
+%% --------------------------------------------------------------------
+%%% Test utility functions
+%% --------------------------------------------------------------------
+%% 	test_setup() ->
+%% 		ets:new(device, [named_table, {keypos, #device.id}]),
+%% 		create_model("test/wurfltest.xml").
+%% 
+%% 	test_cleanup() ->
+%% 		ets:delete(?DEVICE),
+%% 		ok.
 	
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-create_model_test()->
-	create_model("test/wurfltest.xml").
+%% my_test()->
+%% 	{setup,
+%% 	 	fun test_setup/0,
+%% 	 	fun test_cleanup/0,
+%% 	 	[fun search_by_device_id_test/0]
+%% 	}.
 
-parse_test() ->
+%% search_by_device_id_test()->
+%% 	test_setup(),
+%% 	Device = search_by_device_id("hackingtosh"),
+%% 	?assertEqual("hackingtosh", Device#device.id),
+%% 	test_cleanup().
+	
+search_by_ua_test()->
+	Device=wurfler:search_by_ua("rocker_ua"),
+	?assertEqual("hackingtosh", Device#device.id).
+	
+
+process_device_test1()->
+	Result = ets:match(device, #device{id='$1',_='_'}),
+	?assertEqual("hackingtosh", lists:flatten(Result)).
+	
+
+
+
+parse_test1() ->
 	Filename = "test/wurfltest.xml",
 	Xml = parse(Filename),
 	io:format("Xml ~p~n", [Xml]).
 	%%?assertEqual(2, erlang:length(Xml)).
 
-get_devices_test()->
-	Xml = parse("test/wurfltest.xml"),
-	?assertEqual(3,erlang:length(get_devices(Xml))).
 
-process_devices_test()->
-	Xml = parse("test/wurfltest.xml"),
-	Devices = get_devices(Xml),
-	process_devices(Devices).
-
-
-process_device_test()->
-D={xmlElement,device,device,[],
-           {xmlNamespace,[],[]},
-           [{devices,4},{wurfl,1}],
-           6,
-           [{xmlAttribute,id,[],[],[],[],1,[],"hackingtosh",false},
-            {xmlAttribute,user_agent,[],[],[],[],2,[],"CDM-8150/P15 UP.Browser/4.1.26c4",false},
-            {xmlAttribute,fall_back,[],[],[],[],3,[],"rocker",false}]},
-
-
-{xmlElement,device,_,[],_,[_,_],_,Attributes} = D,
-L=process_device_attributes(Attributes),
-io:format("A : ~p~n", [L]).
-
-get_groups_test() ->
+get_groups_test1() ->
 	A={xmlElement,device,device,[],
            {xmlNamespace,[],[]},
            [{devices,4},{wurfl,1}],
@@ -300,7 +335,7 @@ D=get_groups(A),
 	
 io:format("~p~n", [D]).
 
-process_groups_test() ->
+process_groups_test1() ->
 	G={xmlElement,group,group,[], {xmlNamespace,[],[]}, [{device,6},{devices,4},{wurfl,1}],2,
           [{xmlAttribute,id,[],[],[],[],1,[],"sis",false}],
           [{xmlText,
@@ -332,6 +367,12 @@ process_groups_test() ->
 {xmlElement,group,_,_,_,_,_,Attributes,_,_,_,_} = G,
 	Attributes.
 	
+process_list_test()->
+	A=[["generic", [#group{id = "j2me", capabilites = [#capability{name = "myVersion",value = "6.1"}, #capability{name = "myProfile",value = "1.1"}]}]]],
+	[pro(X) || X <- A].
+	
 
-
+pro(X) ->
+	Groups = lists:flatten(lists:nth(2, X)),
+	lists:foldl(fun(G,Result) -> io:format("1..~p~n", [G#group.capabilites])end, [], Groups).
 

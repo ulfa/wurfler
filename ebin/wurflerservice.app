@@ -5,7 +5,8 @@
   {modules, [
              wurfler,
              wurflerservice,
-             wurfler_deps
+             wurfler_deps,
+             device_resource
             ]},
   {registered, [wurflerservice, wurfler]},
   {applications, [

@@ -134,7 +134,7 @@ search_by_device_id(DeviceName)->
 
 search_by_ua(UserAgent)->
 	case ets:match_object(deviceTbl, #device{id='_',user_agent=UserAgent, _='_'}) of
-		[Device] -> Device;
+		[Device] -> Device#device.id;
 		[] -> []
 	end.
 

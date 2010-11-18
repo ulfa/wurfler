@@ -41,15 +41,29 @@ ensure_started(App) ->
 %%          {error, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
+	Ip = case os:getenv("WEBMACHINE_IP") of false -> "0.0.0.0"; Any -> Any end,
+    {ok, Dispatch} = file:consult(filename:join(
+                         [filename:dirname(code:which(?MODULE)),
+                          "..", "priv", "dispatch.conf"])),
 	Wurfler={wurfler,
 				{wurfler, start_link, []},
               	permanent,
               	10000,
               	worker,
               	[wurfler]},
+	WebConfig = [
+                 {ip, Ip},
+                 {backlog, 1000},
+                 {port, 8000},
+                 {log_dir, "priv/log"},
+                 {dispatch, Dispatch}],
+    Web = {webmachine_mochiweb,
+           {webmachine_mochiweb, start, [WebConfig]},
+           permanent, 5000, worker, dynamic},
 		{ok, {{one_for_one, 3, 10},
 		   [
-			Wurfler
+			Wurfler,
+			Web
 		]}}.
 %% ====================================================================!
 %% External functions

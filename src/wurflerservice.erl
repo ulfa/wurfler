@@ -20,7 +20,13 @@
 %% --------------------------------------------------------------------
 %% Internal exports
 %% --------------------------------------------------------------------
-
+ensure_started(App) ->
+    case application:start(App) of
+        ok ->
+            ok;
+        {error, {already_started, App}} ->
+            ok
+    end.
 %% --------------------------------------------------------------------
 %% API Functions
 %% --------------------------------------------------------------------
@@ -55,6 +61,8 @@ init([]) ->
 %%          {error, Reason}
 %% --------------------------------------------------------------------
 start() ->
+	ensure_started(crypto),
+    ensure_started(webmachine),
 	application:start(?MODULE).
 
 start_link(_Type, _Args) ->

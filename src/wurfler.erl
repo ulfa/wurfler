@@ -139,39 +139,9 @@ search_by_ua(UserAgent)->
 
 	
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
-	Result = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),	
-	Capabilities = get_all_capabilities(Result, #state{capabilities=[]}),
-	case extract_fall_back(Result) of
-		[] -> Capabilities;
-		"root" -> Capabilities;
-		Fall_Back -> get_all_capabilities(Fall_Back, #state{capabilities=[Caps|Capabilities]})
-	end;
+	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
+	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)).
 
-get_all_capabilities([], #state{capabilities=Caps})->
-	#state{capabilities=Caps};
-get_all_capabilities([Result], #state{capabilities=Caps})->	
-	Capabilities = extract_capabilities(Result, []),
-	NewAcc = extract_capabilities(Caps, Capabilities),
-	#state{capabilities=NewAcc}.
-	
-handle_device(Device)->
-	Fall_back = extract_fall_back(Device),	
-	Capabilities = extract_capabilities(Device, []),
-	{Fall_back, Capabilities}.
-
-extract_fall_back([]) ->
-	[];
-extract_fall_back(Device) ->
-	lists:nth(1, Device).
-
-extract_capabilities([], Acc) ->
-	Acc;
-extract_capabilities(Device, Acc) ->
-	Groups = lists:nth(2, Device),
-	[concat_capabilites(Acc, Group#group.capabilites) || Group <- Groups].
-concat_capabilites(Acc, List2)->
-	lists:append(Acc, List2).
-	
 search_by_capabilities(Capabilities)->
 	ok.
 
@@ -396,11 +366,17 @@ process_groups_test1() ->
 	Attributes.
 	
 process_list_test()->
-	A=[["generic", [#group{id = "j2me", capabilites = [#capability{name = "myVersion",value = "6.1"}, #capability{name = "myProfile",value = "1.1"}]}]]],
-	[pro(X) || X <- A].
+A=	[{group,"j2me",
+                 [{capability,"myVersion","6.1"},
+                  {capability,"myProfile","1.1"}]},
+     {group,"j2me1",
+                 [{capability,"myVersion1","6.1"},
+                  {capability,"myProfile1","1.1"}]}],
+
+	B=lists:foldl(fun(G,Result) -> [G#group.capabilites|Result] end, [], A),
+	lists:append(B).
+			
 	
 
-pro(X) ->
-	Groups = lists:flatten(lists:nth(2, X)),
-	lists:foldl(fun(G,Result) -> io:format("1..~p~n", [G#group.capabilites])end, [], Groups).
+
 

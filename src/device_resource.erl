@@ -41,11 +41,13 @@ resource_exists(ReqData, Context) ->
 						 Device -> {true, ReqData, Context#context{device=Device}}
 					 end
 	end.
-	
 %%
 %% Local Functions
 %%
-
+get_device(useragent, Value) ->
+	wurfler:searchByUA(Value);
+get_device(devicename, Value) ->
+	wurfler:searchByDeviceName(Value).
 %%
 %% Test Functions
 %%

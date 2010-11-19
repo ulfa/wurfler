@@ -34,6 +34,7 @@ to_html(ReqData, Context) ->
     {HBody, ReqData, Ctx2}.
 
 resource_exists(ReqData, Context) ->
+	error_logger:info_msg("Query Strings : ~p~n," , [wrq:req_qs(ReqData)]),
 	case wrq:get_qs_value("useragent",ReqData) of
 		[] -> {false, ReqData, Context}; 
 		UserAgent -> case wurfler:searchByUA(UserAgent) of

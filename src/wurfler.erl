@@ -137,10 +137,14 @@ search_by_ua(UserAgent)->
 		[] -> []
 	end.
 
-	
+get_all_capabilities([], #state{capabilities=Caps}) ->
+	{ok, #state{capabilities=Caps}};
+get_all_capabilities("root", #state{capabilities=Caps}) ->
+	{ok, #state{capabilities=Caps}};
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
-	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)).
+	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
+	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
 
 search_by_capabilities(Capabilities)->
 	ok.

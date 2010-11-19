@@ -6,7 +6,7 @@
 %%
 %% Include files
 %%
-
+-include("../include/wurfler.hrl").
 -include_lib("eunit/include/eunit.hrl").
 %%
 %% Exported Functions
@@ -24,8 +24,8 @@ init([]) ->
 content_types_provided(ReqData, Context) ->
     {[{"text/html", to_html},{"text/plain",to_text}],ReqData, Context}.
 
-to_text(ReqData, Context) ->
-	Body=Context#context.device,
+to_text(ReqData, #context{device=Device}=Context) ->
+	Body=Device#device.id,
     {Body, ReqData, Context}.
 
 to_html(ReqData, Context) ->

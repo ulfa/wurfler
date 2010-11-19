@@ -24,7 +24,7 @@
 %% ====================================================================
 %% Record definition
 %% ====================================================================
--record(state, {capabilities}).
+-record(state, {groups, capabilities}).
 %% ====================================================================
 %% External functions
 %% ====================================================================
@@ -66,7 +66,7 @@ start() ->
 init([]) ->
 	ets:new(deviceTbl, [named_table,public,{keypos, #device.id}]),
 	wurfler:parse_wurfl("test/wurfltest.xml"),
-    {ok, #state{capabilities=[]}}.
+    {ok, #state{groups=[], capabilities=[]}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -82,7 +82,7 @@ handle_call({search_by_capabilities, Capabilities}, _From, State) ->
 	Result=search_by_capabilities(Capabilities),
     {reply, Result, State};
 handle_call({search_by_ua, Capabilities}, _From, State) ->
-	Result=search_by_ua(Capabilities),
+	Result=search_by_ua(Capabilities, State),
     {reply, Result, State};
 handle_call({search_by_device_id, DeviceName}, _From, State) ->
 	Result=search_by_device_id(DeviceName),
@@ -141,11 +141,23 @@ search_by_device_id(DeviceName)->
 		[] -> []
 	end.
 
-search_by_ua(UserAgent)->
+search_by_ua(UserAgent, State)->
 	case ets:match_object(deviceTbl, #device{id='_',user_agent=UserAgent, _='_'}) of
-		[Device] -> Device#device.id;
-		[] -> []
+		[] -> [];
+		[Device] -> Device,
+					case get_all_groups(Device#device.id, State) of
+						{ok,  #state{groups=Groups}} -> Device#device{groups=Groups};
+						_ -> {error, []}
+					end
 	end.
+
+get_all_groups([], #state{groups=Groups}) ->
+	{ok, #state{groups=Groups}};
+get_all_groups("root", #state{groups=Groups}) ->
+	{ok, #state{groups=Groups}};
+get_all_groups(DeviceName, #state{groups=AllGroups}) ->
+	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
+	get_all_groups(Fall_back, #state{groups=lists:append(AllGroups,Groups)}).
 
 get_all_capabilities([], #state{capabilities=Caps}) ->
 	{ok, #state{capabilities=Caps}};

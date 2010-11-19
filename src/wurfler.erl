@@ -17,9 +17,9 @@
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
--export([start_link/0]).
--export([start/0]).
+-export([start_link/0, start/0]).
 -export([parse_wurfl/1, searchByUA/1, searchByCapabilities/1, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
+-export([backup/0, load/0]).
 %%-compile([export_all]).
 %% ====================================================================
 %% Record definition
@@ -30,7 +30,6 @@
 %% ====================================================================
 parse_wurfl(Filename) ->
 	gen_server:cast(?MODULE, {parse_wurfl, Filename}).
-
 searchByCapabilities(Capabilities) ->
 	gen_server:call(?MODULE, {search_by_capabilities, Capabilities}).
 searchByUA(UserAgent)->
@@ -41,6 +40,10 @@ getAllCapabilities(DeviceName)->
 	gen_server:call(?MODULE, {get_all_capabilities, DeviceName}).
 getVersion() ->
 	gen_server:call(?MODULE, {version}).
+backup()->
+	gen_server:cast(?MODULE, {backup}).
+load()-> 
+	gen_server:cast(?MODULE, {load}).
 %% ====================================================================
 %% Server functions
 %% ====================================================================
@@ -98,7 +101,14 @@ handle_call({version}, _From, State) ->
 %% --------------------------------------------------------------------
 handle_cast({parse_wurfl, Filename}, State) ->
 	create_model(Filename),
+    {noreply, State};
+handle_cast({backup}, State) ->
+	backup_table(),
+    {noreply, State};
+handle_cast({load}, State) ->
+	load_table(),
     {noreply, State}.
+
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
 %% Description: Handling all non call/cast messages
@@ -241,6 +251,11 @@ create_capability(Attributes) ->
 	
 store_devices(Devices) ->
 	ets:insert(deviceTbl, Devices).
+
+backup_table() ->
+	ets:tab2file(deviceTbl, "./backup/wurfl.tbl").
+load_table() ->
+	ets:file2tab("./backup/wurfl.tbl", [{verify,true}]).
 %% --------------------------------------------------------------------
 %%% Test utility functions
 %% --------------------------------------------------------------------

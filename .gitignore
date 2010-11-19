@@ -1,0 +1,5 @@
+/.settings/
+/*.project
+/deps/
+/*.dump
+/*.DS_Store

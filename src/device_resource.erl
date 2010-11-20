@@ -41,14 +41,22 @@ resource_exists(ReqData, Context) ->
 	error_logger:info_msg("wrw:path_info() : ~p~n :" , [wrq:path_info(ReqData)]),
 	error_logger:info_msg("wrw:disp_path : ~p~n :" , [wrq:disp_path(ReqData)]),
 	error_logger:info_msg("wrw:path_tokens() : ~p~n :" , [wrq:path_tokens(ReqData)]),
-	error_logger:info_msg("wrw:get_qs_value() : ~p~n :" , [wrq:get_qs_value("ua",ReqData)]),
-	case wrq:get_qs_value("useragent",ReqData) of
-		[] -> {false, ReqData, Context}; 
-		UserAgent -> case wurfler:searchByUA(UserAgent) of
-						 [] -> {false, ReqData, Context};
-						 Device -> {true, ReqData, Context#context{device=Device}}
-					 end
+	error_logger:info_msg("wrw:req_qs() : ~p~n :" , [wrq:req_qs(ReqData)]),	
+	error_logger:info_msg("wrw:get_qs_value() : ~p~n :" , [wrq:get_qs_value("useragent",ReqData)]),
+	
+	case wrq:req_qs(ReqData) of
+		[] -> {false, ReqData, Context};
+		[{Key, Value}] -> {true, ReqData, Context#context{device=get_device(list_to_atom(Key), Value)}}
 	end.
+
+%% 	case wrq:get_qs_value("useragent",ReqData) of
+%% 		[] -> {false, ReqData, Context}; 
+%% 		UserAgent -> case wurfler:searchByUA(UserAgent) of
+%% 						 [] -> {false, ReqData, Context};
+%% 						 Device -> {true, ReqData, Context#context{device=Device}}
+%% 					 end
+%% 	end.
+
 %%
 %% Local Functions
 %%

@@ -12,6 +12,7 @@
 -include("../include/wurfler.hrl").
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
+-include_lib("stdlib/include/ms_transform.hrl").
 %% --------------------------------------------------------------------
 %% External exports
 
@@ -79,7 +80,7 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({search_by_capabilities, Capabilities}, _From, State) ->
-	Result=search_by_capabilities(Capabilities),
+	Result=search_by_capabilities(Capabilities, State),
     {reply, Result, State};
 handle_call({search_by_ua, Capabilities}, _From, State) ->
 	Result=search_by_ua(Capabilities, State),
@@ -137,8 +138,8 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 search_by_device_id(DeviceName)->	
 	case ets:lookup(deviceTbl, DeviceName) of
-		[Device] -> Device;
-		[] -> []
+		[] -> [];
+		[Device] -> Device
 	end.
 
 search_by_ua(UserAgent, State)->
@@ -163,12 +164,15 @@ get_all_capabilities([], #state{capabilities=Caps}) ->
 	{ok, #state{capabilities=Caps}};
 get_all_capabilities("root", #state{capabilities=Caps}) ->
 	{ok, #state{capabilities=Caps}};
+%% for testing, i don't need the big generic one
+get_all_capabilities("generic", #state{capabilities=Caps}) ->
+	{ok, #state{capabilities=Caps}};
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
 	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
 
-search_by_capabilities(Capabilities)->
+search_by_capabilities(Capabilities, State) ->
 	ok.
 
 create_model(Filename)->
@@ -181,7 +185,7 @@ create_model(Filename)->
 parse(Filename) ->
 	case xmerl_scan:file(Filename) of
 	{Xml,_Rest} -> Xml;
-	Error -> error_logger:info_msg("Some other result ~p~n",[Error]),
+	Error -> error_logger:error_info("Some other result ~p~n",[Error]),
 			 undefined
 	end.
 
@@ -406,7 +410,31 @@ A=	[{group,"j2me",
 
 	B=lists:foldl(fun(G,Result) -> [G#group.capabilites|Result] end, [], A),
 	lists:append(B).
-			
+
+process_device_test()->
+Groups=	[{group,"j2me",
+                 [{capability,"myVersion","6.1"},
+                  {capability,"myProfile","1.1"}]},
+     {group,"j2me1",
+                 [{capability,"myVersion1","6.1"},
+                  {capability,"myProfile1","1.1"}]}],
+
+
+	lists:foldl(fun(Group,Result) ->						 
+						  [Caps || Caps <- Group#group.capabilites ]
+				  end, [], Groups).
+
+
+	
+	
+
+
+
+
+
+
+
+
 	
 
 

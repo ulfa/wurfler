@@ -151,10 +151,14 @@ search_by_ua(UserAgent, State)->
 						_ -> {error, []}
 					end
 	end.
+search_by_capabilities(Capabilities, State) ->
+	ok.
 
 get_all_groups([], #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
 get_all_groups("root", #state{groups=Groups}) ->
+	{ok, #state{groups=Groups}};
+get_all_groups("gener", #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
 get_all_groups(DeviceName, #state{groups=AllGroups}) ->
 	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
@@ -172,8 +176,6 @@ get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
 	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
 
-search_by_capabilities(Capabilities, State) ->
-	ok.
 
 create_model(Filename)->
 	Xml = parse(Filename),
@@ -286,30 +288,13 @@ load_table() ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-%% my_test()->
-%% 	{setup,
-%% 	 	fun test_setup/0,
-%% 	 	fun test_cleanup/0,
-%% 	 	[fun search_by_device_id_test/0]
-%% 	}.
-
-%% search_by_device_id_test()->
-%% 	test_setup(),
-%% 	Device = search_by_device_id("hackingtosh"),
-%% 	?assertEqual("hackingtosh", Device#device.id),
-%% 	test_cleanup().
-	
 search_by_ua_test()->
-	Device=wurfler:search_by_ua("rocker_ua"),
-	?assertEqual("hackingtosh", Device#device.id).
+	Device = search_by_ua("rocker_ua", #state{groups=[], capabilities=[]}),
+	?assertEqual("rocker", Device#device.id).
 	
-
 process_device_test1()->
 	Result = ets:match(device, #device{id='$1',_='_'}),
 	?assertEqual("hackingtosh", lists:flatten(Result)).
-	
-
-
 
 parse_test1() ->
 	Filename = "test/wurfltest.xml",

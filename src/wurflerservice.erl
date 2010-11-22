@@ -77,6 +77,7 @@ init([]) ->
 start() ->
 	ensure_started(crypto),
     ensure_started(webmachine),
+	ensure_started(erlbuild),
 	application:start(?MODULE).
 
 start_link(_Type, _Args) ->

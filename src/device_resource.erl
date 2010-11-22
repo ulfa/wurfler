@@ -33,6 +33,7 @@ to_html(ReqData, Context) ->
     HBody = io_lib:format("<html><body>~s</body></html>~n",[erlang:iolist_to_binary(Body)]),
     {HBody, ReqData, Ctx2}.
 
+%% create the wurfl xml presentaton here
 to_xml(ReqData, Context)->
 	ok.
 	

@@ -39,35 +39,33 @@ to_html(ReqData, Context) ->
     HBody = io_lib:format("<html><body>~s</body></html>~n",[erlang:iolist_to_binary(Body)]),
     {HBody, ReqData, Ctx2}.
 
-%% create the wurfl xml presentaton here
 %% curl -H "Accept: text/xml" -v http://localhost:8000/device?useragent=rocker_ua
 to_xml(ReqData, #context{device=Device}=Context)->
-	D = create_xml(device,Device),
+	D=lists:flatten(xmerl:export_simple_content([create_xml(device,Device)], xmerl_xml)),
+	{D, ReqData, Context}.
 	
-	D1=lists:flatten(xmerl:export_simple_content([D], xmerl_xml)),
-	io:format("~p~n", [D1]),
-	{D1, ReqData, Context}.
-	
+
+%% curl -A "rocker_ua" -v http://localhost:8000/device 
 resource_exists(ReqData, Context) ->
 %% 	error_logger:info_msg("wrw:path() : ~p~n :" , [wrq:path(ReqData)]),
 %% 	error_logger:info_msg("wrw:path_info() : ~p~n :" , [wrq:path_info(ReqData)]),
 %% 	error_logger:info_msg("wrw:disp_path() : ~p~n :" , [wrq:disp_path(ReqData)]),
 %% 	error_logger:info_msg("wrw:path_tokens() : ~p~n :" , [wrq:path_tokens(ReqData)]),
 %% 	error_logger:info_msg("wrw:req_qs() : ~p~n :" , [wrq:req_qs(ReqData)]),	
-%% 	error_logger:info_msg("wrw:get_qs_value() : ~p~n :" , [wrq:get_qs_value("useragent",ReqData)]),
+%% 	error_logger:info_msg("wrw:get_qs_value() : ~p~n :" , [wrq:get_qs_value("device",ReqData)]),
 %% 	error_logger:info_msg("wrw:req_headers() : ~p~n :" , [wrq:req_headers(ReqData)]),
-%% 	
-	case wrq:req_qs(ReqData) of
+%% 	error_logger:info_msg("wrw:path_info() : ~p~n :" , [wrq:path_info(device, ReqData)]),	
+	case get_device(wrq:path_info(device, ReqData), ReqData) of
 		[] -> {false, ReqData, Context};
-		[{Key, Value}] -> {true, ReqData, Context#context{device=get_device(list_to_atom(Key), Value)}}
+		Device -> {true, ReqData, Context#context{device=Device}}
 	end.
 
 %%
 %% Local Functions
 %%
-get_device(useragent, Value) ->
-	wurfler:searchByUA(Value);
-get_device(devicename, Value) ->
+get_device(undefined, ReqData) ->
+	wurfler:searchByUA(wrq:get_req_header("User-Agent", ReqData));
+get_device(Value, _ReqData) ->
 	wurfler:searchByDeviceName(Value).
 
 %%

@@ -6,7 +6,8 @@
              wurfler,
              wurflerservice,
              wurfler_deps,
-             device_resource
+             device_resource,
+             devices_resource
             ]},
   {registered, [wurflerservice, wurfler]},
   {applications, [

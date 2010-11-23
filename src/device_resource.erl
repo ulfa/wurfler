@@ -55,6 +55,7 @@ resource_exists(ReqData, Context) ->
 %% Local Functions
 %%
 get_device(undefined, ReqData) ->
+error_logger:info_msg("UA ~p~n", [wrq:get_req_header("User-Agent", ReqData)]),
 	wurfler:searchByUA(wrq:get_req_header("User-Agent", ReqData));
 get_device(Value, _ReqData) ->
 	wurfler:searchByDeviceName(Value).

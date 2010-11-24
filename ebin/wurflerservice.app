@@ -6,6 +6,7 @@
              wurfler,
              wurflerservice,
              wurfler_deps,
+             xml_factory,
              device_resource,
              devices_resource
             ]},

@@ -13,6 +13,8 @@
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
+
+-define(WURFL_CONFIG, "priv/wurfler.config").
 %% --------------------------------------------------------------------
 %% External exports
 
@@ -66,9 +68,12 @@ start() ->
 %% --------------------------------------------------------------------
 init([]) ->
 	ets:new(deviceTbl, [named_table,public,{keypos, #device.id}]),
-	wurfler:parse_wurfl("test/wurfl.xml"),
+	wurfler:parse_wurfl(get_wurfl_file(?WURFL_CONFIG)),
     {ok, #state{groups=[], capabilities=[]}}.
 
+get_wurfl_file(?WURFL_CONFIG) ->
+	{ok, Config} = file:consult(?WURFL_CONFIG),
+	proplists:get_value(wurfl_file, Config).
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
 %% Description: Handling call messages
@@ -407,7 +412,8 @@ Groups=	[{group,"j2me",
 
 
 	
-	
+get_wurfl_file_test() ->
+	?assertEqual("test/wurfltest.xml", get_wurfl_file(?WURFL_CONFIG)).
 
 
 

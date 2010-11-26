@@ -66,7 +66,7 @@ start() ->
 %% --------------------------------------------------------------------
 init([]) ->
 	ets:new(deviceTbl, [named_table,public,{keypos, #device.id}]),
-	wurfler:parse_wurfl("test/wurfltest.xml"),
+	wurfler:parse_wurfl("test/wurfl.xml"),
     {ok, #state{groups=[], capabilities=[]}}.
 
 %% --------------------------------------------------------------------
@@ -182,7 +182,8 @@ create_model(Filename)->
 	XPath = "/wurfl/devices/device",
 	DevicesXml = xmerl_xpath:string (XPath, Xml),
 	Devices=process_devices(DevicesXml),
-	store_devices(Devices).
+	store_devices(Devices),
+	error_logger:info_msg("loaded model~n").
 
 parse(Filename) ->
 	case xmerl_scan:file(Filename) of
@@ -190,11 +191,6 @@ parse(Filename) ->
 	Error -> error_logger:error_info("Some other result ~p~n",[Error]),
 			 undefined
 	end.
-
-get_devices(Xml)->
-	XPath = "/wurfl/devices/device",
-	Devices = xmerl_xpath:string (XPath, Xml),
-	process_devices(Devices).
 
 get_capabilities(Group)->
 	XPath = "capability",

@@ -23,7 +23,8 @@
 -export([start_link/0, start/0]).
 -export([parse_wurfl/1, searchByUA/1, searchByCapabilities/1, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
 -export([backup/0, load/0]).
-%%-compile([export_all]).
+
+-compile([export_all]).
 %% ====================================================================
 %% Record definition
 %% ====================================================================
@@ -92,10 +93,10 @@ handle_call({search_by_ua, Capabilities}, _From, State) ->
     {reply, Result, State};
 handle_call({search_by_device_id, DeviceName}, _From, State) ->
 	Result=search_by_device_id(DeviceName),
-    {reply, Result, State};
+    {reply, Result, new_state()};
 handle_call({get_all_capabilities, DeviceName}, _From, State) ->
-	Result=get_all_capabilities(DeviceName, State),
-    {reply, Result, State};
+	{ok, Result}=get_all_capabilities(DeviceName, State),
+    {reply, Result#state.capabilities, new_state()};
 handle_call({version}, _From, State) ->
     {reply, "0.1", State}.
 %% --------------------------------------------------------------------
@@ -160,7 +161,14 @@ search_by_ua(UserAgent, State)->
 					end
 	end.
 search_by_capabilities(Capabilities, State) ->
+	List_Of_Funs=create_funs_from_list(Capabilities),
+	
 	ok.
+
+iterate_devices([]) ->
+	ets:first(deviceTbl);
+iterate_devices(Key) ->
+	ets:next(deviceTbl, Key).
 
 get_all_groups([], #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
@@ -177,8 +185,8 @@ get_all_capabilities([], #state{capabilities=Caps}) ->
 get_all_capabilities("root", #state{capabilities=Caps}) ->
 	{ok, #state{capabilities=Caps}};
 %% for testing, i don't need the big generic one
-get_all_capabilities("generic", #state{capabilities=Caps}) ->
-	{ok, #state{capabilities=Caps}};
+%%get_all_capabilities("generic", #state{capabilities=Caps}) ->
+%%{ok, #state{capabilities=Caps}};
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
@@ -278,20 +286,98 @@ backup_table() ->
 	ets:tab2file(deviceTbl, "./backup/wurfl.tbl").
 load_table() ->
 	ets:file2tab("./backup/wurfl.tbl", [{verify,true}]).
-%% --------------------------------------------------------------------
-%%% Test utility functions
-%% --------------------------------------------------------------------
-%% 	test_setup() ->
-%% 		ets:new(device, [named_table, {keypos, #device.id}]),
-%% 		create_model("test/wurfltest.xml").
-%% 
-%% 	test_cleanup() ->
-%% 		ets:delete(?DEVICE),
-%% 		ok.
+
+create_fun(CheckName, CheckValue, '==')->
+	fun(Name, Value) ->
+		case Name of
+			CheckName -> error_logger:info_msg("it's the Name we want to check ~p ~n", [Name]),
+						 case Value of
+							 CheckValue -> {ok};
+							 _ -> {nok}
+						 end;
+			_ -> {ok}
+		end
+	end;
+create_fun(CheckName, CheckValue, '/=')->
+	fun(Name, Value) ->
+		case Name == CheckName andalso Value /= CheckValue of
+			true -> {ok};
+			false -> {nok}
+		end
+	end;
+create_fun(CheckName, CheckValue, '>')->
+	fun(Name, Value) ->
+		case Name == CheckName andalso Value > CheckValue of
+			true -> {ok};
+			false -> {nok}
+		end
+	end;
+create_fun(CheckName, CheckValue, '<')->
+	fun(Name, Value) ->
+		case Name == CheckName andalso Value < CheckValue of
+			true -> {ok};
+			false -> {nok}
+		end
+	end.
+%% Run all funs for one capability
+%% Only if all funs return ok, its ok
+and_cond([Fun|Funs], {CheckName, CheckValue}) ->
+	io:format("and_cond : ~p~p~p~n", [Fun, CheckName, CheckValue]),
+    case Fun(CheckName, CheckValue) of
+		{ok} -> and_cond(Funs, {CheckName, CheckValue});
+        {nok} -> {nok}
+    end;
+and_cond([], {CheckName, CheckValue}) -> 
+	{ok}.
+
+create_funs_from_list(List) ->
+	[create_fun(Name, Value, Operator) || {Name, {Value, Operator}} <- List].
+
+run_funs_against_list(List_Of_Funs, [#capability{name=CheckName, value=CheckValue}|List_Of_Caps]) ->
+	case and_cond(List_Of_Funs, {CheckName, CheckValue}) of
+		{ok} -> run_funs_against_list(List_Of_Funs, List_Of_Caps);
+		{nok} -> io:format("break : ~p~p ~n", [CheckName, CheckValue]),
+				 {nok}
+	end;
+	
+run_funs_against_list(List_Of_Funs, []) ->
+	{ok}.
 	
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+
+create_function_test() ->
+	A=create_fun("test", "123", '=='),
+	?assertEqual({ok}, A("test", "123")),
+	B=create_fun("test", "123", '/='),
+	?assertEqual({ok}, B("test", "234")),
+	?assertEqual({nok}, B("test" , "123")),
+	?assertEqual({nok}, B("test1" , "234")),
+	C=create_fun("test", 123, '>'),
+	?assertEqual({ok}, C("test", 234)),
+	?assertEqual({nok}, C("test1", 234)),
+	D=create_fun("test", 123, '<'),
+	?assertEqual({ok}, D("test", 24)).
+	
+create_funs_from_list_test() ->
+	List=[{"handheldfriendly", {"false", '=='}},
+	 {"playback_mp4", {"false", '=='}},
+	 {"playback_wmv", {"none", '=='}}],
+	?assertEqual(3, erlang:length(create_funs_from_list(List))).
+
+run_funs_against_list_test()->
+	List_of_para=[{"handheldfriendly", {"true", '=='}},
+	 {"playback_mp4", {"false", '=='}},
+	 {"playback_wmv", {"none", '=='}}],
+	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para), wurfler:getAllCapabilities("generic"))),
+	List_of_para1=[{"handheldfriendly", {"false", '=='}},
+	 {"playback_mp4", {"false", '=='}},
+	 {"playback_wmv", {"none", '=='}}],
+	?assertEqual({ok},run_funs_against_list(create_funs_from_list(List_of_para1), wurfler:getAllCapabilities("generic"))).
+	
+	
+	
 search_by_ua_test()->
 	Device = search_by_ua("rocker_ua", #state{groups=[], capabilities=[]}),
 	?assertEqual("rocker", Device#device.id).
@@ -417,8 +503,7 @@ Groups=	[{group,"j2me",
 get_wurfl_file_test() ->
 	?assertEqual("test/wurfltest.xml", get_wurfl_file(?WURFL_CONFIG)).
 
-
-
+	
 
 
 

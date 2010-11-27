@@ -69,7 +69,7 @@ start() ->
 init([]) ->
 	ets:new(deviceTbl, [named_table,public,{keypos, #device.id}]),
 	wurfler:parse_wurfl(get_wurfl_file(?WURFL_CONFIG)),
-    {ok, #state{groups=[], capabilities=[]}}.
+    {ok, new_state()}.
 
 get_wurfl_file(?WURFL_CONFIG) ->
 	{ok, Config} = file:consult(?WURFL_CONFIG),
@@ -141,6 +141,9 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+new_state() ->
+	#state{groups=[], capabilities=[]}.
+
 search_by_device_id(DeviceName)->	
 	case ets:lookup(deviceTbl, DeviceName) of
 		[] -> [];
@@ -410,10 +413,11 @@ Groups=	[{group,"j2me",
 						  [Caps || Caps <- Group#group.capabilites ]
 				  end, [], Groups).
 
-
 	
 get_wurfl_file_test() ->
 	?assertEqual("test/wurfltest.xml", get_wurfl_file(?WURFL_CONFIG)).
+
+
 
 
 

@@ -10,7 +10,7 @@
              device_resource,
              devices_resource
             ]},
-  {registered, [wurflerservice, wurfler]},
+  {registered, [wurflerservice]},
   {applications, [
                   kernel,
                   stdlib

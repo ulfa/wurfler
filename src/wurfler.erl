@@ -28,7 +28,7 @@
 %% ====================================================================
 %% Record definition
 %% ====================================================================
--record(state, {groups=[], capabilities=[]}).
+-record(state, {devices=[], groups=[], capabilities=[]}).
 %% ====================================================================
 %% External functions
 %% ====================================================================
@@ -91,7 +91,7 @@ handle_call({search_by_capabilities, Capabilities}, _From, State) ->
 handle_call({search_by_ua, Capabilities}, _From, State) ->
 	Result=search_by_ua(Capabilities, State),
     {reply, Result, State};
-handle_call({search_by_device_id, DeviceName}, _From, State) ->
+handle_call({search_by_device_id, DeviceName}, _From, _State) ->
 	Result=search_by_device_id(DeviceName),
     {reply, Result, new_state()};
 handle_call({get_all_capabilities, DeviceName}, _From, State) ->
@@ -143,7 +143,7 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 %% --------------------------------------------------------------------
 new_state() ->
-	#state{groups=[], capabilities=[]}.
+	#state{devices=[], groups=[], capabilities=[]}.
 
 search_by_device_id(DeviceName)->	
 	case ets:lookup(deviceTbl, DeviceName) of
@@ -162,8 +162,18 @@ search_by_ua(UserAgent, State)->
 	end.
 search_by_capabilities(Capabilities, State) ->
 	List_Of_Funs=create_funs_from_list(Capabilities),
+	NextKey = ets:first(deviceTbl),
+	get_devices_for_caps(List_Of_Funs, NextKey, State).
+
+get_devices_for_caps(List_Of_Funs, Key, State)->
+	NextKey = ets:next(deviceTbl, Key),
+	Device = search_by_device_id(Key),
+	{ok,#state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State#state{capabilities=[]}),
+	case run_funs_against_list(List_Of_Funs, Caps) of
+		{ok} -> get_devices_for_caps(List_Of_Funs, NextKey,State#state{devices=[Device|State#state.devices]});
+		{nok} -> get_devices_for_caps(List_Of_Funs, NextKey, State)
+	end.
 	
-	ok.
 
 iterate_devices([]) ->
 	ets:first(deviceTbl);

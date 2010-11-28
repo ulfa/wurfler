@@ -12,7 +12,7 @@
 %%
 %% Exported Functions
 %%
--export([init/1, to_html/2, to_text/2, to_xml/2, content_types_provided/2, resource_exists/2]).
+-export([init/1, to_xml/2, content_types_provided/2, resource_exists/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -record(context, {device}).
@@ -29,15 +29,15 @@ allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
 %% curl -H "Accept: text/plain" -v http://localhost:8000/device
-to_text(ReqData, #context{device=Device}=Context) ->
-	Body=Device#device.id,
-    {Body, ReqData, Context}.
+%% to_text(ReqData, #context{device=Device}=Context) ->
+%% 	Body=Device#device.id,
+%%     {Body, ReqData, Context}.
 
 %% curl -A "rocker_ua" -H "Accept: text/html" -v http://localhost:8000/device
-to_html(ReqData, Context) ->
-    {Body, _RD, Ctx2} = to_text(ReqData, Context),
-    HBody = io_lib:format("<html><body>~s</body></html>~n",[erlang:iolist_to_binary(Body)]),
-    {HBody, ReqData, Ctx2}.
+%% to_html(ReqData, Context) ->
+%%     {Body, _RD, Ctx2} = to_text(ReqData, Context),
+%%     HBody = io_lib:format("<html><body>~s</body></html>~n",[erlang:iolist_to_binary(Body)]),
+%%     {HBody, ReqData, Ctx2}.
 
 %% curl -H "Accept: text/xml" -v http://localhost:8000/device/rocker
 to_xml(ReqData, #context{device=Device}=Context)->

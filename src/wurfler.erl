@@ -28,7 +28,7 @@
 %% ====================================================================
 %% Record definition
 %% ====================================================================
--record(state, {devices=[], groups=[], capabilities=[]}).
+-record(state, {devices=[], groups=[], capabilities=[], modell=[]}).
 %% ====================================================================
 %% External functions
 %% ====================================================================
@@ -87,7 +87,7 @@ get_wurfl_file(?WURFL_CONFIG) ->
 %% --------------------------------------------------------------------
 handle_call({search_by_capabilities, Capabilities}, _From, State) ->
 	Result=search_by_capabilities(Capabilities, State),
-    {reply, Result, State};
+    {reply, Result#state.devices, State};
 handle_call({search_by_ua, Capabilities}, _From, State) ->
 	Result=search_by_ua(Capabilities, State),
     {reply, Result, State};
@@ -107,7 +107,7 @@ handle_call({version}, _From, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_cast({parse_wurfl, Filename}, State) ->
-	create_model(Filename),
+	create_model(Filename, State),
     {noreply, State};
 handle_cast({backup}, State) ->
 	backup_table(),
@@ -161,21 +161,27 @@ search_by_ua(UserAgent, State)->
 					end
 	end.
 search_by_capabilities(Capabilities, State) ->
+	io:format("State ~n~p", [erlang:length(State#state.modell)]),
 	List_Of_Funs=create_funs_from_list(Capabilities),
 	NextKey = ets:first(deviceTbl),
 	get_devices_for_caps(List_Of_Funs, NextKey, State).
 
 get_devices_for_caps(_List_Of_Funs, '$end_of_table', State) ->
-	State;
-
+	State#state{devices=create_devices(State#state.devices)};
+	
 get_devices_for_caps(List_Of_Funs, Key, State)->
 	NextKey = ets:next(deviceTbl, Key),
 	Device = search_by_device_id(Key),
 	{ok,#state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State#state{capabilities=[]}),
 	case run_funs_against_list(List_Of_Funs, Caps) of
-		{ok} -> get_devices_for_caps(List_Of_Funs, NextKey,State#state{devices=[Device|State#state.devices]});
+		{ok} -> get_devices_for_caps(List_Of_Funs, NextKey,State#state{devices=[create_device(Device)|State#state.devices]});
 		{nok} -> get_devices_for_caps(List_Of_Funs, NextKey, State)
 	end.
+
+create_device(#device{id=Id}) ->
+	{'device', [{id, Id}, {model_name,[]}, {brand_name,[]}], []}.
+create_devices(Devices)->
+	[{'devices', [], Devices}].
 
 get_all_groups([], #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
@@ -200,14 +206,14 @@ get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
 
 
-create_model(Filename)->
+create_model(Filename, _State)->
 	Xml = parse(Filename),
 	XPath = "/wurfl/devices/device",
 	DevicesXml = xmerl_xpath:string (XPath, Xml),
 	Devices=process_devices(DevicesXml),
 	store_devices(Devices),
 	error_logger:info_msg("loaded model~n").
-
+	
 parse(Filename) ->
 	case xmerl_scan:file(Filename) of
 	{Xml,_Rest} -> Xml;
@@ -378,7 +384,7 @@ run_funs_against_list_test()->
 	List_of_para=[{"handheldfriendly", {"true", '=='}},
 	 {"playback_mp4", {"false", '=='}},
 	 {"playback_wmv", {"none", '=='}}],
-	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para), wurfler:getAllCapabilities("generic"))),
+	?assertEqual({ok},run_funs_against_list(create_funs_from_list(List_of_para), wurfler:getAllCapabilities("generic"))),
 	List_of_para1=[{"handheldfriendly", {"false", '=='}},
 	 {"playback_mp4", {"false", '=='}},
 	 {"playback_wmv", {"none", '=='}}],

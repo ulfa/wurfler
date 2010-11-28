@@ -604,6 +604,8 @@ WMLProgramming mailing list
 			<group id="j2me">
 				<capability name="myVersion" value="6.1"/>
 				<capability name="myProfile" value="1.1"/>
+				<capability name="j2me_cldc_1_1" value="true"/>
+				<capability name="j2me_midp_1_0" value="true"/>
 			</group>
 			<group id="j2me1">
 				<capability name="myVersion" value="6.1"/>

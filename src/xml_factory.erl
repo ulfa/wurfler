@@ -12,7 +12,7 @@
 %%
 %% Exported Functions
 %%
--export([create_xml/2]).
+-export([create_xml/2, parse/1, get_attribute/2]).
 
 %%
 %% API Functions
@@ -31,6 +31,19 @@ create_xml(group, #group{id=Id, capabilites=Capabilites})->
 	{'group', [{id, Id}], Caps};
 create_xml(capability, Capability)->
 	{'capability', [{name, Capability#capability.name}, {value, Capability#capability.value}], []}.
+
+parse(Bin) when is_binary(Bin) ->
+	{Xml,_} = xmerl_scan:string(binary_to_list(Bin)),
+	Xml;
+
+parse(String) when is_list(String)->
+	{Xml,_} = xmerl_scan:string(String),
+	Xml.
+get_attribute(XPath, Node) ->
+	case xmerl_xpath:string(XPath, Node) of
+		[#xmlAttribute{value = Value}] -> Value;
+		O -> O
+	end.
 %%
 %% Local Functions
 %%
@@ -56,9 +69,7 @@ create_xml_device_test() ->
 	log_xml([D]).
 
 
-%%
-%% Test helper functions
-%%
+
 create_device()->
 	#device{id="Nokia", user_agent="blahblahblah", actual_device_root=undefined, fall_back=undefined, 
 			groups=[create_group_1(), create_group_2()]}.
@@ -85,14 +96,7 @@ create_capabilities_2() ->
 tto_xml(A)->
 	lists:flatten(xmerl:export_simple_content(A, xmerl_xml)).
 
-parse(String) ->
-	{Xml,_} = xmerl_scan:string(String),
-	Xml.
-get_attribute(XPath, Node) ->
-	case xmerl_xpath:string(XPath, Node) of
-		[#xmlAttribute{value = Value}] -> Value;
-		O -> O
-	end.
+
 log_xml(Element)->
 	B=lists:flatten(xmerl:export_simple_content(Element, xmerl_xml)),
 	io:format("Xml: ~n~p~n", [B]).

@@ -311,25 +311,34 @@ create_fun(CheckName, CheckValue, '==')->
 		end
 	end;
 create_fun(CheckName, CheckValue, '/=')->
-	fun(Name, Value) ->
-		case Name == CheckName andalso Value /= CheckValue of
-			true -> {ok};
-			false -> {nok}
-		end
+	fun(Name, Value) ->			
+		case Name of
+			CheckName ->  case Value /= CheckValue of
+							 true -> {ok};
+							 false -> {nok}
+						 end;
+			_ -> {continue}
+		end			
 	end;
 create_fun(CheckName, CheckValue, '>')->
 	fun(Name, Value) ->
-		case Name == CheckName andalso Value > CheckValue of
-			true -> {ok};
-			false -> {nok}
-		end
+		case Name of
+			CheckName ->  case Value > CheckValue of
+							 true -> {ok};
+							 false -> {nok}
+						 end;
+			_ -> {continue}
+		end			
 	end;
 create_fun(CheckName, CheckValue, '<')->
 	fun(Name, Value) ->
-		case Name == CheckName andalso Value < CheckValue of
-			true -> {ok};
-			false -> {nok}
-		end
+		case Name of
+			CheckName ->  case Value < CheckValue of
+							 true -> {ok};
+							 false -> {nok}
+						 end;
+			_ -> {continue}
+		end			
 	end.
 %% Run all funs for one capability
 %% Only if all funs return ok, its ok
@@ -367,10 +376,10 @@ create_function_test() ->
 	B=create_fun("test", "123", '/='),
 	?assertEqual({ok}, B("test", "234")),
 	?assertEqual({nok}, B("test" , "123")),
-	?assertEqual({nok}, B("test1" , "234")),
+	?assertEqual({continue}, B("test1" , "234")),
 	C=create_fun("test", 123, '>'),
 	?assertEqual({ok}, C("test", 234)),
-	?assertEqual({nok}, C("test1", 234)),
+	?assertEqual({continue}, C("test1", 234)),
 	D=create_fun("test", 123, '<'),
 	?assertEqual({ok}, D("test", 24)).
 	

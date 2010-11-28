@@ -59,21 +59,3 @@ error_logger:info_msg("UA ~p~n", [wrq:get_req_header("User-Agent", ReqData)]),
 	wurfler:searchByUA(wrq:get_req_header("User-Agent", ReqData));
 get_device(Value, _ReqData) ->
 	wurfler:searchByDeviceName(Value).
-
-%%
-%% create the xml for devices
-%%
-create_xml(devices, Devices)->
-	[create_xml(device, Device) || Device <- Devices];
-create_xml(device, #device{id=Id, user_agent=U_A, actual_device_root=A_D_R, fall_back=F_B, groups=Groups})->
-	{'device', [{id, Id}, {user_agent, U_A}, {actual_device_root, A_D_R}, {fall_back, F_B}],
-	 create_xml(groups, Groups)};
-create_xml(groups, Groups)->
-	[create_xml(group, Group) || Group <- Groups];
-create_xml(capabilities, Capabilities)->
-	[create_xml(capability, Cap) || Cap <- Capabilities];
-create_xml(group, #group{id=Id, capabilites=Capabilites})->
-	Caps = create_xml(capabilities, Capabilites),
-	{'group', [{id, Id}], Caps};
-create_xml(capability, Capability)->
-	{'capability', [{name, Capability#capability.name}, {value, Capability#capability.value}], []}.

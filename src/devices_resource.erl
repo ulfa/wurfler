@@ -13,7 +13,7 @@
 %%
 %% Exported Functions
 %%
--export([init/1, to_json/2, to_text/2, to_xml/2, content_types_provided/2, resource_exists/2]).
+-export([init/1, to_json/2, to_xml/2, content_types_provided/2, resource_exists/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -record(context, {device}).
@@ -30,14 +30,11 @@ content_types_provided(ReqData, Context) ->
 allowed_methods(ReqData, Context) ->
     {['POST'], ReqData, Context}.
 
-to_text(ReqData, #context{device=Device}=Context) ->
-	Body=Device#device.id,
-    {Body, ReqData, Context}.
-
 to_json(ReqData, Context) ->  
 	error_logger:info_msg("to_json ~n"),
     {"HBody", ReqData, Context}.
 
+%% curl -d '@test/xml_caps_request.xml' -H "Accept: text/xml" -v http://localhost:8000/devices
 to_xml(ReqData, #context{device=Device}=Context)->
 	{ok, ReqData, Context}.
 

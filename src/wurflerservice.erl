@@ -97,7 +97,7 @@ start(_Type, _Args) ->
 stop() ->
 	application:stop(crypto),
 	application:stop(webmachine),
-	application:stop(erlbuild),
+%%	application:stop(erlbuild),
     application:stop(?MODULE).
 %% --------------------------------------------------------------------
 %% Func: stop/1

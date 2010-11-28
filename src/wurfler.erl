@@ -165,6 +165,9 @@ search_by_capabilities(Capabilities, State) ->
 	NextKey = ets:first(deviceTbl),
 	get_devices_for_caps(List_Of_Funs, NextKey, State).
 
+get_devices_for_caps(_List_Of_Funs, '$end_of_table', State) ->
+	State;
+
 get_devices_for_caps(List_Of_Funs, Key, State)->
 	NextKey = ets:next(deviceTbl, Key),
 	Device = search_by_device_id(Key),
@@ -173,18 +176,12 @@ get_devices_for_caps(List_Of_Funs, Key, State)->
 		{ok} -> get_devices_for_caps(List_Of_Funs, NextKey,State#state{devices=[Device|State#state.devices]});
 		{nok} -> get_devices_for_caps(List_Of_Funs, NextKey, State)
 	end.
-	
-
-iterate_devices([]) ->
-	ets:first(deviceTbl);
-iterate_devices(Key) ->
-	ets:next(deviceTbl, Key).
 
 get_all_groups([], #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
 get_all_groups("root", #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
-get_all_groups("gener", #state{groups=Groups}) ->
+get_all_groups("generic", #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
 get_all_groups(DeviceName, #state{groups=AllGroups}) ->
 	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
@@ -195,8 +192,8 @@ get_all_capabilities([], #state{capabilities=Caps}) ->
 get_all_capabilities("root", #state{capabilities=Caps}) ->
 	{ok, #state{capabilities=Caps}};
 %% for testing, i don't need the big generic one
-%%get_all_capabilities("generic", #state{capabilities=Caps}) ->
-%%{ok, #state{capabilities=Caps}};
+get_all_capabilities("generic", #state{capabilities=Caps}) ->
+ 	{ok, #state{capabilities=Caps}};
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
@@ -300,12 +297,11 @@ load_table() ->
 create_fun(CheckName, CheckValue, '==')->
 	fun(Name, Value) ->
 		case Name of
-			CheckName -> error_logger:info_msg("it's the Name we want to check ~p ~n", [Name]),
-						 case Value of
+			CheckName ->  case Value of
 							 CheckValue -> {ok};
 							 _ -> {nok}
 						 end;
-			_ -> {ok}
+			_ -> {continue}
 		end
 	end;
 create_fun(CheckName, CheckValue, '/=')->
@@ -332,22 +328,24 @@ create_fun(CheckName, CheckValue, '<')->
 %% Run all funs for one capability
 %% Only if all funs return ok, its ok
 and_cond([Fun|Funs], {CheckName, CheckValue}) ->
-	io:format("and_cond : ~p~p~p~n", [Fun, CheckName, CheckValue]),
     case Fun(CheckName, CheckValue) of
-		{ok} -> and_cond(Funs, {CheckName, CheckValue});
-        {nok} -> {nok}
+		{ok} -> and_cond({ok});
+		{nok} -> and_cond({nok});
+        {continue} -> and_cond(Funs, {CheckName, CheckValue})
     end;
-and_cond([], {CheckName, CheckValue}) -> 
-	{ok}.
+and_cond([], {_CheckName, _CheckValue}) -> 
+	{continue}.
+and_cond(ReturnValue) ->
+	ReturnValue.	
 
 create_funs_from_list(List) ->
 	[create_fun(Name, Value, Operator) || {Name, {Value, Operator}} <- List].
 
 run_funs_against_list(List_Of_Funs, [#capability{name=CheckName, value=CheckValue}|List_Of_Caps]) ->
 	case and_cond(List_Of_Funs, {CheckName, CheckValue}) of
+		{continue} ->run_funs_against_list(List_Of_Funs, List_Of_Caps);
 		{ok} -> run_funs_against_list(List_Of_Funs, List_Of_Caps);
-		{nok} -> io:format("break : ~p~p ~n", [CheckName, CheckValue]),
-				 {nok}
+		{nok} -> {nok}
 	end;
 	
 run_funs_against_list(List_Of_Funs, []) ->
@@ -387,7 +385,12 @@ run_funs_against_list_test()->
 	?assertEqual({ok},run_funs_against_list(create_funs_from_list(List_of_para1), wurfler:getAllCapabilities("generic"))).
 	
 	
-	
+search_by_capabilities_test() ->
+	List=[{"handheldfriendly", {"false", '=='}},
+	 {"playback_mp4", {"false", '=='}},
+	 {"playback_wmv", {"none", '=='}}],
+	search_by_capabilities(List, new_state()).
+
 search_by_ua_test()->
 	Device = search_by_ua("rocker_ua", #state{groups=[], capabilities=[]}),
 	?assertEqual("rocker", Device#device.id).

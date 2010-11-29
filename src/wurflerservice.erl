@@ -91,6 +91,7 @@ init([]) ->
 %% --------------------------------------------------------------------
 start() ->
 	ensure_started(crypto),
+	ensure_started(mnesia),
     ensure_started(webmachine),
 	ensure_started(erlbuild),
 	application:start(?MODULE).
@@ -112,7 +113,8 @@ start(_Type, _Args) ->
 stop() ->
 	application:stop(crypto),
 	application:stop(webmachine),
-%%	application:stop(erlbuild),
+	application:stop(erlbuild),
+	application:stop(mnesia),
     application:stop(?MODULE).
 %% --------------------------------------------------------------------
 %% Func: stop/1

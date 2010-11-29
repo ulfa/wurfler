@@ -27,7 +27,7 @@
 %%
 %% Exported Functions
 %%
--export([init/1, to_json/2, to_xml/2, post_is_create/2, content_types_provided/2, process_post/2]).
+-export([init/1, to_xml/2, post_is_create/2, content_types_provided/2, process_post/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -record(context, {devices=[]}).
@@ -39,14 +39,15 @@ init([]) ->
 	{ok, #context{devices=[]}}.
 
 content_types_provided(ReqData, Context) ->
-    {[{"application/json", to_json}, {"text/xml", to_xml}],ReqData, Context}.
+    {[{"text/xml", to_xml}],ReqData, Context}.
+
 
 allowed_methods(ReqData, Context) ->
     {['POST'], ReqData, Context}.
 
-to_json(ReqData, Context) ->  
-	error_logger:info_msg("to_json ~n"),
-    {"HBody", ReqData, Context}.
+%% to_json(ReqData, Context) ->  
+%% 	error_logger:info_msg("to_json ~n"),
+%%     {"HBody", ReqData, Context}.
 
 %% curl -d '@test/xml_caps_request.xml' -H "Accept: text/xml" -v http://localhost:8000/devices
 to_xml(ReqData, Context)->
@@ -56,7 +57,7 @@ allow_missing_post(ReqData, Context) ->
 	{true, ReqData, Context}.
 
 post_is_create(ReqData, Context) ->
-	{false, ReqData, Context}.
+	{true, ReqData, Context}.
 
 resource_exists(ReqData, Context) ->
 	{true, ReqData, Context}.

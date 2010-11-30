@@ -1,5 +1,6 @@
 /.settings/
 /*.project
 /deps/
+/db/
 /*.dump
 /*.DS_Store

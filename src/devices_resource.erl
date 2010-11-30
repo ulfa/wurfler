@@ -49,7 +49,7 @@ allowed_methods(ReqData, Context) ->
 %% 	error_logger:info_msg("to_json ~n"),
 %%     {"HBody", ReqData, Context}.
 
-%% curl -d '@test/xml_caps_request.xml' -H "Accept: text/xml" -v http://localhost:8000/devices
+
 to_xml(ReqData, Context)->
 	{ok, ReqData, Context}.
 
@@ -57,7 +57,7 @@ allow_missing_post(ReqData, Context) ->
 	{true, ReqData, Context}.
 
 post_is_create(ReqData, Context) ->
-	{true, ReqData, Context}.
+	{false, ReqData, Context}.
 
 resource_exists(ReqData, Context) ->
 	{true, ReqData, Context}.

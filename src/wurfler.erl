@@ -36,7 +36,6 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([import_wurfl/1, searchByUA/1, searchByCapabilities/1, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
--export([backup/0, load/0]).
 
 -compile([export_all]).
 %% ====================================================================
@@ -58,10 +57,6 @@ getAllCapabilities(DeviceName)->
 	gen_server:call(?MODULE, {get_all_capabilities, DeviceName}).
 getVersion() ->
 	gen_server:call(?MODULE, {version}).
-backup()->
-	gen_server:cast(?MODULE, {backup}).
-load()-> 
-	gen_server:cast(?MODULE, {load}).
 %% ====================================================================
 %% Server functions
 %% ====================================================================
@@ -82,8 +77,6 @@ start() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-	ets:new(deviceTbl, [named_table,public,{keypos, #device.id}]),
-	%%wurfler:create_model(get_wurfl_file(?WURFL_CONFIG), new_state()),
 	wurfler:import_wurfl_file(get_wurfl_file(?WURFL_CONFIG)),
     {ok, new_state()}.
 
@@ -122,14 +115,7 @@ handle_call({version}, _From, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_cast({import_wurfl, Filename}, State) ->
-	%%create_model(Filename, State),
 	import_wurfl_file(Filename),
-    {noreply, State};
-handle_cast({backup}, State) ->
-	backup_table(),
-    {noreply, State};
-handle_cast({load}, State) ->
-	load_table(),
     {noreply, State}.
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
@@ -161,13 +147,13 @@ new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
 
 search_by_device_id(DeviceName)->	
-	case ets:lookup(deviceTbl, DeviceName) of
+	case wurfler_db:find_record_by_id(devicesTbl, DeviceName) of
 		[] -> [];
 		[Device] -> Device
 	end.
 
 search_by_ua(UserAgent, State)->
-	case ets:match_object(deviceTbl, #device{id='_',user_agent=UserAgent, _='_'}) of
+	case wurfler_db:find_record_by_ua(devicesTbl, UserAgent) of
 		[] -> [];
 		[Device] -> Device,
 					case get_all_groups(Device#device.id, State) of
@@ -178,14 +164,14 @@ search_by_ua(UserAgent, State)->
 search_by_capabilities(Capabilities, State) ->
 	io:format("State ~n~p", [erlang:length(State#state.modell)]),
 	List_Of_Funs=create_funs_from_list(Capabilities),
-	NextKey = ets:first(deviceTbl),
+	NextKey = wurfler_db:get_first_device(devicesTbl),
 	get_devices_for_caps(List_Of_Funs, NextKey, State).
 
 get_devices_for_caps(_List_Of_Funs, '$end_of_table', State) ->
 	State#state{devices=create_devices(State#state.devices)};
 	
 get_devices_for_caps(List_Of_Funs, Key, State)->
-	NextKey = ets:next(deviceTbl, Key),
+	NextKey = wurfler_db:get_next_device(devicesTbl, Key),
 	Device = search_by_device_id(Key),
 	{ok,#state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State#state{capabilities=[]}),
 	case run_funs_against_list(List_Of_Funs, Caps) of
@@ -218,14 +204,6 @@ get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
 	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
-
-create_model(Filename, _State)->
-	Xml = parse(Filename),
-	XPath = "/wurfl/devices/device",
-	DevicesXml = xmerl_xpath:string (XPath, Xml),
-	Devices = process_devices(DevicesXml),
-	store_devices(Devices),
-	error_logger:info_msg("loaded model~n").
 
 import_wurfl_file(Filename) ->
 	Xml = parse(Filename),
@@ -314,13 +292,7 @@ create_capability(Attributes) ->
 	#capability{name=proplists:get_value(name, Attributes), value=proplists:get_value(value, Attributes)}.
 	
 store_devices(Device) ->
-	ets:insert(deviceTbl, Device),
 	wurfler_db:save_device(devicesTbl, Device).
-
-backup_table() ->
-	ets:tab2file(deviceTbl, "./backup/wurfl.tbl").
-load_table() ->
-	ets:file2tab("./backup/wurfl.tbl", [{verify,true}]).
 
 create_fun(CheckName, CheckValue, '==')->
 	fun(Name, Value) ->
@@ -386,7 +358,7 @@ run_funs_against_list(List_Of_Funs, [#capability{name=CheckName, value=CheckValu
 		{nok} -> {nok}
 	end;
 	
-run_funs_against_list(List_Of_Funs, []) ->
+run_funs_against_list(_List_Of_Funs, []) ->
 	{ok}.
 	
 %% --------------------------------------------------------------------
@@ -536,19 +508,6 @@ A=	[{group,"j2me",
 
 	B=lists:foldl(fun(G,Result) -> [G#group.capabilites|Result] end, [], A),
 	lists:append(B).
-
-process_device_test()->
-Groups=	[{group,"j2me",
-                 [{capability,"myVersion","6.1"},
-                  {capability,"myProfile","1.1"}]},
-     {group,"j2me1",
-                 [{capability,"myVersion1","6.1"},
-                  {capability,"myProfile1","1.1"}]}],
-
-
-	lists:foldl(fun(Group,Result) ->						 
-						  [Caps || Caps <- Group#group.capabilites ]
-				  end, [], Groups).
 
 	
 get_wurfl_file_test() ->

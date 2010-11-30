@@ -14,7 +14,7 @@ curl -d '@test/xml_caps_request.xml' -H "Accept: text/xml" -v http://localhost:8
 
 or
 
-curl -A "rocker_ua" -v http://localhost:8000/device
+curl -H "Accept: text/xml" -A "rocker_ua" -v http://localhost:8000/device
 
 The first request will send a get request to the service and will return the information 
 of the device with the id.
@@ -24,3 +24,13 @@ have the capabilities.
 In the current version the information model_name and brand_name is missing. 
 
 The third request will analyze the given user agent and will return the device information.
+
+# Migration to mnesia
+
+The new version uses mnesia instead of ets tables.
+
+## Installation
+
+First you have to run install.sh which creates the schema and the db tables.
+
+

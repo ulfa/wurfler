@@ -45,7 +45,6 @@ create_db() ->
 	mnesia:create_table(symbianTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(androidTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	%%mnesia:wait_for_tables([deviceTbl,j2meTbl,symbianTbl,blackberryTbl], 20000),
 	application:stop(mnesia).
 
 save_device(devicesTbl, Device)->

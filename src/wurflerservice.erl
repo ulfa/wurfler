@@ -17,8 +17,6 @@
 %% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 %% See the License for the specific language governing permissions and
 %% limitations under the License.
-
-
 -module(wurflerservice).
 
 -behaviour(application).
@@ -60,12 +58,24 @@ init([]) ->
     {ok, Dispatch} = file:consult(filename:join(
                          [filename:dirname(code:which(?MODULE)),
                           "..", "priv", "dispatch.conf"])),
+	WurflerConfig={wurfler_config,
+				{wurfler_config, start_link, []},
+              	permanent,
+              	10000,
+              	worker,
+              	[wurfler_config]},	
 	Wurfler={wurfler,
 				{wurfler, start_link, []},
               	permanent,
               	10000,
               	worker,
               	[wurfler]},
+	WurflerFilePoller={wurfler_file_poller,
+				{wurfler_file_poller, start_link, []},
+              	permanent,
+              	10000,
+              	worker,
+              	[wurfler_file_poller]},
 	WebConfig = [
                  {ip, Ip},
                  {backlog, 1000},
@@ -77,7 +87,9 @@ init([]) ->
            permanent, 5000, worker, dynamic},
 		{ok, {{one_for_one, 3, 10},
 		   [
+			WurflerConfig,
 			Wurfler,
+			WurflerFilePoller,
 			Web
 		]}}.
 %% ====================================================================!

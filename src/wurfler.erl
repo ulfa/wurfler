@@ -27,8 +27,6 @@
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
-
--define(WURFL_CONFIG, "priv/wurfler.config").
 %% --------------------------------------------------------------------
 %% External exports
 
@@ -77,12 +75,11 @@ start() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-	wurfler:import_wurfl_file(get_wurfl_file(?WURFL_CONFIG)),
+	wurfler:import_wurfl_file(get_wurfl_file()),
     {ok, new_state()}.
 
-get_wurfl_file(?WURFL_CONFIG) ->
-	{ok, Config} = file:consult(?WURFL_CONFIG),
-	proplists:get_value(wurfl_file, Config).
+get_wurfl_file() ->
+	wurfler_config:get_value(wurfl_file).
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
 %% Description: Handling call messages
@@ -191,7 +188,8 @@ get_all_groups("root", #state{groups=Groups}) ->
 get_all_groups("generic", #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
 get_all_groups(DeviceName, #state{groups=AllGroups}) ->
-	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
+	%%[{Fall_back, Groups}] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
+	[{Fall_back, Groups}] = wurfler_db:find_group_by_id(devicesTbl, DeviceName),
 	get_all_groups(Fall_back, #state{groups=lists:append(AllGroups,Groups)}).
 
 get_all_capabilities([], #state{capabilities=Caps}) ->
@@ -511,7 +509,7 @@ A=	[{group,"j2me",
 
 	
 get_wurfl_file_test() ->
-	?assertEqual("test/wurfltest.xml", get_wurfl_file(?WURFL_CONFIG)).
+	?assertEqual("test/wurfltest.xml", get_wurfl_file()).
 
 	
 

@@ -28,7 +28,7 @@
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
--export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, get_first_device/1, get_next_device/2]).
+-export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, get_first_device/1, get_next_device/2, find_group_by_id/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -58,8 +58,11 @@ save_device(blackberryTbl, Device)->
 
 find_record_by_id(devicesTbl, Id) ->
 	mnesia:activity(transaction, fun() -> mnesia:read({devicesTbl, Id}) end).
+find_group_by_id(devicesTbl, Id) ->
+	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([{P#device.fall_back, P#device.groups} || P <- mnesia:table(devicesTbl), P#device.id == Id ])) end).
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
+
 get_first_device(devicesTbl) ->
 	mnesia:activity(transaction, fun() -> mnesia:first(devicesTbl) end).
 get_next_device(devicesTbl, Key) ->

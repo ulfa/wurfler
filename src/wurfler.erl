@@ -35,7 +35,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
--export([parse_wurfl/1, searchByUA/1, searchByCapabilities/1, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
+-export([import_wurfl/1, searchByUA/1, searchByCapabilities/1, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
 -export([backup/0, load/0]).
 
 -compile([export_all]).
@@ -46,8 +46,8 @@
 %% ====================================================================
 %% External functions
 %% ====================================================================
-parse_wurfl(Filename) ->
-	gen_server:cast(?MODULE, {parse_wurfl, Filename}).
+import_wurfl(Filename) ->
+	gen_server:cast(?MODULE, {import_wurfl, Filename}).
 searchByCapabilities(Capabilities) ->
 	gen_server:call(?MODULE, {search_by_capabilities, Capabilities}).
 searchByUA(UserAgent)->
@@ -83,7 +83,8 @@ start() ->
 %% --------------------------------------------------------------------
 init([]) ->
 	ets:new(deviceTbl, [named_table,public,{keypos, #device.id}]),
-	wurfler:parse_wurfl(get_wurfl_file(?WURFL_CONFIG)),
+	%%wurfler:create_model(get_wurfl_file(?WURFL_CONFIG), new_state()),
+	wurfler:import_wurfl_file(get_wurfl_file(?WURFL_CONFIG)),
     {ok, new_state()}.
 
 get_wurfl_file(?WURFL_CONFIG) ->
@@ -120,8 +121,9 @@ handle_call({version}, _From, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_cast({parse_wurfl, Filename}, State) ->
-	create_model(Filename, State),
+handle_cast({import_wurfl, Filename}, State) ->
+	%%create_model(Filename, State),
+	import_wurfl_file(Filename),
     {noreply, State};
 handle_cast({backup}, State) ->
 	backup_table(),
@@ -129,7 +131,6 @@ handle_cast({backup}, State) ->
 handle_cast({load}, State) ->
 	load_table(),
     {noreply, State}.
-
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
 %% Description: Handling all non call/cast messages
@@ -211,7 +212,6 @@ get_all_capabilities([], #state{capabilities=Caps}) ->
 	{ok, #state{capabilities=Caps}};
 get_all_capabilities("root", #state{capabilities=Caps}) ->
 	{ok, #state{capabilities=Caps}};
-%% for testing, i don't need the big generic one
 get_all_capabilities("generic", #state{capabilities=Caps}) ->
  	{ok, #state{capabilities=Caps}};
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
@@ -219,14 +219,18 @@ get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
 	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
 
-
 create_model(Filename, _State)->
 	Xml = parse(Filename),
 	XPath = "/wurfl/devices/device",
 	DevicesXml = xmerl_xpath:string (XPath, Xml),
-	Devices=process_devices(DevicesXml),
+	Devices = process_devices(DevicesXml),
 	store_devices(Devices),
 	error_logger:info_msg("loaded model~n").
+
+import_wurfl_file(Filename) ->
+	Xml = parse(Filename),
+	DevicesXml = xmerl_xpath:string ("/wurfl/devices/device", Xml),
+	process_devices(DevicesXml).
 	
 parse(Filename) ->
 	case xmerl_scan:file(Filename) of
@@ -263,12 +267,15 @@ process_group(Group)->
 	{xmlElement,group,_,_,_,_,_,Attributes,_,_,_,_} = Group,
 	Group_Attributes = process_attributes(group,Attributes),
 	create_group(Group_Attributes, Capabilities).
+
 process_device(Device) ->
 	Groups = get_groups(Device),
 	{xmlElement,device,_,[],_,[_,_],_,Attributes,_,_,_,_} = Device,
 	Device_Attributes=process_attributes(device, Attributes),
-	create_device(Device_Attributes, Groups).
-
+	Device_Record = create_device(Device_Attributes, Groups),
+	store_devices(Device_Record),
+	Device_Record.
+	
 process_attributes(group, Attributes)->
 	[process_attribute(group, Attribute) || Attribute <- Attributes];
 process_attributes(device, Attributes)->
@@ -306,8 +313,9 @@ create_group(Attributes, Capabilities) ->
 create_capability(Attributes) ->
 	#capability{name=proplists:get_value(name, Attributes), value=proplists:get_value(value, Attributes)}.
 	
-store_devices(Devices) ->
-	ets:insert(deviceTbl, Devices).
+store_devices(Device) ->
+	ets:insert(deviceTbl, Device),
+	wurfler_db:save_device(devicesTbl, Device).
 
 backup_table() ->
 	ets:tab2file(deviceTbl, "./backup/wurfl.tbl").
@@ -354,6 +362,7 @@ create_fun(CheckName, CheckValue, '<')->
 			_ -> {continue}
 		end			
 	end.
+
 %% Run all funs for one capability
 %% Only if all funs return ok, its ok
 and_cond([Fun|Funs], {CheckName, CheckValue}) ->
@@ -372,7 +381,7 @@ create_funs_from_list(List) ->
 
 run_funs_against_list(List_Of_Funs, [#capability{name=CheckName, value=CheckValue}|List_Of_Caps]) ->
 	case and_cond(List_Of_Funs, {CheckName, CheckValue}) of
-		{continue} ->run_funs_against_list(List_Of_Funs, List_Of_Caps);
+		{continue} -> run_funs_against_list(List_Of_Funs, List_Of_Caps);
 		{ok} -> run_funs_against_list(List_Of_Funs, List_Of_Caps);
 		{nok} -> {nok}
 	end;

@@ -39,15 +39,15 @@ create_db() ->
 		_ -> error_logger:info_msg("schema created ~n")
 	end,
 	application:start(mnesia),
-	mnesia:create_table(devicesTbl,[{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	mnesia:create_table(j2meTbl,[{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	mnesia:create_table(symbianTbl,[{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	mnesia:create_table(blackberryTbl,[{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
+	mnesia:create_table(devicesTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
+	mnesia:create_table(j2meTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
+	mnesia:create_table(symbianTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
+	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:wait_for_tables([deviceTbl,j2meTbl,symbianTbl,blackberryTbl], 20000),
 	application:stop(mnesia).
 
 save_device(devicesTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(deviceTbl, Device, write) end);
+	mnesia:activity(transaction, fun() -> mnesia:write(devicesTbl, Device, write) end);
 save_device(j2meTbl, Device)->
 	mnesia:activity(transaction, fun() -> mnesia:write(j2meTbl, Device, write) end);
 save_device(symbianTbl, Device)->

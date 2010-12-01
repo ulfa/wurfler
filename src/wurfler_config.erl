@@ -79,7 +79,6 @@ init([]) ->
 handle_call({get_value, Key}, _From, State=#state{config=Config})->
 	Value=proplists:get_value(Key, Config),
     {reply,Value, State}.
-
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages
@@ -89,7 +88,6 @@ handle_call({get_value, Key}, _From, State=#state{config=Config})->
 %% --------------------------------------------------------------------
 handle_cast(_Msg, State) ->
     {noreply, State}.
-
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
 %% Description: Handling all non call/cast messages
@@ -99,7 +97,6 @@ handle_cast(_Msg, State) ->
 %% --------------------------------------------------------------------
 handle_info(_Info, State) ->
     {noreply, State}.
-
 %% --------------------------------------------------------------------
 %% Function: terminate/2
 %% Description: Shutdown the server
@@ -107,7 +104,6 @@ handle_info(_Info, State) ->
 %% --------------------------------------------------------------------
 terminate(_Reason, _State) ->
     ok.
-
 %% --------------------------------------------------------------------
 %% Func: code_change/3
 %% Purpose: Convert process state when code is changed
@@ -115,11 +111,9 @@ terminate(_Reason, _State) ->
 %% --------------------------------------------------------------------
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
-
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-

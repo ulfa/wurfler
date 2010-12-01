@@ -54,6 +54,7 @@ start() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
+	start_timer(?PROPERTY(timer_interval)),
     {ok, #state{last_poll_time=new_poll_time(date(), time())}}.
 
 %% --------------------------------------------------------------------
@@ -69,7 +70,6 @@ init([]) ->
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
-
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages
@@ -77,15 +77,8 @@ handle_call(_Request, _From, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_cast({time_triggered, []}, State) ->
-	{Directory, Compiled_Regex} = get_parameter(),
-	{Files, NewState} = get_new_files(Directory, Compiled_Regex, State),
-	case erlang:length(Files) of
-		0 -> [];
-		_ -> error_logger:info_msg("Files found : ~p ~n", [Files])
-	end,
-	
-    {noreply, NewState}.
+handle_cast(_Request, State) ->	
+    {noreply,State}.
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
 %% Description: Handling all non call/cast messages
@@ -93,9 +86,17 @@ handle_cast({time_triggered, []}, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_info(_Info, State) ->
-    {noreply, State}.
+handle_info({next_run}, State) ->
+	{Directory, Compiled_Regex} = get_parameter(),
+	{Files, NewState} = get_new_files(Directory, Compiled_Regex, State),
+	case erlang:length(Files) of
+		0 -> [];
+		_ -> error_logger:info_msg("Files found : ~p ~n", [Files]),
+			 send_to_processing(Files)
+	end,
 
+	start_timer(?PROPERTY(timer_interval)),
+    {noreply, State}.
 %% --------------------------------------------------------------------
 %% Function: terminate/2
 %% Description: Shutdown the server
@@ -103,7 +104,6 @@ handle_info(_Info, State) ->
 %% --------------------------------------------------------------------
 terminate(_Reason, _State) ->
     ok.
-
 %% --------------------------------------------------------------------
 %% Func: code_change/3
 %% Purpose: Convert process state when code is changed
@@ -111,7 +111,6 @@ terminate(_Reason, _State) ->
 %% --------------------------------------------------------------------
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
-
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -137,19 +136,20 @@ get_new_files(Directory, Compiled_Regex, _State=#state{last_poll_time=Last_poll_
     {NewFiles, New_state}.
 	
 get_parameter() ->
-	{ok, Directory} = ?PROPERTY(polling_dir),
-	{ok, Regex} = ?PROPERTY(files_regex),
-	{ok, Compiled_Regex} = re:compile(Regex),
+	Directory = ?PROPERTY(polling_dir),
+	Regex = ?PROPERTY(files_regex),
+	Compiled_Regex = re:compile(Regex),
 	{Directory, Compiled_Regex}.
 
+start_timer(Time) ->
+	erlang:send_after(Time, self(), {next_run}).
 %% --------------------------------------------------------------------
 %%
 %% --------------------------------------------------------------------
-send_cc_controller([]) ->
+send_to_processing([]) ->
 	ok;
-send_cc_controller(Files) ->
-	cc_controller:process_files(Files).
-
+send_to_processing(Files) ->
+	error_logger:info_msg("proccessing ~p~n", [Files]).
 %% --------------------------------------------------------------------
 %%% create new poll time
 %% --------------------------------------------------------------------

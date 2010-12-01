@@ -62,7 +62,6 @@ find_group_by_id(devicesTbl, Id) ->
 	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([{P#device.fall_back, P#device.groups} || P <- mnesia:table(devicesTbl), P#device.id == Id ])) end).
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
-
 get_first_device(devicesTbl) ->
 	mnesia:activity(transaction, fun() -> mnesia:first(devicesTbl) end).
 get_next_device(devicesTbl, Key) ->
@@ -74,5 +73,3 @@ find_record_by_id_test() ->
 	?assertMatch([{device, "rocker", _, _,_,_}], find_record_by_id(devicesTbl, "rocker")).
 find_record_by_ua_test() ->
 	?assertMatch([{device, _,"rocker_ua", _,_,_}], find_record_by_ua(devicesTbl, "rocker_ua")).
-
-

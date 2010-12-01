@@ -28,8 +28,8 @@
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
--export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, get_first_device/1, get_next_device/2, find_group_by_id/2]).
--export([find_capabilities_by_id/2]).
+-export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
+-export([get_all_keys/1, find_record_by_id/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -47,7 +47,9 @@ create_db() ->
 	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(androidTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	application:stop(mnesia).
-
+%% --------------------------------------------------------------------
+%% save functions
+%% --------------------------------------------------------------------
 save_device(devicesTbl, Device)->
 	mnesia:activity(transaction, fun() -> mnesia:write(devicesTbl, Device, write) end);
 save_device(j2meTbl, Device)->
@@ -56,25 +58,23 @@ save_device(symbianTbl, Device)->
 	mnesia:activity(transaction, fun() -> mnesia:write(symbianTbl, Device, write) end);
 save_device(blackberryTbl, Device)->
 	mnesia:activity(transaction, fun() -> mnesia:write(blackberryTbl, Device, write) end).
-
+%% --------------------------------------------------------------------
+%% finder functions
+%% --------------------------------------------------------------------
 find_record_by_id(devicesTbl, Id) ->
-	mnesia:activity(transaction, fun() -> mnesia:read({devicesTbl, Id}) end).
-find_group_by_id(devicesTbl, Id) ->
-	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([{P#device.fall_back, P#device.groups} || P <- mnesia:table(devicesTbl), P#device.id == Id ])) end).
-find_capabilities_by_id(devicesTbl, Id) ->
-	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([{P#device.fall_back, P#device.groups} || P <- mnesia:table(devicesTbl), P#device.id == Id ])) end).
+	mnesia:dirty_read(devicesTbl, Id).
+find_groups_by_id(devicesTbl, Id) ->
+	[Device] = mnesia:dirty_read(devicesTbl, Id), {Device#device.fall_back, Device#device.groups}.
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
-get_first_device(devicesTbl) ->
-	mnesia:activity(transaction, fun() -> mnesia:first(devicesTbl) end).
-get_next_device(devicesTbl, Key) ->
-	mnesia:activity(transaction, fun() -> mnesia:next(devicesTbl, Key) end).
+get_all_keys(devicesTbl) ->
+	mnesia:dirty_all_keys(devicesTbl).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
 find_record_by_id_test() ->
-	?assertMatch([{device, "rocker", _, _,_,_}], find_record_by_id(devicesTbl, "rocker")).
+	?assertMatch([{device, "benq_s668c_ver1", _, _,_,_}], find_record_by_id(devicesTbl, "benq_s668c_ver1")).
 find_record_by_ua_test() ->
-	?assertMatch([{device, _,"rocker_ua", _,_,_}], find_record_by_ua(devicesTbl, "rocker_ua")).
-find_capabilities_by_id_test() ->
-	find_capabilities_by_id(devicesTbl, "chtml_generic").
+	?assertMatch([{device, _,"Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", _,_,_}], find_record_by_ua(devicesTbl, "Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610")).
+find_group_by_id_test() ->
+	find_groups_by_id(devicesTbl, "generic").

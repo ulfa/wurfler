@@ -138,7 +138,7 @@ get_new_files(Directory, Compiled_Regex, _State=#state{last_poll_time=Last_poll_
 get_parameter() ->
 	Directory = ?PROPERTY(polling_dir),
 	Regex = ?PROPERTY(files_regex),
-	Compiled_Regex = re:compile(Regex),
+	{ok,Compiled_Regex} = re:compile(Regex),
 	{Directory, Compiled_Regex}.
 
 start_timer(Time) ->
@@ -148,8 +148,13 @@ start_timer(Time) ->
 %% --------------------------------------------------------------------
 send_to_processing([]) ->
 	ok;
-send_to_processing(Files) ->
-	error_logger:info_msg("proccessing ~p~n", [Files]).
+send_to_processing([File|Files]) ->
+	error_logger:info_msg("proccessing ~p~n", [Files]),
+	wurfler_importer:import_wurfl(File),
+	send_to_processing(Files).
+
+rename_wurfl(File) ->
+	file:rename(File).
 %% --------------------------------------------------------------------
 %%% create new poll time
 %% --------------------------------------------------------------------

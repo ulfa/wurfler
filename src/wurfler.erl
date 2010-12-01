@@ -154,7 +154,6 @@ search_by_ua(UserAgent, State)->
 					end
 	end.
 search_by_capabilities(Capabilities, State) ->
-	io:format("State ~n~p", [erlang:length(State#state.modell)]),
 	List_Of_Funs=create_funs_from_list(Capabilities),
 	NextKey = wurfler_db:get_first_device(devicesTbl),
 	get_devices_for_caps(List_Of_Funs, NextKey, State).
@@ -164,6 +163,7 @@ get_devices_for_caps(_List_Of_Funs, '$end_of_table', State) ->
 	
 get_devices_for_caps(List_Of_Funs, Key, State)->
 	NextKey = wurfler_db:get_next_device(devicesTbl, Key),
+	io:format("get_devices_for_caps ~p~n", [NextKey]),
 	Device = search_by_device_id(Key),
 	{ok,#state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State#state{capabilities=[]}),
 	case run_funs_against_list(List_Of_Funs, Caps) of
@@ -183,7 +183,6 @@ get_all_groups("root", #state{groups=Groups}) ->
 get_all_groups("generic", #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
 get_all_groups(DeviceName, #state{groups=AllGroups}) ->
-	%%[{Fall_back, Groups}] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
 	[{Fall_back, Groups}] = wurfler_db:find_group_by_id(devicesTbl, DeviceName),
 	get_all_groups(Fall_back, #state{groups=lists:append(AllGroups,Groups)}).
 
@@ -194,7 +193,7 @@ get_all_capabilities("root", #state{capabilities=Caps}) ->
 get_all_capabilities("generic", #state{capabilities=Caps}) ->
  	{ok, #state{capabilities=Caps}};
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
-	[[Fall_back, Groups]] = ets:match(deviceTbl, #device{id=DeviceName, _='_', fall_back='$1', groups='$2', _='_'}),
+	[{Fall_back, Groups}] = wurfler_db:find_capabilities_by_id(devicesTbl, DeviceName),
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
 	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
 

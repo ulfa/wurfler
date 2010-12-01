@@ -75,7 +75,13 @@ init([]) ->
               	permanent,
               	10000,
               	worker,
-              	[wurfler_file_poller]},
+              	[wurfler_importer]},
+	WurflerImporter={wurfler_importer,
+				{wurfler_importer, start_link, []},
+              	permanent,
+              	10000,
+              	worker,
+              	[wurfler_importer]},	
 	WebConfig = [
                  {ip, Ip},
                  {backlog, 1000},
@@ -90,6 +96,7 @@ init([]) ->
 			WurflerConfig,
 			Wurfler,
 			WurflerFilePoller,
+			WurflerImporter,
 			Web
 		]}}.
 %% ====================================================================!

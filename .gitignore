@@ -2,5 +2,6 @@
 /*.project
 /deps/
 /db/
+/import/
 /*.dump
 /*.DS_Store

@@ -42,6 +42,8 @@
 %% ====================================================================
 get_value(Key) ->
 	gen_server:call(?MODULE, {get_value, Key}).
+reload() ->
+	gen_server:call(?MODULE, {reload}).
 %% ====================================================================
 %% Server functions
 %% ====================================================================
@@ -78,7 +80,11 @@ init([]) ->
 %% --------------------------------------------------------------------
 handle_call({get_value, Key}, _From, State=#state{config=Config})->
 	Value=proplists:get_value(Key, Config),
-    {reply,Value, State}.
+    {reply,Value, State};
+
+handle_call({reload}, _From, _State)->
+	{ok, [Config]} = file:consult(?WURFL_CONFIG),
+    {reply, ok, #state{config=Config}}.
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages

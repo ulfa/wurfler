@@ -119,6 +119,7 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 %% --------------------------------------------------------------------
 import_wurfl_file(Filename) ->
+	error_logger:info_msg("import started : ~p~n" ,[Filename]),
 	Xml = parse(Filename),
 	DevicesXml = xmerl_xpath:string ("/wurfl/devices/device", Xml),
 	D=process_devices(DevicesXml),

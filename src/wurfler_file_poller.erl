@@ -88,7 +88,7 @@ handle_cast(_Request, State) ->
 %% --------------------------------------------------------------------
 handle_info({next_run}, State) ->
 	{Directory, Compiled_Regex} = get_parameter(),
-	{Files, NewState} = get_new_files(Directory, Compiled_Regex, State),
+	{Files, _NewState} = get_new_files(Directory, Compiled_Regex, State),
 	case erlang:length(Files) of
 		0 -> [];
 		_ -> error_logger:info_msg("Files found : ~p ~n", [Files]),
@@ -149,12 +149,14 @@ start_timer(Time) ->
 send_to_processing([]) ->
 	ok;
 send_to_processing([File|Files]) ->
-	error_logger:info_msg("proccessing ~p~n", [Files]),
-	wurfler_importer:import_wurfl(File),
+	error_logger:info_msg("proccessing ~p~n", [File|Files]),
+	wurfler_importer:import_wurfl(rename_wurfl(File)),
 	send_to_processing(Files).
 
 rename_wurfl(File) ->
-	file:rename(File).
+	NewFile = File ++ "old",
+	file:rename(File, NewFile),
+	NewFile.
 %% --------------------------------------------------------------------
 %%% create new poll time
 %% --------------------------------------------------------------------

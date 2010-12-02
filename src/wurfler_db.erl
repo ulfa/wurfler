@@ -41,7 +41,7 @@ create_db() ->
 		_ -> error_logger:info_msg("schema created ~n")
 	end,
 	application:start(mnesia),
-	mnesia:create_table(devicesTbl,[{index, [user_agent,fall_back, actual_device_root]},{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
+	mnesia:create_table(devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(j2meTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(symbianTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
@@ -73,9 +73,6 @@ find_capabilities_by_id(devicesTbl, Id) ->
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
 get_all_keys(devicesTbl) ->
-	%%mnesia:dirty_all_keys(devicesTbl).
-	%%mnesia:dirty_match_object(devicesTbl, {device, '$1', '_', "true", '_', '_'}).
-	%%mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root == "true" ])) end).
 	mnesia:dirty_select((devicesTbl),[{{device, '$1', '_', "true", '_', '_'}, [], ['$1']}]).
 %% --------------------------------------------------------------------
 %%% Test functions

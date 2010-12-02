@@ -75,7 +75,8 @@ find_record_by_ua(devicesTbl, Ua) ->
 get_all_keys(devicesTbl) ->
 	%%mnesia:dirty_all_keys(devicesTbl).
 	%%mnesia:dirty_match_object(devicesTbl, {device, '$1', '_', "true", '_', '_'}).
-	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root == "true" ])) end).
+	%%mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root == "true" ])) end).
+	mnesia:dirty_select((devicesTbl),[{{device, '$1', '_', "true", '_', '_'}, [], ['$1']}]).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

@@ -70,11 +70,12 @@ find_capabilities_by_id(devicesTbl, Id) ->
 	[Device] = mnesia:dirty_read(devicesTbl, Id),
 	Caps=lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
 	{Device#device.fall_back, Caps}.
-
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
 get_all_keys(devicesTbl) ->
-	mnesia:dirty_all_keys(devicesTbl).
+	%%mnesia:dirty_all_keys(devicesTbl).
+	%%mnesia:dirty_match_object(devicesTbl, {device, '$1', '_', "true", '_', '_'}).
+	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root == "true" ])) end).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -86,3 +87,6 @@ find_group_by_id_test() ->
 	find_groups_by_id(devicesTbl, "generic").
 find_capabilities_by_id_test()->
 	?assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")).
+get_all_keys_test() ->
+	%%?assertEqual(13917,erlang:length(get_all_keys(devicesTbl))).
+	?assertEqual(6337,erlang:length(get_all_keys(devicesTbl))).

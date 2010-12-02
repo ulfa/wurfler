@@ -121,7 +121,8 @@ code_change(_OldVsn, State, _Extra) ->
 import_wurfl_file(Filename) ->
 	Xml = parse(Filename),
 	DevicesXml = xmerl_xpath:string ("/wurfl/devices/device", Xml),
-	process_devices(DevicesXml).
+	D=process_devices(DevicesXml),
+	error_logger:info_msg("import finished : ~p~n" ,[erlang:length(D)]).
 
 parse(Filename) ->
 	case xmerl_scan:file(Filename) of

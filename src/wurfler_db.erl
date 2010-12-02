@@ -29,7 +29,7 @@
 %% External exports
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
--export([get_all_keys/1, find_record_by_id/2]).
+-export([get_all_keys/1, find_capabilities_by_id/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -41,7 +41,7 @@ create_db() ->
 		_ -> error_logger:info_msg("schema created ~n")
 	end,
 	application:start(mnesia),
-	mnesia:create_table(devicesTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
+	mnesia:create_table(devicesTbl,[{index, [user_agent,fall_back, actual_device_root]},{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(j2meTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(symbianTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
@@ -65,6 +65,12 @@ find_record_by_id(devicesTbl, Id) ->
 	mnesia:dirty_read(devicesTbl, Id).
 find_groups_by_id(devicesTbl, Id) ->
 	[Device] = mnesia:dirty_read(devicesTbl, Id), {Device#device.fall_back, Device#device.groups}.
+
+find_capabilities_by_id(devicesTbl, Id) ->
+	[Device] = mnesia:dirty_read(devicesTbl, Id),
+	Caps=lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
+	{Device#device.fall_back, Caps}.
+
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
 get_all_keys(devicesTbl) ->
@@ -78,3 +84,5 @@ find_record_by_ua_test() ->
 	?assertMatch([{device, _,"Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", _,_,_}], find_record_by_ua(devicesTbl, "Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610")).
 find_group_by_id_test() ->
 	find_groups_by_id(devicesTbl, "generic").
+find_capabilities_by_id_test()->
+	?assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")).

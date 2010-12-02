@@ -144,14 +144,10 @@ search_by_device_id(DeviceName)->
 		[Device] -> Device
 	end.
 
-search_by_ua(UserAgent, State)->
+search_by_ua(UserAgent, _State)->
 	case wurfler_db:find_record_by_ua(devicesTbl, UserAgent) of
 		[] -> [];
-		[Device] -> Device,
-					case get_all_groups(Device#device.id, State) of
-						{ok,  #state{groups=Groups}} -> Device#device{groups=Groups};
-						_ -> {error, []}
-					end
+		[Device] -> Device
 	end.
 search_by_capabilities(Capabilities, State) ->
 	List_Of_Funs=create_funs_from_list(Capabilities),
@@ -191,8 +187,7 @@ get_all_capabilities("root", #state{capabilities=Caps}) ->
 get_all_capabilities("generic", #state{capabilities=Caps}) ->
  	{ok, #state{capabilities=Caps}};
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
-	{Fall_back, Groups} = wurfler_db:find_groups_by_id(devicesTbl, DeviceName),	
-	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
+	{Fall_back, Capabilities} = wurfler_db:find_capabilities_by_id(devicesTbl, DeviceName),	
 	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
 
 create_fun(CheckName, CheckValue, '==')->
@@ -303,56 +298,9 @@ search_by_capabilities_test() ->
 	search_by_capabilities(List, new_state()).
 
 search_by_ua_test()->
-	Device = search_by_ua("rocker_ua", #state{groups=[], capabilities=[]}),
-	?assertEqual("rocker", Device#device.id).
+	Device = search_by_ua("Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", wurfler:new_state()),
+	?assertEqual("opera_nokia_7610_ver1", Device#device.id).
 	
-process_device_test1()->
-	Result = ets:match(device, #device{id='$1',_='_'}),
-	?assertEqual("hackingtosh", lists:flatten(Result)).
-
-process_groups_test1() ->
-	G={xmlElement,group,group,[], {xmlNamespace,[],[]}, [{device,6},{devices,4},{wurfl,1}],2,
-          [{xmlAttribute,id,[],[],[],[],1,[],"sis",false}],
-          [{xmlText,
-               [{group,2},{device,6},{devices,4},{wurfl,1}],
-               1,[],"\n\t\t\t\t",text},
-           {xmlElement,capability,capability,[],
-               {xmlNamespace,[],[]},
-               [{group,2},{device,6},{devices,4},{wurfl,1}],
-               2,
-               [{xmlAttribute,name,[],[],[],[],1,[],"mobile_browser_version",
-                    false},
-                {xmlAttribute,value,[],[],[],[],2,[],"6.1",false}],
-               [],[],undefined,undeclared},
-           {xmlText,
-               [{group,2},{device,6},{devices,4},{wurfl,1}],
-               3,[],"\n\t\t\t    ",text},
-           {xmlElement,capability,capability,[],
-               {xmlNamespace,[],[]},
-               [{group,2},{device,6},{devices,4},{wurfl,1}],
-               4,
-               [{xmlAttribute,name,[],[],[],[],1,[],"release_date",false},
-                {xmlAttribute,value,[],[],[],[],2,[],"2002_august",false}],
-               [],[],undefined,undeclared},
-           {xmlText,
-               [{group,2},{device,6},{devices,4},{wurfl,1}],
-               5,[],"\n\t\t\t",text}],
-          [],undefined,undeclared},
-
-{xmlElement,group,_,_,_,_,_,Attributes,_,_,_,_} = G,
-	Attributes.
-	
-process_list_test()->
-A=	[{group,"j2me",
-                 [{capability,"myVersion","6.1"},
-                  {capability,"myProfile","1.1"}]},
-     {group,"j2me1",
-                 [{capability,"myVersion1","6.1"},
-                  {capability,"myProfile1","1.1"}]}],
-
-	B=lists:foldl(fun(G,Result) -> [G#group.capabilites|Result] end, [], A),
-	lists:append(B).
-
 	
 
 

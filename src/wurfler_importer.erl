@@ -211,23 +211,35 @@ create_capability(Attributes) ->
 store_devices(Device) ->
 	wurfler_db:save_device(devicesTbl, Device).
 
+add_attributes(Device, Attributes) ->
+	lists:append(get_brand_and_model(Device), Attributes).
+
+get_brand_and_model(Device) ->
+	[get_brand_name(Device), get_model_name(Device)].								
+
 get_brand_name(Device) ->
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
 	[Brand_name] = [Value || {capability,"brand_name", Value }<- Capabilities],
-	Brand_name.
+	{brand_name, Brand_name}.
 
 get_model_name(Device) ->
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
 	[Model_name] = [Value || {capability,"model_name", Value }<- Capabilities],
-	Model_name.
+	{model_name, Model_name}.
 
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+add_attributes_test() ->
+	{ok, [Device]} = file:consult("test/device"),
+	Attributes = [{test, "test"}, {test1, "test2"}],
+	?assertEqual(4, erlang:length(add_attributes(Device, Attributes))).
+get_brand_and_model_test() ->
+	{ok, [Device]} = file:consult("test/device"),
+	?assertEqual(2, erlang:length(get_brand_and_model(Device))).
 get_brand_name_test()->
 	{ok, [Device]} = file:consult("test/device"),
-	?assertEqual("HTC", get_brand_name(Device)).
-
+	?assertEqual({brand_name,"HTC"}, get_brand_name(Device)).
 get_model_name_test() ->
 	{ok,[Device]} = file:consult("test/device"),
-	?assertEqual("Legend", get_model_name(Device)).
+	?assertEqual({model_name, "Legend"}, get_model_name(Device)).

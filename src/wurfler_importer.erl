@@ -167,6 +167,7 @@ process_device(Device) ->
 	Groups = get_groups(Device),
 	{xmlElement,device,_,[],_,[_,_],_,Attributes,_,_,_,_} = Device,
 	Device_Attributes=process_attributes(device, Attributes),
+	%%Device_Record = create_device(add_attributes(Groups, Device_Attributes), Groups),
 	Device_Record = create_device(Device_Attributes, Groups),
 	store_devices(Device_Record),
 	Device_Record.
@@ -200,6 +201,8 @@ create_device(Attributes, Groups)->
 			user_agent=proplists:get_value(user_agent, Attributes),
 			actual_device_root=proplists:get_value(actual_device_root, Attributes),
 			fall_back=proplists:get_value(fall_back, Attributes),
+			%%brand_name=proplists:get_value(brand_name, Attributes),
+			%%model_name=proplists:get_value(model_name, Attributes),
 			groups=Groups}.
 
 create_group(Attributes, Capabilities) ->
@@ -211,21 +214,30 @@ create_capability(Attributes) ->
 store_devices(Device) ->
 	wurfler_db:save_device(devicesTbl, Device).
 
-add_attributes(Device, Attributes) ->
-	lists:append(get_brand_and_model(Device), Attributes).
+add_attributes(Groups, Attributes) ->
+	lists:append(get_brand_and_model(Groups), Attributes).
 
-get_brand_and_model(Device) ->
-	[get_brand_name(Device), get_model_name(Device)].								
+get_brand_and_model(Groups) ->
+	[get_brand_name(Groups), get_model_name(Groups)].								
 
-get_brand_name(Device) ->
-	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
+get_brand_name(Groups) when erlang:length(Groups) > 0->
+	io:format("Groups ~p~n", [Groups]),
+	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
 	[Brand_name] = [Value || {capability,"brand_name", Value }<- Capabilities],
-	{brand_name, Brand_name}.
+	case Brand_name of
+		[] -> {brand_name, undefined};
+		_  -> {brand_name, Brand_name}
+	end.
 
-get_model_name(Device) ->
-	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
-	[Model_name] = [Value || {capability,"model_name", Value }<- Capabilities],
-	{model_name, Model_name}.
+get_model_name([]) ->
+	{model_name, undefined};
+get_model_name(Groups) ->
+	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
+	[Model_name] = [Value || {capability,"model_name", Value } <- Capabilities],
+	case Model_name of
+		[] -> {model_name, undefined};
+		_ -> {model_name, Model_name}
+	end.
 
 %% --------------------------------------------------------------------
 %%% Test functions

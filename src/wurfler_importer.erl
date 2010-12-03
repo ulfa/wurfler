@@ -122,8 +122,10 @@ import_wurfl_file(Filename) ->
 	error_logger:info_msg("import started : ~p~n" ,[Filename]),
 	Xml = parse(Filename),
 	DevicesXml = xmerl_xpath:string ("/wurfl/devices/device", Xml),
-	D=process_devices(DevicesXml),
-	error_logger:info_msg("import finished : ~p~n" ,[erlang:length(D)]).
+	D = process_devices(DevicesXml),
+	Count = erlang:length(D),
+	error_logger:info_msg("import finished : ~p~n" ,[Count]),
+	Count.
 
 parse(Filename) ->
 	case xmerl_scan:file(Filename) of
@@ -209,7 +211,23 @@ create_capability(Attributes) ->
 store_devices(Device) ->
 	wurfler_db:save_device(devicesTbl, Device).
 
+get_brand_name(Device) ->
+	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
+	[Brand_name] = [Value || {capability,"brand_name", Value }<- Capabilities],
+	Brand_name.
+
+get_model_name(Device) ->
+	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
+	[Model_name] = [Value || {capability,"model_name", Value }<- Capabilities],
+	Model_name.
+
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+get_brand_name_test()->
+	{ok, [Device]} = file:consult("test/device"),
+	?assertEqual("HTC", get_brand_name(Device)).
 
+get_model_name_test() ->
+	{ok,[Device]} = file:consult("test/device"),
+	?assertEqual("Legend", get_model_name(Device)).

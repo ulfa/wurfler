@@ -65,7 +65,6 @@ find_record_by_id(devicesTbl, Id) ->
 	mnesia:dirty_read(devicesTbl, Id).
 find_groups_by_id(devicesTbl, Id) ->
 	[Device] = mnesia:dirty_read(devicesTbl, Id), {Device#device.fall_back, Device#device.groups}.
-
 find_capabilities_by_id(devicesTbl, Id) ->
 	[Device] = mnesia:dirty_read(devicesTbl, Id),
 	Caps=lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
@@ -86,5 +85,4 @@ find_group_by_id_test() ->
 find_capabilities_by_id_test()->
 	?assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")).
 get_all_keys_test() ->
-	%%?assertEqual(13917,erlang:length(get_all_keys(devicesTbl))).
 	?assertEqual(6337,erlang:length(get_all_keys(devicesTbl))).

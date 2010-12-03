@@ -1,0 +1,11 @@
+{device,"htc_legend_ver1",
+         "Mozilla/5.0 (Linux; U; Android 2.1; es-es; HTC Legend Build/ERD79) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17 NGP",
+         "true","generic_android_ver2_1",
+         [{group,"product_info",
+                 [{capability,"has_qwerty_keyboard","false"},
+                  {capability,"model_name","Legend"},
+                  {capability,"brand_name","HTC"}]},
+          {group,"display",
+                 [{capability,"resolution_height","480"},
+                  {capability,"max_image_height","360"}]},
+          {group,"bearer",[{capability,"max_data_rate","1800"}]}]}.

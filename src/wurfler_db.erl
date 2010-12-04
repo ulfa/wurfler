@@ -72,7 +72,7 @@ find_capabilities_by_id(devicesTbl, Id) ->
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
 get_all_keys(devicesTbl) ->
-	mnesia:dirty_select((devicesTbl),[{{device, '$1', '_', "true", '_', '_'}, [], ['$1']}]).
+	mnesia:dirty_select((devicesTbl),[{{device, '$1', '_', "true", '_', '_', '_', '_'}, [], ['$1']}]).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

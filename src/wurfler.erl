@@ -165,8 +165,8 @@ get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 		{nok} -> get_devices_for_caps(List_Of_Funs, Keys, State)
 	end.
 
-create_device(#device{id=Id}) ->
-	{'device', [{id, Id}, {model_name,[]}, {brand_name,[]}], []}.
+create_device(#device{id=Id, brand_name=Brand_name, model_name=Model_name}) ->
+	{'device', [{id, Id}, {model_name,Model_name}, {brand_name,Brand_name}], []}.
 create_devices(Devices)->
 	[{'devices', [], Devices}].
 

@@ -166,9 +166,9 @@ process_group(Group)->
 process_device(Device) ->
 	Groups = get_groups(Device),
 	{xmlElement,device,_,[],_,[_,_],_,Attributes,_,_,_,_} = Device,
-	Device_Attributes=process_attributes(device, Attributes),
-	%%Device_Record = create_device(add_attributes(Groups, Device_Attributes), Groups),
-	Device_Record = create_device(Device_Attributes, Groups),
+	Device_Attributes = process_attributes(device, Attributes),
+	Device_Record = create_device(add_attributes(Groups, Device_Attributes), Groups),
+	%%Device_Record = create_device(Device_Attributes, Groups),
 	store_devices(Device_Record),
 	Device_Record.
 	
@@ -201,8 +201,8 @@ create_device(Attributes, Groups)->
 			user_agent=proplists:get_value(user_agent, Attributes),
 			actual_device_root=proplists:get_value(actual_device_root, Attributes),
 			fall_back=proplists:get_value(fall_back, Attributes),
-			%%brand_name=proplists:get_value(brand_name, Attributes),
-			%%model_name=proplists:get_value(model_name, Attributes),
+			brand_name=proplists:get_value(brand_name, Attributes),
+			model_name=proplists:get_value(model_name, Attributes),
 			groups=Groups}.
 
 create_group(Attributes, Capabilities) ->
@@ -220,25 +220,19 @@ add_attributes(Groups, Attributes) ->
 get_brand_and_model(Groups) ->
 	[get_brand_name(Groups), get_model_name(Groups)].								
 
-get_brand_name(Groups) when erlang:length(Groups) > 0->
-	io:format("Groups ~p~n", [Groups]),
+get_brand_name(Groups) ->
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
-	[Brand_name] = [Value || {capability,"brand_name", Value }<- Capabilities],
-	case Brand_name of
+	case [Value || #capability{name="brand_name", value=Value } <- Capabilities] of
 		[] -> {brand_name, undefined};
-		_  -> {brand_name, Brand_name}
+		[Brand_name]  -> {brand_name, Brand_name}
 	end.
 
-get_model_name([]) ->
-	{model_name, undefined};
 get_model_name(Groups) ->
 	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
-	[Model_name] = [Value || {capability,"model_name", Value } <- Capabilities],
-	case Model_name of
+	case [Value || #capability{name="model_name", value=Value} <- Capabilities] of
 		[] -> {model_name, undefined};
-		_ -> {model_name, Model_name}
+		[Model_name] -> {model_name, Model_name}
 	end.
-
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -252,6 +246,9 @@ get_brand_and_model_test() ->
 get_brand_name_test()->
 	{ok, [Device]} = file:consult("test/device"),
 	?assertEqual({brand_name,"HTC"}, get_brand_name(Device)).
+get_brand_name_without_test()->
+	{ok, [Device1]} = file:consult("test/groups"),
+	?assertEqual(2, erlang:length(get_brand_and_model(Device1))).
 get_model_name_test() ->
 	{ok,[Device]} = file:consult("test/device"),
 	?assertEqual({model_name, "Legend"}, get_model_name(Device)).

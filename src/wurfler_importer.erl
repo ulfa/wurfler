@@ -221,21 +221,31 @@ get_brand_and_model(Groups) ->
 	[get_brand_name(Groups), get_model_name(Groups)].								
 
 get_brand_name(Groups) ->
-	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
-	case [Value || #capability{name="brand_name", value=Value } <- Capabilities] of
+	case [Value || #capability{name="brand_name", value=Value } <- get_capabilities_for_groups(Groups)] of
 		[] -> {brand_name, undefined};
 		[Brand_name]  -> {brand_name, Brand_name}
 	end.
 
 get_model_name(Groups) ->
-	Capabilities = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)),
-	case [Value || #capability{name="model_name", value=Value} <- Capabilities] of
+	case [Value || #capability{name="model_name", value=Value} <- get_capabilities_for_groups(Groups)] of
 		[] -> {model_name, undefined};
 		[Model_name] -> {model_name, Model_name}
 	end.
+
+get_device_os(Groups) ->
+	case [Value || #capability{name="device_os", value=Value} <- get_capabilities_for_groups(Groups)] of
+		[] -> {model_name, undefined};
+		[Model_name] -> Model_name
+	end.
+
+get_capabilities_for_groups(Groups) ->
+	lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+get_device_os_test() ->
+	{ok, [Groups]} = file:consult("test/groups"),
+	?assertEqual("Android",get_device_os(Groups)).
 add_attributes_test() ->
 	{ok, [Device]} = file:consult("test/device"),
 	Attributes = [{test, "test"}, {test1, "test2"}],

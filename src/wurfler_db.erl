@@ -29,7 +29,7 @@
 %% External exports
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
--export([get_all_keys/1, find_capabilities_by_id/2]).
+-export([get_all_keys/1, find_capabilities_by_id/2, find_table_for_application/1]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -47,6 +47,10 @@ create_db() ->
 	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(androidTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	application:stop(mnesia).
+
+get_apptbl()->
+	{ok, [Data]} = file:consult("./include/app2table"),
+	fun() -> lists:foreach(fun mnesia:write/1, Data) end.
 %% --------------------------------------------------------------------
 %% save functions
 %% --------------------------------------------------------------------

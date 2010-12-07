@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <query>
-	<application>j2me</application>
 	<capabilities>
 		<capability name="j2me_cldc_1_1" value="true" operator="=="/>
 		<capability name="j2me_midp_1_" value="true" operator="=="/>

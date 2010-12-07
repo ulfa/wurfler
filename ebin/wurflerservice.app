@@ -12,7 +12,8 @@
              device_resource,
              devices_resource,
              wurfler_db,             
-             wurfler_file_poller
+             wurfler_file_poller,
+			 wurfler_patch
             ]},
   {registered, [wurflerservice]},
   {applications, [

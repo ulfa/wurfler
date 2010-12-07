@@ -1,0 +1,41 @@
+<wurfl_patch>
+	<devices>
+		<device user_agent="" fall_back="root" id="generic">
+			<group id="magical_powers">
+				<capability name="makes_good_coffee" value="false" />
+				<capability name="average_coffee_preparation_time" value="0" />
+			</group>
+			<group id="display">
+				<capability name="resolution_height" value="200" />
+				<capability name="lucas_capa" value="0" />
+			</group>
+			<group id="new_group">
+				<capability name="new_capa1" value="false" />
+				<capability name="new_capa2" value="0" />
+			</group>
+		</device>
+		<device user_agent="Nokia 20" fall_back="generic"
+			id="nokia_generic_series20">
+			<group id="new_group">
+				<capability name="new_capa1" value="true" />
+				<capability name="new_capa2" value="34832798" />
+			</group>
+			<group id="display">
+				<capability name="resolution_height" value="3300" />
+			</group>
+		</device>
+		<!-- Adding a Coffeee Pot to the WURFL -->
+		<device id="bialetti_ver61" user_agent="Bialetti 6.1"
+			fall_back="generic">
+			<group id="magical_powers">
+				<capability name="makes_good_coffee" value="true" />
+				<capability name="average_coffee_preparation_time" value="5" />
+			</group>
+			<group id="display">
+				<capability name="resolution_width" value="190" />
+				<capability name="resolution_height" value="140" />
+				<capability name="lucas_capa" value="34832798" />
+			</group>
+		</device>
+	</devices>
+</wurfl_patch>

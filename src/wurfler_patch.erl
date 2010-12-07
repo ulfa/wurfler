@@ -24,7 +24,7 @@
 %% Include files
 %% --------------------------------------------------------------------
 -include_lib("eunit/include/eunit.hrl").
-
+-include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
@@ -50,9 +50,43 @@ process_device(Device) ->
 
 get_device(devicesTbl, Id) ->
 	wurfler_db:find_record_by_id(devicesTbl, Id).
+
+merge_device(DeviceXml, DeviceDb) ->
+	ok.
+merge_groups(GroupsXml, GroupsDb) ->
+	ok.
+merge_group(GroupXml, GroupDb) ->
+	ok.
+merge_capabilities(CapabilitiesXml, CapabilitiesDb) ->
+	ok.
+merge_capability(CapabilityXml, CapabilityDb) ->
+	Value = xml_factory:get_attribute("/capability/@value", CapabilityXml),
+	CapabilityDb#capability{value=Value}. 
+	
+get_capability(CapabilitiesDb, Capability_Name) ->
+	[Capability || Capability <- CapabilitiesDb, Capability#capability.name==Capability_Name].
+
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+merge_capability_test() ->
+	CapabilityDb = #capability{name="test", value="testDb"},
+ 	CapabilityXml = {xmlElement,capability,capability,[], 
+					 {xmlNamespace,[],[]}, 
+					 [{group,4},{device,6},{devices,2},{wurfl_patch,1}],4,
+                   [{xmlAttribute,name,[],[],[],[],1,[],"test",false},
+                    {xmlAttribute,value,[],[],[],[],2,[],"testXml",false}],
+                   [],[],"./test",undeclared},
+ 	NewCapability = merge_capability(CapabilityXml, CapabilityDb),
+	?assertEqual("testXml", NewCapability#capability.value).
+
+get_capability_test() ->
+	CapabilitiesDb = #capability{name="test", value="testDb"},
+	[Cap] =  get_capability([CapabilitiesDb], "test"),
+	?assertMatch(#capability{name="test", value="testDb"},Cap).
+merge_device_test() ->
+	ok.
+%% 	merge_device(DeviceXml, DeviceDb).
 import_wurflpatch_test()->
 	ok.
 get_device_test() ->

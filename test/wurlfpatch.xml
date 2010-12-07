@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <wurfl_patch>
 	<devices>
 		<device user_agent="" fall_back="root" id="generic">
@@ -24,7 +25,6 @@
 				<capability name="resolution_height" value="3300" />
 			</group>
 		</device>
-		<!-- Adding a Coffeee Pot to the WURFL -->
 		<device id="bialetti_ver61" user_agent="Bialetti 6.1"
 			fall_back="generic">
 			<group id="magical_powers">

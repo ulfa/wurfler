@@ -47,11 +47,13 @@ create_xml(capability, Capability)->
 	{'capability', [{name, Capability#capability.name}, {value, Capability#capability.value}], []}.
 
 parse(Bin) when is_binary(Bin) ->
-	{Xml,_} = xmerl_scan:string(binary_to_list(Bin)),
+	{Xml,_Rest} = xmerl_scan:string(binary_to_list(Bin)),
 	Xml;
-
 parse(String) when is_list(String)->
-	{Xml,_} = xmerl_scan:string(String),
+	{Xml,_Rest} = xmerl_scan:string(String),
+	Xml.
+parse_file(Filename)  ->
+	{Xml,_Rest} = xmerl_scan:file(Filename),
 	Xml.
 get_attribute(XPath, Node) ->
 	case xmerl_xpath:string(XPath, Node) of
@@ -64,6 +66,10 @@ get_attribute(XPath, Node) ->
 %%
 %% Test Functions
 %%
+parse_filename_test() ->
+	Xml = parse_file("./test/wurlfpatch.xml"),
+	{xmlElement,wurfl_patch,wurfl_patch,[], {_, _, _}, _, _, _, _, _,_,_} = Xml.
+
 create_xml_capability_test() ->
 	Cap = #capability{name="myVersion", value="1.0"},
 	log_xml([create_xml(capability, Cap)]),
@@ -81,13 +87,9 @@ create_xml_device_test() ->
 	Device = create_device(),
 	D=create_xml(device, Device),
 	log_xml([D]).
-
-
-
 create_device()->
 	#device{id="Nokia", user_agent="blahblahblah", actual_device_root=undefined, fall_back=undefined, 
 			groups=[create_group_1(), create_group_2()]}.
-
 create_goups() ->
 	[create_group_1(), create_group_2()].
 create_group_1() ->

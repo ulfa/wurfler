@@ -28,11 +28,32 @@
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
--export([]).
+-export([import_wurflpatch/1]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+import_wurflpatch(Filename) ->
+	Wurfl_Patch = xml_factory:parse_file(Filename),
+	Devices = xmerl_xpath:string ("/wurfl/devices/device", Wurfl_Patch),
+	process_devices(Devices).
 
+process_devices(Devices) ->
+	[process_device(Device) || Device <- Devices].
+
+process_device(Device) ->
+	Id = xml_factory:get_attribute("/wurfl/devices/device/@id", Device),
+	Groups = xml_factory:get_attribute("/wurfl/devices/device/@id", Device).
+
+get_device(devicesTbl, Id) ->
+	case wurfler_db:find_record_by_id(devicesTbl, Id) of
+		[] -> [];
+		[Device] -> Device 
+	end.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+import_wurflpatch_test()->
+	ok.
+get_device_test() ->
+	?assertEqual([], get_device(devicesTbl, "unknown")),
+	?assertMatch({device,"generic",[],undefined,"root",_,_,_}, get_device(devicesTbl, "generic")).

@@ -34,26 +34,31 @@
 %% --------------------------------------------------------------------
 import_wurflpatch(Filename) ->
 	Wurfl_Patch = xml_factory:parse_file(Filename),
-	Devices = xmerl_xpath:string ("/wurfl/devices/device", Wurfl_Patch),
+	Devices = xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch),
 	process_devices(Devices).
 
 process_devices(Devices) ->
 	[process_device(Device) || Device <- Devices].
 
 process_device(Device) ->
-	Id = xml_factory:get_attribute("/wurfl/devices/device/@id", Device),
+	Id = xml_factory:get_attribute("/wurfl_patch/devices/device/@id", Device),
+	case get_device(devicesTbl, Id) of
+		[] -> wurfler_importer:process_device(Device);
+		[DeviceDB] -> DeviceDB
+	end,
 	Groups = xml_factory:get_attribute("/wurfl/devices/device/@id", Device).
 
 get_device(devicesTbl, Id) ->
-	case wurfler_db:find_record_by_id(devicesTbl, Id) of
-		[] -> [];
-		[Device] -> Device 
-	end.
+	wurfler_db:find_record_by_id(devicesTbl, Id).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
 import_wurflpatch_test()->
 	ok.
 get_device_test() ->
-	?assertEqual([], get_device(devicesTbl, "unknown")),
-	?assertMatch({device,"generic",[],undefined,"root",_,_,_}, get_device(devicesTbl, "generic")).
+	?assertMatch([{device,"generic",[],undefined,"root",_,_,_}], get_device(devicesTbl, "generic")).
+process_device_test() ->
+	Wurfl_Patch = xml_factory:parse_file("./test/wurlfpatch.xml"),
+	Devices = xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch),
+	io:format("--- ~p~n", [Devices]).
+	

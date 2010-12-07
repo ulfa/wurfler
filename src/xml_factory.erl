@@ -26,7 +26,7 @@
 %%
 %% Exported Functions
 %%
--export([create_xml/2, parse/1, get_attribute/2]).
+-export([create_xml/2, parse/1, parse_file/1, get_attribute/2]).
 
 %%
 %% API Functions

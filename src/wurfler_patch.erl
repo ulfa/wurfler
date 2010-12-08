@@ -20,15 +20,106 @@
 %%% -------------------------------------------------------------------
 -module(wurfler_patch).
 
+-behaviour(gen_server).
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include("../include/wurfler.hrl").
+-include_lib("eunit/include/eunit.hrl").
+-include_lib("xmerl/include/xmerl.hrl").
 %% --------------------------------------------------------------------
 %% External exports
+
+%% gen_server callbacks
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+-export([start_link/0]).
+-export([start/0]).
+-export([import_wurfl_patch/1]).
+%% ====================================================================
+%% External functions
+%% ====================================================================
+import_wurfl_patch(Filename) ->
+	gen_server:cast(?MODULE, {import_wurfl_patch, Filename}).
+
+
 %% --------------------------------------------------------------------
--export([import_wurflpatch/1]).
+%% record definitions
+%% --------------------------------------------------------------------
+-record(state, {}).
+%% ====================================================================
+%% Server functions
+%% ====================================================================
+%%--------------------------------------------------------------------
+%% Function: start_link() -> {ok,Pid} | ignore | {error,Error}
+%% Description: Starts the server
+%%--------------------------------------------------------------------
+start_link() ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
+start() ->
+	start_link().
+%% --------------------------------------------------------------------
+%% Function: init/1
+%% Description: Initiates the server
+%% Returns: {ok, State}          |
+%%          {ok, State, Timeout} |
+%%          ignore               |
+%%          {stop, Reason}
+%% --------------------------------------------------------------------
+init([]) ->
+    {ok, #state{}}.
+
+%% --------------------------------------------------------------------
+%% Function: handle_call/3
+%% Description: Handling call messages
+%% Returns: {reply, Reply, State}          |
+%%          {reply, Reply, State, Timeout} |
+%%          {noreply, State}               |
+%%          {noreply, State, Timeout}      |
+%%          {stop, Reason, Reply, State}   | (terminate/2 is called)
+%%          {stop, Reason, State}            (terminate/2 is called)
+%% --------------------------------------------------------------------
+handle_call(Request, From, State) ->
+    Reply = ok,
+    {reply, Reply, State}.
+
+%% --------------------------------------------------------------------
+%% Function: handle_cast/2
+%% Description: Handling cast messages
+%% Returns: {noreply, State}          |
+%%          {noreply, State, Timeout} |
+%%          {stop, Reason, State}            (terminate/2 is called)
+%% --------------------------------------------------------------------
+handle_cast({import_wurflpatch, Filename}, State) ->
+	import_wurflpatch(Filename),
+    {noreply, State}.
+
+%% --------------------------------------------------------------------
+%% Function: handle_info/2
+%% Description: Handling all non call/cast messages
+%% Returns: {noreply, State}          |
+%%          {noreply, State, Timeout} |
+%%          {stop, Reason, State}            (terminate/2 is called)
+%% --------------------------------------------------------------------
+handle_info(Info, State) ->
+    {noreply, State}.
+
+%% --------------------------------------------------------------------
+%% Function: terminate/2
+%% Description: Shutdown the server
+%% Returns: any (ignored by gen_server)
+%% --------------------------------------------------------------------
+terminate(Reason, State) ->
+    ok.
+
+%% --------------------------------------------------------------------
+%% Func: code_change/3
+%% Purpose: Convert process state when code is changed
+%% Returns: {ok, NewState}
+%% --------------------------------------------------------------------
+code_change(OldVsn, State, Extra) ->
+    {ok, State}.
+
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -58,14 +149,16 @@ merge_groups(GroupsXml, GroupsDb) ->
 merge_group(GroupXml, GroupDb) ->
 	ok.
 merge_capabilities(CapabilitiesXml, CapabilitiesDb) ->
+	%% 1. iterate throw the list of CapabilitiesXml
+
 	ok.
+
 merge_capability(CapabilityXml, CapabilityDb) ->
 	Value = xml_factory:get_attribute("/capability/@value", CapabilityXml),
 	CapabilityDb#capability{value=Value}. 
 	
 get_capability(CapabilitiesDb, Capability_Name) ->
 	[Capability || Capability <- CapabilitiesDb, Capability#capability.name==Capability_Name].
-
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -95,4 +188,3 @@ process_device_test() ->
 	Wurfl_Patch = xml_factory:parse_file("./test/wurlfpatch.xml"),
 	Devices = xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch),
 	io:format("--- ~p~n", [Devices]).
-	

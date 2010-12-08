@@ -132,13 +132,12 @@ import_wurflpatch(Filename, State) ->
 process_devices(Devices, State) ->
 	[process_device(Device, State) || Device <- Devices].
 
-process_device(Device, State) ->
-	Id = xml_factory:get_attribute("/wurfl_patch/devices/device/@id", Device),
+process_device(DeviceXml, State) ->
+	Id = xml_factory:get_attribute("/wurfl_patch/devices/device/@id", DeviceXml),
 	case get_device(devicesTbl, Id) of
-		[] -> wurfler_importer:process_device(Device);
-		[DeviceDB] -> DeviceDB
-	end,
-	Groups = xml_factory:get_attribute("/wurfl/devices/device/@id", Device).
+		[] -> wurfler_importer:process_device(DeviceXml);
+		[DeviceDB] -> merge_device(DeviceXml, DeviceDB)
+	end.
 
 get_device(devicesTbl, Id) ->
 	wurfler_db:find_record_by_id(devicesTbl, Id).
@@ -150,7 +149,12 @@ get_capability_from_group(Group, Capability_Name) ->
 	[Capability || Capability <- Group#group.capabilites, Capability#capability.name == Capability_Name].
 
 merge_device(DeviceXml, DeviceDb) ->
-	ok.
+	GroupsXml = xmerl_xpath:string ("/wurfl_patch/devices/device/group", DeviceXml),
+	Groups = merge_groups(GroupsXml,DeviceDb#device.groups),
+	User_Agent = xml_factory:get_attribute("/wurfl_patch/devices/device/@user_agent", DeviceXml),
+	Actual_device_root = xml_factory:get_attribute("/wurfl_patch/devices/device/@actual_device_root", DeviceXml),
+	Fall_back = xml_factory:get_attribute("/wurfl_patch/devices/device/@fall_back", DeviceXml),
+	DeviceDb#device{user_agent=User_Agent, actual_device_root=Actual_device_root, fall_back=Fall_back, groups=Groups}.
 merge_groups(GroupsXml, GroupsDb) ->
 	ok.
 merge_group(GroupXml, GroupDb) ->

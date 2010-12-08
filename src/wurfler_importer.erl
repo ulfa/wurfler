@@ -34,7 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0]).
 -export([start/0]).
--export([import_wurfl/1, process_device/1]).
+-export([import_wurfl/1, process_device/1, process_group/1]).
 -record(state, {}).
 
 %% ====================================================================
@@ -157,7 +157,7 @@ process_groups(Groups)->
 process_devices(Devices) ->
 	[process_device(Device)|| Device <- Devices].
 
-process_group(Group)->	
+process_group(Group)->
 	Capabilities = get_capabilities(Group),
 	{xmlElement,group,_,_,_,_,_,Attributes,_,_,_,_} = Group,
 	Group_Attributes = process_attributes(group,Attributes),
@@ -239,6 +239,9 @@ get_capabilities_for_groups(Groups) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+process_group_test()->
+	GroupXml = xml_factory:parse_file("./test/group_xml"),
+	?assertMatch({group, "magical_powers", _},process_group(GroupXml)).
 get_device_os_test() ->
 	{ok, [Groups]} = file:consult("test/groups"),
 	?assertEqual("Android",get_device_os(Groups)).

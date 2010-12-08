@@ -45,7 +45,7 @@ import_wurfl_patch(Filename) ->
 %% --------------------------------------------------------------------
 %% record definitions
 %% --------------------------------------------------------------------
--record(state, {}).
+-record(state, {generic}).
 %% ====================================================================
 %% Server functions
 %% ====================================================================
@@ -91,7 +91,8 @@ handle_call(Request, From, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_cast({import_wurflpatch, Filename}, State) ->
-	import_wurflpatch(Filename),
+	Generic = get_device(devicesTbl, "generic"),
+	import_wurflpatch(Filename, State#state{generic=Generic}),
     {noreply, State}.
 
 %% --------------------------------------------------------------------
@@ -123,15 +124,15 @@ code_change(OldVsn, State, Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
-import_wurflpatch(Filename) ->
-	Wurfl_Patch = xml_factory:parse_file(Filename),
+import_wurflpatch(Filename, State) ->
+	Wurfl_Patch = xml_factory:parse_file(Filename),	
 	Devices = xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch),
-	process_devices(Devices).
+	process_devices(Devices, State).
 
-process_devices(Devices) ->
-	[process_device(Device) || Device <- Devices].
+process_devices(Devices, State) ->
+	[process_device(Device, State) || Device <- Devices].
 
-process_device(Device) ->
+process_device(Device, State) ->
 	Id = xml_factory:get_attribute("/wurfl_patch/devices/device/@id", Device),
 	case get_device(devicesTbl, Id) of
 		[] -> wurfler_importer:process_device(Device);
@@ -142,6 +143,12 @@ process_device(Device) ->
 get_device(devicesTbl, Id) ->
 	wurfler_db:find_record_by_id(devicesTbl, Id).
 
+get_group(Device, Group_Id) ->
+	[Group || Group <- Device#device.groups, Group#group.id == Group_Id].
+
+get_capability_from_group(Group, Capability_Name) ->
+	[Capability || Capability <- Group#group.capabilites, Capability#capability.name == Capability_Name].
+
 merge_device(DeviceXml, DeviceDb) ->
 	ok.
 merge_groups(GroupsXml, GroupsDb) ->
@@ -150,7 +157,7 @@ merge_group(GroupXml, GroupDb) ->
 	ok.
 merge_capabilities(CapabilitiesXml, CapabilitiesDb) ->
 	%% 1. iterate throw the list of CapabilitiesXml
-
+    
 	ok.
 
 merge_capability(CapabilityXml, CapabilityDb) ->
@@ -158,7 +165,7 @@ merge_capability(CapabilityXml, CapabilityDb) ->
 	CapabilityDb#capability{value=Value}. 
 	
 get_capability(CapabilitiesDb, Capability_Name) ->
-	[Capability || Capability <- CapabilitiesDb, Capability#capability.name==Capability_Name].
+	[Capability || Capability <- CapabilitiesDb, Capability#capability.name == Capability_Name].
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -177,6 +184,18 @@ get_capability_test() ->
 	CapabilitiesDb = #capability{name="test", value="testDb"},
 	[Cap] =  get_capability([CapabilitiesDb], "test"),
 	?assertMatch(#capability{name="test", value="testDb"},Cap).
+
+get_group_test() ->
+  [Device] = get_device(devicesTbl, "generic"),
+  [Group]=get_group(Device, "j2me"),
+  ?assertEqual("j2me", Group#group.id).
+
+get_capability_from_group_test() ->
+	[Device] = get_device(devicesTbl, "generic"),
+	[Group]=get_group(Device, "j2me"),
+	[Cap] = get_capability_from_group(Group, "j2me_canvas_width"),
+	?assertEqual("j2me_canvas_width", Cap#capability.name).
+
 merge_device_test() ->
 	ok.
 %% 	merge_device(DeviceXml, DeviceDb).

@@ -46,18 +46,23 @@ create_db() ->
 	mnesia:create_table(symbianTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(androidTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
+	mnesia:create_table(index,[{disc_copies, [node()]}, {index, [table]}, {attributes, record_info(fields, index)}]),
 	application:stop(mnesia).
 %% --------------------------------------------------------------------
 %% save functions
 %% --------------------------------------------------------------------
 save_device(devicesTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(devicesTbl, Device, write) end);
+	mnesia:activity(transaction, fun() -> mnesia:write(index, #index{table=devicesTbl, device=Device#device.id}, write), 
+										  mnesia:write(devicesTbl, Device, write) end);
 save_device(j2meTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(j2meTbl, Device, write) end);
-save_device(symbianTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(symbianTbl, Device, write) end);
+	mnesia:activity(transaction, fun() -> mnesia:write(index, #index{table=devicesTbl, device=Device#device.id}, write), 
+										  mnesia:write(j2meTbl, Device, write) end);
+save_device(symbianTbl, Device)-> 
+	mnesia:activity(transaction, fun() -> mnesia:write(index, #index{table=devicesTbl, device=Device#device.id}, write),
+										  mnesia:write(symbianTbl, Device, write) end);
 save_device(blackberryTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(blackberryTbl, Device, write) end).
+	mnesia:activity(transaction, fun() -> mnesia:write(index, #index{table=devicesTbl, device=Device#device.id}, write),
+										  mnesia:write(blackberryTbl, Device, write) end).
 %% --------------------------------------------------------------------
 %% finder functions
 %% --------------------------------------------------------------------

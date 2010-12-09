@@ -229,6 +229,26 @@ create_fun(CheckName, CheckValue, '<')->
 						 end;
 			_ -> {continue}
 		end			
+	end;
+create_fun(CheckName, CheckValue, '=<')->
+	fun(Name, Value) ->
+		case Name of
+			CheckName ->  case Value =< CheckValue of
+							 true -> {ok};
+							 false -> {nok}
+						 end;
+			_ -> {continue}
+		end			
+	end;
+create_fun(CheckName, CheckValue, '>=')->
+	fun(Name, Value) ->
+		case Name of
+			CheckName ->  case Value >= CheckValue of
+							 true -> {ok};
+							 false -> {nok}
+						 end;
+			_ -> {continue}
+		end			
 	end.
 
 %% Run all funs for one capability
@@ -260,20 +280,45 @@ run_funs_against_list(_List_Of_Funs, []) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-
 create_function_test() ->
 	A=create_fun("test", "123", '=='),
 	?assertEqual({ok}, A("test", "123")),
+	?assertEqual({nok}, A("test", "12")),
+	?assertEqual({continue}, A("unknown", "123")),
+	
 	B=create_fun("test", "123", '/='),
 	?assertEqual({ok}, B("test", "234")),
 	?assertEqual({nok}, B("test" , "123")),
 	?assertEqual({continue}, B("test1" , "234")),
-	C=create_fun("test", 123, '>'),
-	?assertEqual({ok}, C("test", 234)),
-	?assertEqual({continue}, C("test1", 234)),
-	D=create_fun("test", 123, '<'),
-	?assertEqual({ok}, D("test", 24)).
 	
+	C=create_fun("test", 123, '>'),
+	%% 234 > 123
+	?assertEqual({ok}, C("test", 234)),
+	?assertEqual({nok}, C("test", 23)),
+	?assertEqual({continue}, C("unknown", 234)),
+	
+	D=create_fun("test", 123, '<'),
+	?assertEqual({ok}, D("test", 24)),
+	?assertEqual({nok}, D("test", 242)),
+	?assertEqual({continue}, D("unknown", 234)),
+	
+	E=create_fun("test", 123, '=<'),
+	%% 123 =< 123
+	?assertEqual({ok}, E("test",123)),
+	%% 12 =< 123
+	?assertEqual({ok}, E("test",12)),
+	%% 1234 =< 123
+	?assertEqual({nok}, E("test",1234)),
+	?assertEqual({continue}, E("unknow",123)),
+
+	F=create_fun("test", 123, '>='),
+	%% 123 >= 123
+	?assertEqual({ok}, F("test",123)),
+	%% 12 >= 123
+	?assertEqual({nok}, F("test",12)),
+	%% 1234 >= 123
+	?assertEqual({ok}, F("test",1234)),
+	?assertEqual({continue}, F("unknow",123)).
 create_funs_from_list_test() ->
 	List=[{"handheldfriendly", {"false", '=='}},
 	 {"playback_mp4", {"false", '=='}},

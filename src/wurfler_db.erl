@@ -53,17 +53,22 @@ create_db() ->
 %% save functions
 %% --------------------------------------------------------------------
 save_device(devicesTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(index, #index{table=devicesTbl, device=Device#device.id}, write), 
+	mnesia:activity(transaction, fun() -> save_index(devices_tbl, Device), 
 										  mnesia:write(devicesTbl, Device, write) end);
 save_device(j2meTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(index, #index{table=devicesTbl, device=Device#device.id}, write), 
+	mnesia:activity(transaction, fun() -> save_index(devices_tbl, Device),
 										  mnesia:write(j2meTbl, Device, write) end);
 save_device(symbianTbl, Device)-> 
-	mnesia:activity(transaction, fun() -> mnesia:write(index, #index{table=devicesTbl, device=Device#device.id}, write),
+	mnesia:activity(transaction, fun() -> save_index(devices_tbl, Device),
 										  mnesia:write(symbianTbl, Device, write) end);
 save_device(blackberryTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(index, #index{table=devicesTbl, device=Device#device.id}, write),
+	mnesia:activity(transaction, fun() -> save_index(devices_tbl, Device),
 										  mnesia:write(blackberryTbl, Device, write) end).
+save_index(Table, Device) ->
+	case mnesia:read({index, Device#device.id}) of
+		[] -> mnesia:write(#index{table=Table, device=Device#device.id});
+		[Index] -> mnesia:write(Index#index{table=[Table|Index#index.table]})
+	end.
 %% --------------------------------------------------------------------
 %% finder functions
 %% --------------------------------------------------------------------

@@ -195,7 +195,7 @@ merge_groups_test() ->
 	DeviceXml = xml_factory:parse_file("./test/group_patch_xml"),
 	GroupsXml = xmerl_xpath:string ("/device/group", DeviceXml),
 	{ok, [GroupsDb]} = file:consult("./test/group_patch"),
-	merge_groups(GroupsXml, GroupsDb).
+	?assertEqual(3,erlang:length(merge_groups(GroupsXml, GroupsDb))).
 	
 merge_capability_test() ->
 	CapabilityDb = #capability{name="test", value="testDb"},

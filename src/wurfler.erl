@@ -190,12 +190,16 @@ get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	{Fall_back, Capabilities} = wurfler_db:find_capabilities_by_id(devicesTbl, DeviceName),	
 	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
 
+%%------------------------------------------------------------------------------
+%% Here i can optimize the create_fun stuff.
+%% Perhaps i will use erl_scan and co.
+%%------------------------------------------------------------------------------
 create_fun(CheckName, CheckValue, '==')->
 	fun(Name, Value) ->
 		case Name of
-			CheckName ->  case Value of
-							 CheckValue -> {ok};
-							 _ -> {nok}
+			CheckName ->  case Value == CheckValue of
+							 true -> {ok};
+							 false -> {nok}
 						 end;
 			_ -> {continue}
 		end
@@ -250,7 +254,6 @@ create_fun(CheckName, CheckValue, '>=')->
 			_ -> {continue}
 		end			
 	end.
-
 %% Run all funs for one capability
 %% Only if all funs return ok, its ok
 and_cond([Fun|Funs], {CheckName, CheckValue}) ->

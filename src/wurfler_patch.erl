@@ -164,6 +164,7 @@ merge_groups(GroupsXml, GroupsDb) ->
 	
 merge_group(GroupXml, GroupDb) ->
 	Id = xml_factory:get_attribute("/group/@id", GroupXml),
+	io:format("1... ~p~n ", [Id]),
 	case get_group_of_groups(GroupDb, Id) of
 		[] ->  wurfler_importer:process_group(GroupXml);		
 		[Group] -> io:format("1... ~n "),
@@ -191,9 +192,9 @@ get_capability(CapabilitiesDb, Capability_Name) ->
 %% --------------------------------------------------------------------
 merge_group_test() ->
 	GroupXml = xml_factory:parse_file("./test/group_xml"),
-	Group = xmerl_xpath:string ("/device/group", GroupXml),
+	[Group] = xmerl_xpath:string ("/group", GroupXml),
 	{ok, [GroupsDb]} = file:consult("./test/group_patch"),
-	io:format("3... ~n "),
+ 	io:format("3... ~p~n ", [Group]),
 	?assertMatch({group, "magical_powers", _},merge_group(Group, GroupsDb)).
 
 merge_groups_test() ->

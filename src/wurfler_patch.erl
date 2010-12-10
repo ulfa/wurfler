@@ -164,25 +164,31 @@ merge_groups(GroupsXml, GroupsDb) ->
 	
 merge_group(GroupXml, GroupDb) ->
 	Id = xml_factory:get_attribute("/group/@id", GroupXml),
-	io:format("1... ~p~n ", [Id]),
 	case get_group_of_groups(GroupDb, Id) of
 		[] ->  wurfler_importer:process_group(GroupXml);		
-		[Group] -> io:format("1... ~n "),
-					CapsXml = xmerl_xpath:string("/group/capability", GroupXml),
-				   io:format("2... ~p~n ", [CapsXml]),
+		[Group] -> CapsXml = xmerl_xpath:string("/group/capability", GroupXml),
 				   Caps = merge_capabilities(CapsXml, Group#group.capabilites),
+				   io:format("3...caps ~p~n ", [Caps]),
 				   Group#group{capabilites=Caps}	
 	end.
 
 merge_capabilities(CapabilitiesXml, CapabilitiesDb) ->
-	[merge_capability(CapabilityXml, CapabilitiesDb) || CapabilityXml <- CapabilitiesXml].
+	G=[merge_capability(xml,CapabilityXml, CapabilitiesDb) || CapabilityXml <- CapabilitiesXml],
+	G1=[merge_capability(db,CapDb, G) || CapDb <- CapabilitiesDb],
+	lists:flatten(lists:append(G, G1)).
 
-merge_capability(CapabilityXml, CapabilitiesDb) ->
+merge_capability(xml,CapabilityXml, CapabilitiesDb) ->
 	Name = xml_factory:get_attribute("/capability/@name", CapabilityXml),
 	Value = xml_factory:get_attribute("/capability/@value", CapabilityXml),
 	case get_capability(CapabilitiesDb, Name) of 
 		[] -> wurfler_importer:process_capability(CapabilityXml);
 		[Capability] -> Capability#capability{value=Value}
+	end;
+	
+merge_capability(db,CapabilityDB, Capabilities) ->
+	case get_capability(Capabilities, CapabilityDB#capability.name) of
+		[] -> CapabilityDB;
+		_ -> []
 	end.
 	
 get_capability(CapabilitiesDb, Capability_Name) ->
@@ -194,7 +200,6 @@ merge_group_test() ->
 	GroupXml = xml_factory:parse_file("./test/group_xml"),
 	[Group] = xmerl_xpath:string ("/group", GroupXml),
 	{ok, [GroupsDb]} = file:consult("./test/group_patch"),
- 	io:format("3... ~p~n ", [Group]),
 	?assertMatch({group, "magical_powers", _},merge_group(Group, GroupsDb)).
 
 merge_groups_test() ->
@@ -211,7 +216,7 @@ merge_capability_test() ->
                    [{xmlAttribute,name,[],[],[],[],1,[],"test1",false},
                     {xmlAttribute,value,[],[],[],[],2,[],"testXml",false}],
                    [],[],"./test",undeclared},
- 	NewCapability = merge_capability(CapabilityXml, CapabilitiesDb),
+ 	NewCapability = merge_capability(xml,CapabilityXml, CapabilitiesDb),
 	?assertEqual("test1", NewCapability#capability.name),
 	?assertEqual("testXml", NewCapability#capability.value).
 

@@ -34,7 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0]).
 -export([start/0]).
--export([import_wurfl/1, process_device/1, process_group/1, process_capability/1]).
+-export([import_wurfl/1, process_device/1, process_group/1, process_capability/1, store_device/1]).
 -record(state, {}).
 
 %% ====================================================================
@@ -168,7 +168,7 @@ process_device(Device) ->
 	{xmlElement,device,_,[],_,[_,_],_,Attributes,_,_,_,_} = Device,
 	Device_Attributes = process_attributes(device, Attributes),
 	Device_Record = create_device(add_attributes(Groups, Device_Attributes), Groups),
-	store_devices(Device_Record),
+	store_device(Device_Record),
 	Device_Record.
 	
 process_attributes(group, Attributes)->
@@ -210,7 +210,7 @@ create_group(Attributes, Capabilities) ->
 create_capability(Attributes) ->
 	#capability{name=proplists:get_value(name, Attributes), value=proplists:get_value(value, Attributes)}.
 	
-store_devices(Device) ->
+store_device(Device) ->
 	wurfler_db:save_device(devicesTbl, Device).
 
 add_attributes(Groups, Attributes) ->

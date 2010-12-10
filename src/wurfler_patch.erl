@@ -132,11 +132,12 @@ import_wurflpatch(Filename, State) ->
 process_devices(Devices, State) ->
 	[process_device(Device, State) || Device <- Devices].
 
-process_device(DeviceXml, State) ->
-	Id = xml_factory:get_attribute("/wurfl_patch/devices/device/@id", DeviceXml),
+process_device(DeviceXml, _State) ->
+	Id = xml_factory:get_attribute("/device/@id", DeviceXml),
 	case get_device(devicesTbl, Id) of
 		[] -> wurfler_importer:process_device(DeviceXml);
-		[DeviceDB] -> merge_device(DeviceXml, DeviceDB)
+		[DeviceDB] ->  D = merge_device(DeviceXml, DeviceDB),
+					   wurfler_importer:store_device(D)
 	end.
 
 get_device(devicesTbl, Id) ->
@@ -152,24 +153,31 @@ get_capability_from_group(Group, Capability_Name) ->
 	[Capability || Capability <- Group#group.capabilites, Capability#capability.name == Capability_Name].
 
 merge_device(DeviceXml, DeviceDb) ->
-	GroupsXml = xmerl_xpath:string ("/wurfl_patch/devices/device/group", DeviceXml),
-	Groups = merge_groups(GroupsXml,DeviceDb#device.groups),
-	User_Agent = xml_factory:get_attribute("/wurfl_patch/devices/device/@user_agent", DeviceXml),
-	Actual_device_root = xml_factory:get_attribute("/wurfl_patch/devices/device/@actual_device_root", DeviceXml),
-	Fall_back = xml_factory:get_attribute("/wurfl_patch/devices/device/@fall_back", DeviceXml),
+	GroupsXml = xmerl_xpath:string ("/device/group", DeviceXml),
+	Groups = merge_groups(GroupsXml, DeviceDb#device.groups),
+	User_Agent = xml_factory:get_attribute("/device/@user_agent", DeviceXml),
+	Actual_device_root = xml_factory:get_attribute("/device/@actual_device_root", DeviceXml),
+	Fall_back = xml_factory:get_attribute("/device/@fall_back", DeviceXml),
 	DeviceDb#device{user_agent=User_Agent, actual_device_root=Actual_device_root, fall_back=Fall_back, groups=Groups}.
 
 merge_groups(GroupsXml, GroupsDb) ->
-	[merge_group(GroupXml, GroupsDb) || GroupXml <- GroupsXml].
+
+	G=[merge_group(xml, GroupXml, GroupsDb) || GroupXml <- GroupsXml],
+	G1=[merge_group(db, Group, G) || Group <- GroupsDb],
+	lists:flatten(lists:append(G, G1)).
 	
-merge_group(GroupXml, GroupDb) ->
+merge_group(xml, GroupXml, GroupDb) ->
 	Id = xml_factory:get_attribute("/group/@id", GroupXml),
 	case get_group_of_groups(GroupDb, Id) of
 		[] ->  wurfler_importer:process_group(GroupXml);		
 		[Group] -> CapsXml = xmerl_xpath:string("/group/capability", GroupXml),
 				   Caps = merge_capabilities(CapsXml, Group#group.capabilites),
-				   io:format("3...caps ~p~n ", [Caps]),
 				   Group#group{capabilites=Caps}	
+	end;
+merge_group(db, GroupDb, GroupsDB) ->
+	case get_group_of_groups(GroupsDB, GroupDb#group.id) of
+		[] -> GroupDb;
+		_ -> []
 	end.
 
 merge_capabilities(CapabilitiesXml, CapabilitiesDb) ->
@@ -199,14 +207,19 @@ get_capability(CapabilitiesDb, Capability_Name) ->
 merge_group_test() ->
 	GroupXml = xml_factory:parse_file("./test/group_xml"),
 	[Group] = xmerl_xpath:string ("/group", GroupXml),
-	{ok, [GroupsDb]} = file:consult("./test/group_patch"),
-	?assertMatch({group, "magical_powers", _},merge_group(Group, GroupsDb)).
+	{ok, [GroupsDb]} = file:consult("./test/group_db"),
+	G=merge_group(xml, Group, GroupsDb),
+%% 	io:format("G ~p~n", [G]),
+	?assertMatch({group, "magical_powers", _},G),
+	?assertEqual(4, erlang:length(G#group.capabilites)).
 
 merge_groups_test() ->
 	DeviceXml = xml_factory:parse_file("./test/group_patch_xml"),
 	GroupsXml = xmerl_xpath:string ("/device/group", DeviceXml),
 	{ok, [GroupsDb]} = file:consult("./test/group_patch"),
-	?assertEqual(3,erlang:length(merge_groups(GroupsXml, GroupsDb))).
+	G=merge_groups(GroupsXml, GroupsDb),
+	io:format("G ~p~n ", [G]),
+	?assertEqual(4,erlang:length(G)).
 	
 merge_capability_test() ->
 	CapabilitiesDb = [#capability{name="test", value="testDb"}],
@@ -240,7 +253,8 @@ merge_device_test() ->
 	ok.
 %% 	merge_device(DeviceXml, DeviceDb).
 import_wurflpatch_test()->
-	ok.
+	import_wurflpatch("./test/device_patch_xml", #state{}).
+
 get_device_test() ->
 	?assertMatch([{device,"generic",[],undefined,"root",_,_,_}], get_device(devicesTbl, "generic")).
 process_device_test() ->

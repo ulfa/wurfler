@@ -14,8 +14,9 @@
 
 %%% -------------------------------------------------------------------
 %%% Author  : Ulf uaforum1@googlemail.com
-%%% Description :
 %%%
+%%% Description : This module reads a wurlf file, parses the xml and
+%%% stores the devices in the db.
 %%% Created : 
 %%% -------------------------------------------------------------------
 -module(wurfler_importer).

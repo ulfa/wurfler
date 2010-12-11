@@ -14,7 +14,10 @@
 
 %%% -------------------------------------------------------------------
 %%% Author  : Ulf uaforum1@googlemail.com
-%%% Description :
+%%%
+%%% Description : This module reads wurfl_patch files, merge them and
+%%% and delegates the insertion of the merged device to the 
+%%% wurfler_importer
 %%%
 %%% Created : 
 %%% -------------------------------------------------------------------

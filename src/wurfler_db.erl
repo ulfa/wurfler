@@ -14,8 +14,9 @@
 
 %%% -------------------------------------------------------------------
 %%% Author  : Ulf uaforum1@googlemail.com
-%%% Description :
 %%%
+%%% Description : This module is responsible for reading and storing
+%%% devices from the database.
 %%% Created : 
 %%% -------------------------------------------------------------------
 -module(wurfler_db).

@@ -1,7 +1,3 @@
-%% Author: ulf
-%% Created: Nov 24, 2010
-%% Description: TODO: Add description to xml_factory
-
 %% Copyright 2010 Ulf Angermann
 %%
 %% Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +11,15 @@
 %% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 %% See the License for the specific language governing permissions and
 %% limitations under the License.
+%%% -------------------------------------------------------------------
+%%% Author  : Ulf uaforum1@googlemail.com
+%%%
+%%% Description : This module has some xml functions inside. It is 
+%%% used to create xml devices and parsing
+%%%
+%%% Created : 
+%%% -------------------------------------------------------------------
+
 -module(xml_factory).
 
 %%

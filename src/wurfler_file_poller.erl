@@ -87,16 +87,9 @@ handle_cast(_Request, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_info({next_run}, State) ->
-	{Directory, Compiled_Regex} = get_parameter(),
-	{Files, _NewState} = get_new_files(Directory, Compiled_Regex, State),
-	case erlang:length(Files) of
-		0 -> [];
-		_ -> error_logger:info_msg("Files found : ~p ~n", [Files]),
-			 send_to_processing(Files)
-	end,
-
+	NewStates = [get_new_files(Dir, Regex, list_to_atom(Module), State) || [{directory, Dir}, {regex, Regex}, {modul, Module}] <- ?PROPERTY(polling)],
 	start_timer(?PROPERTY(timer_interval)),
-    {noreply, State}.
+    {noreply, lists:last(NewStates)}.
 %% --------------------------------------------------------------------
 %% Function: terminate/2
 %% Description: Shutdown the server
@@ -114,15 +107,15 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
-get_new_files(Directory, Compiled_Regex, _State=#state{last_poll_time=Last_poll_time}) ->
-	%%error_logger:info_msg("get files since : ~p~n", [Last_poll_time]),
+get_new_files(Directory, Regex, Module, _State=#state{last_poll_time=Last_poll_time}) ->
+%% 	error_logger:info_msg("get files since : ~p in : ~p Regex : ~p for : ~p ~n", [Last_poll_time, Directory, Regex, Module]),
     {ok, Files} = file:list_dir(Directory),
 	New_state = #state{last_poll_time=new_poll_time(date(), time())},
     FilteredFiles = lists:map(
         fun(X) -> filename:join([Directory,X]) end,
         lists:filter(
             fun(Y) ->
-                re:run(Y,Compiled_Regex,[{capture,none}]) == match end,
+                re:run(Y,get_regex(Regex),[{capture,none}]) == match end,
             Files
         )
     ),
@@ -131,32 +124,30 @@ get_new_files(Directory, Compiled_Regex, _State=#state{last_poll_time=Last_poll_
             {ok, FileInfo} = file:read_file_info(Filename),
             calendar:datetime_to_gregorian_seconds(FileInfo#file_info.mtime) > Last_poll_time
         end,
-        FilteredFiles
-    ),				   
-    {NewFiles, New_state}.
+        FilteredFiles),
 	
-get_parameter() ->
-	Directory = ?PROPERTY(polling_dir),
-	Regex = ?PROPERTY(files_regex),
+%% error_logger:info_msg("New Files ~p~n", NewFiles),	
+	case erlang:length(NewFiles) of
+		0 -> [];
+		_ -> send_to_processing(Module, NewFiles)
+	end,
+    New_state.
+	
+get_regex(Regex) ->
 	{ok,Compiled_Regex} = re:compile(Regex),
-	{Directory, Compiled_Regex}.
+	Compiled_Regex.
 
 start_timer(Time) ->
 	erlang:send_after(Time, self(), {next_run}).
 %% --------------------------------------------------------------------
 %%
 %% --------------------------------------------------------------------
-send_to_processing([]) ->
+send_to_processing(_Module, []) ->
 	ok;
-send_to_processing([File|Files]) ->
-	error_logger:info_msg("proccessing ~p~n", [File|Files]),
-	wurfler_importer:import_wurfl(rename_wurfl(File)),
-	send_to_processing(Files).
-
-rename_wurfl(File) ->
-	NewFile = File ++ "old",
-	file:rename(File, NewFile),
-	NewFile.
+send_to_processing(Module, [File|Files]) ->
+	error_logger:info_msg("proccessing for : ~p with : ~p~n", [Module, File]),
+	Module:import(File),
+	send_to_processing(Module, Files).
 %% --------------------------------------------------------------------
 %%% create new poll time
 %% --------------------------------------------------------------------
@@ -165,3 +156,9 @@ new_poll_time(Date, Time) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+get_new_files_test() ->
+	Poll = new_poll_time(date(), time()),
+	NewState=get_new_files("./wurfl", "wurfl.xml$", wurfler_importer, #state{last_poll_time=Poll}),
+ 	?assert(NewState#state.last_poll_time >= Poll).
+
+

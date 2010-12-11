@@ -34,13 +34,12 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0]).
 -export([start/0]).
--export([import_wurfl_patch/1]).
+-export([import/1]).
 %% ====================================================================
 %% External functions
 %% ====================================================================
-import_wurfl_patch(Filename) ->
+import(Filename) ->
 	gen_server:cast(?MODULE, {import_wurfl_patch, Filename}).
-
 
 %% --------------------------------------------------------------------
 %% record definitions
@@ -90,9 +89,9 @@ handle_call(Request, From, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_cast({import_wurflpatch, Filename}, State) ->
+handle_cast({import_wurfl_patch, Filename}, State) ->
 	Generic = get_device(devicesTbl, "generic"),
-	import_wurflpatch(Filename, State#state{generic=Generic}),
+	import(Filename, State#state{generic=Generic}),
     {noreply, State}.
 
 %% --------------------------------------------------------------------
@@ -124,10 +123,12 @@ code_change(OldVsn, State, Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
-import_wurflpatch(Filename, State) ->
+import(Filename, State) ->
+	error_logger:info_msg("starting importing wurfl patch~n"),
 	Wurfl_Patch = xml_factory:parse_file(Filename),	
 	Devices = xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch),
-	process_devices(Devices, State).
+	process_devices(Devices, State),
+	error_logger:info_msg("finished importing wurfl patch~n").
 
 process_devices(Devices, State) ->
 	[process_device(Device, State) || Device <- Devices].
@@ -253,7 +254,7 @@ merge_device_test() ->
 	ok.
 %% 	merge_device(DeviceXml, DeviceDb).
 import_wurflpatch_test()->
-	import_wurflpatch("./test/device_patch_xml", #state{}).
+	import("./test/device_patch_xml", #state{}).
 
 get_device_test() ->
 	?assertMatch([{device,"generic",[],undefined,"root",_,_,_}], get_device(devicesTbl, "generic")).

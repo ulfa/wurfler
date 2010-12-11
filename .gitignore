@@ -3,5 +3,6 @@
 /deps/
 /db/
 /import/
+/wurfl_patch/
 /*.dump
 /*.DS_Store

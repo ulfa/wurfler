@@ -33,6 +33,24 @@ The new version uses mnesia instead of ets tables.
 
 First you have to run install.sh which creates the schema and the db tables.
 
+## Data import
+
+To import data you have to follow these steps:
+
+### wurfl file
+
+In the directory test there is a wurfl-2.0.25.xml file. Please, rename it and copy
+this file in the directory wurfl. Everything else will be done by the system. 
+If this is not available, you have to create it.Normaly, it will be created
+using the install.sh script.
+
+
+### wurfl_patch file
+
+To insert new data or to modify existing data you have to use the wurfl_patch.xml.
+After creating a wurfl_patch.xml file you can copy this in the wurfl_patch directory.
+Everything else will be done by the system.
+
 ## Runing common_test
 
 Before running the following line you have to modify the cover.spec and test.spec.

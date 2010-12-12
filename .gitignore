@@ -4,5 +4,7 @@
 /db/
 /import/
 /wurfl_patch/
+/wurfl/
+/logs/
 /*.dump
 /*.DS_Store

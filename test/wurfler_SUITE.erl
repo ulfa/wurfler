@@ -56,7 +56,7 @@ suite() -> [{timetrap, {seconds, 20}}].
 %%
 %% Description: Returns a list of test case group definitions.
 %%--------------------------------------------------------------------
-groups() -> [].
+groups() -> [{get_requests, [sequence], [get_device_by_id]}].
 
 %%--------------------------------------------------------------------
 %% Function: all() -> GroupsAndTestCases
@@ -70,7 +70,7 @@ groups() -> [].
 %% Description: Returns the list of groups and test cases that
 %%              are to be executed.
 %%--------------------------------------------------------------------
-all() -> [].
+all() -> [{group, get_requests}].
 
 %%--------------------------------------------------------------------
 %% Function: init_per_suite(Config0) ->
@@ -87,6 +87,7 @@ all() -> [].
 %% variable, but should NOT alter/remove any existing entries.
 %%--------------------------------------------------------------------
 init_per_suite(Config) -> 
+	ibrowse:start(),
 	Config.
 %%--------------------------------------------------------------------
 %% Function: end_per_suite(Config0) -> void() | {save_config,Config1}
@@ -97,6 +98,7 @@ init_per_suite(Config) ->
 %% Description: Cleanup after the suite.
 %%--------------------------------------------------------------------
 end_per_suite(_Config) ->
+	ibrowse:stop(),
 	ok.
 
 %%--------------------------------------------------------------------
@@ -163,3 +165,6 @@ init_per_testcase(TestCase, Config) ->
 %%--------------------------------------------------------------------
 end_per_testcase(TestCase, Config) ->
     Config.
+
+get_device_by_id(_Config)->
+	ibrowse:send_req("http://localhost:8000/device/rocker", [{"Content-Type", "text/xml"}], get).

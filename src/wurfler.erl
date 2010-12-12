@@ -350,7 +350,8 @@ search_by_ua_test()->
 	?assertEqual("opera_nokia_7610_ver1", Device#device.id).
 	
 	
-
+search_by_device_id_test() ->
+	?assertEqual([],search_by_device_id("unknown")).
 
 
 

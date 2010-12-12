@@ -35,7 +35,7 @@
 %% API Functions
 %%
 init([]) -> 
-	{ok, #context{device=undefined}}.
+	{ok, #context{device=[]}}.
 
 content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}],ReqData, Context}.
@@ -62,8 +62,8 @@ to_xml(ReqData, #context{device=Device}=Context)->
  
 resource_exists(ReqData, Context) ->
 	case get_device(wrq:path_info(device, ReqData), ReqData) of
-		[] -> {false, ReqData, Context};
-		Device -> {true, ReqData, Context#context{device=Device}}
+		[] -> {false, ReqData, Context#context{device=[]}};
+		Devices -> {true, ReqData, Context#context{device=Devices}}
 	end.
 
 %%

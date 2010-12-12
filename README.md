@@ -36,6 +36,10 @@ First you have to run install.sh which creates the schema and the db tables.
 ## Runing common_test
 
 Before running the following line you have to modify the cover.spec and test.spec.
-Inside these files you hae to specify your own absolute path. Then you can run : 
+Inside these files you have to specify your own absolute path. Later i will build
+a script which will do the work for you.
+In the cover.spec you also have to specify the name of your node. 
+
+Then you can run : 
 
 ct_run -spec test/test.spec -pa deps/*/ebin/ ./ebin -cover test/cover.spec 

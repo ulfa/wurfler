@@ -6,5 +6,9 @@
 /wurfl_patch/
 /wurfl/
 /logs/
+/test/wurfler_SUITE.beam
+/test/cover.spec
+/test/test.spec
+/Mnesia.lilly@*
 /*.dump
 /*.DS_Store

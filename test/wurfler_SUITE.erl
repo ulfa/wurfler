@@ -167,4 +167,4 @@ end_per_testcase(TestCase, Config) ->
     Config.
 
 get_device_by_id(_Config)->
-	ibrowse:send_req("http://localhost:8000/device/rocker", [{"Content-Type", "text/xml"}], get).
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device/generic", [{"Content-Type", "text/xml"}], get).

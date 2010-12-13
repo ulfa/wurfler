@@ -120,7 +120,7 @@ terminate(Reason, State) ->
 %% Purpose: Convert process state when code is changed
 %% Returns: {ok, NewState}
 %% --------------------------------------------------------------------
-code_change(OldVsn, State, Extra) ->
+code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 %% --------------------------------------------------------------------
@@ -129,8 +129,10 @@ code_change(OldVsn, State, Extra) ->
 import(Filename, State) ->
 	error_logger:info_msg("starting importing wurfl patch~n"),
 	Wurfl_Patch = xml_factory:parse_file(Filename),	
-	Devices = xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch),
-	process_devices(Devices, State),
+	case xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch) of
+		[] -> error_logger:info_msg("no devices found! ~n"); 
+		Devices ->	 process_devices(Devices, State)
+	end,
 	error_logger:info_msg("finished importing wurfl patch~n").
 
 process_devices(Devices, State) ->
@@ -261,6 +263,8 @@ import_wurflpatch_test()->
 
 get_device_test() ->
 	?assertMatch([{device,"generic",[],undefined,"root",_,_,_}], get_device(devicesTbl, "generic")).
+
 process_device_test() ->
 	Wurfl_Patch = xml_factory:parse_file("./test/wurlfpatch.xml"),
 	Devices = xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch).
+

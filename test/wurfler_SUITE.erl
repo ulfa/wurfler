@@ -56,7 +56,7 @@ suite() -> [{timetrap, {seconds, 20}}].
 %%
 %% Description: Returns a list of test case group definitions.
 %%--------------------------------------------------------------------
-groups() -> [{get_requests, [sequence], [get_device_by_id]}].
+groups() -> [{get_requests, [sequence], [get_device_by_id, get_device_by_id_404, get_device_by_ua]}].
 
 %%--------------------------------------------------------------------
 %% Function: all() -> GroupsAndTestCases
@@ -171,3 +171,6 @@ get_device_by_id(_Config)->
 
 get_device_by_id_404(_Config) ->
 	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/device/unknown", [{"Content-Type", "text/xml"}], get).
+
+get_device_by_ua(_Config) ->
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/xml"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).

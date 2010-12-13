@@ -1,6 +1,6 @@
-# First version
+# actual version
 
-In the frist version of the wurfler you can query by user-agent and you can
+In this version of the wurfler you can query by user-agent and you can
 query by capabilities. Also, it is possible to get information of device by
 sending the device id to the service.
 

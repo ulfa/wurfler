@@ -345,6 +345,11 @@ search_by_capabilities_test() ->
 	 {"playback_wmv", {"none", '=='}}],
 	search_by_capabilities(List, new_state()).
 
+search_by_capabilities_test_1() ->
+	List=[{"makes_good_coffee", {"false", '=='}}],
+	search_by_capabilities(List, new_state()).
+
+
 search_by_ua_test()->
 	Device = search_by_ua("Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", wurfler:new_state()),
 	?assertEqual("opera_nokia_7610_ver1", Device#device.id).

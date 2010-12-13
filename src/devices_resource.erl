@@ -85,11 +85,16 @@ create_cap(Cap) ->
 %% --------------------------------------------------------------------
 %% Test functions
 %% --------------------------------------------------------------------
-
-body_test() ->
+get_capabilities_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
-	Xml = xml_factory:parse(Xml_Bin),
-	Caps = xmerl_xpath:string ("/query/capabilities/capability", Xml),
-	[create_cap(Cap)||Cap <- Caps].
-	
+	?assertEqual([{"j2me_cldc_1_1",{"true",'=='}},{"j2me_midp_1_",{"true",'=='}}],  get_capabilities(Xml_Bin)).
 
+get_devices_test() ->
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
+ 	?assertEqual(1, erlang:length(get_devices(get_capabilities(Xml_Bin)))).
+
+xml_test() ->
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
+	A=lists:flatten(xmerl:export_simple_content(get_devices(get_capabilities(Xml_Bin)), xmerl_xml)),
+	?assertEqual(451787, erlang:length(A)).
+	

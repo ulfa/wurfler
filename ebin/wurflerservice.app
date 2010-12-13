@@ -13,8 +13,7 @@
              devices_resource,
              wurfler_db,             
              wurfler_file_poller,
-	 wurfler_patch,
-	 wurfler_SUITE
+	 wurfler_patch
 	
             ]},
   {registered, [wurflerservice]},

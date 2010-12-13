@@ -168,3 +168,6 @@ end_per_testcase(TestCase, Config) ->
 
 get_device_by_id(_Config)->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device/generic", [{"Content-Type", "text/xml"}], get).
+
+get_device_by_id_404(_Config) ->
+	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/device/unknown", [{"Content-Type", "text/xml"}], get).

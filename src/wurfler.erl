@@ -155,7 +155,7 @@ search_by_capabilities(Capabilities, State) ->
 	get_devices_for_caps(List_Of_Funs, Keys, State).
 
 get_devices_for_caps(_List_Of_Funs, [], State) ->
-	State#state{devices=create_devices(State#state.devices)};
+	State#state{devices=erlang:list_to_binary(create_devices(State#state.devices))};
 	
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),

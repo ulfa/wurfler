@@ -66,7 +66,7 @@ process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
 	Caps=get_capabilities(Body),
 	D=lists:flatten(xmerl:export_simple_content(get_devices(Caps), xmerl_xml)),
-	{true, wrq:append_to_response_body(list_to_binary(D), ReqData), Context}.
+	{true, wrq:append_to_response_body(D, ReqData), Context}.
 %%
 %% Local Functions
 %%

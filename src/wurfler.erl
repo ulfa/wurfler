@@ -155,6 +155,7 @@ search_by_capabilities(Capabilities, State) ->
 	get_devices_for_caps(List_Of_Funs, Keys, State).
 
 get_devices_for_caps(_List_Of_Funs, [], State) ->
+	error_logger:info_msg("found : ~p devices ~n", [erlang:length(State#state.devices)]),
 	State#state{devices=create_devices(State#state.devices)};
 	
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->

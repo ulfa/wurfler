@@ -65,8 +65,9 @@ resource_exists(ReqData, Context) ->
 process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
 	Caps=get_capabilities(Body),
-	D=lists:flatten(xmerl:export_simple_content(get_devices(Caps), xmerl_xml)),
-	{true, wrq:append_to_response_body(list_to_binary(D), ReqData), Context}.
+	Devices = get_devices(Caps),
+	D=lists:flatten(xmerl:export_simple_content(Devices, xmerl_xml)),
+	{true, wrq:append_to_response_body(D, ReqData), Context}.
 %%
 %% Local Functions
 %%
@@ -82,6 +83,7 @@ create_cap(Cap) ->
 	Name = xml_factory:get_attribute("/capability/@name", Cap),
 	Value = xml_factory:get_attribute("/capability/@value", Cap),
 	Operator = list_to_atom(xml_factory:get_attribute("/capability/@operator", Cap)),
+	error_logger:info_msg("Capability : Name : ~p Value  : ~p Operator : ~p~n", [Name, Value, Operator]),
 	{Name, {Value, Operator}}.
 %% --------------------------------------------------------------------
 %% Test functions

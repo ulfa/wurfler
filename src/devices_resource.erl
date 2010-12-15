@@ -66,8 +66,12 @@ process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
 	Caps=get_capabilities(Body),
 	Devices = get_devices(Caps),
-	D=lists:flatten(xmerl:export_simple_content(Devices, xmerl_xml)),
-	{true, wrq:append_to_response_body(D, ReqData), Context}.
+ 	D=lists:flatten(xmerl:export_simple_content(Devices, xmerl_xml)),
+	D0 = list_to_binary(Devices),
+	io:format("Size : ~p~n ", [is_binary(D0)]),
+	D1=iolist_to_binary([D0]),
+	error_logger:info_msg("Size : ~p~n", [iolist_size(D1)]),
+	{true, wrq:append_to_response_body(D1, ReqData), Context}.
 %%
 %% Local Functions
 %%
@@ -90,11 +94,15 @@ create_cap(Cap) ->
 %% --------------------------------------------------------------------
 get_capabilities_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
-	?assertEqual([{"j2me_cldc_1_1",{"true",'=='}},{"j2me_midp_1_",{"true",'=='}}],  get_capabilities(Xml_Bin)).
+	?assertEqual([{"j2me_cldc_1_1",{"true",'=='}},{"j2me_midp_1_1",{"true",'=='}}],  get_capabilities(Xml_Bin)).
 
 get_devices_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
- 	?assertEqual(1, erlang:length(get_devices(get_capabilities(Xml_Bin)))).
+	D=get_devices(get_capabilities(Xml_Bin)),
+	io:format("1... ~p~n", [D]),
+	D1=lists:flatten(xmerl:export_simple_content(D, xmerl_xml)),
+	io:format("2... ~p~n", [D1]),
+ 	?assertEqual(1, erlang:length(D)).
 
 xml_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,

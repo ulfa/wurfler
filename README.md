@@ -1,6 +1,3 @@
-
-# THIS RELEASE IS NOT WORKING. I AM STILL WORKING ON THIS PROBLEM
-
 # actual version
 
 In this version of the wurfler you can query by user-agent and you can

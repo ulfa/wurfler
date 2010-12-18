@@ -154,16 +154,6 @@ search_by_capabilities(Capabilities, State) ->
 	Keys = wurfler_db:get_all_keys(devicesTbl),
 	get_devices_for_caps(List_Of_Funs, Keys, State).
 
-get_devices_for_caps(_List_Of_Funs, [], State) ->
-	State#state{devices=erlang:list_to_binary(create_devices(State#state.devices))};
-	
-get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
-	Device = search_by_device_id(Key),
-	{ok,#state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State#state{capabilities=[]}),
-	case run_funs_against_list(List_Of_Funs, Caps) of
-		{ok} -> get_devices_for_caps(List_Of_Funs, Keys,State#state{devices=[create_device(Device)|State#state.devices]});
-		{nok} -> get_devices_for_caps(List_Of_Funs, Keys, State)
-	end.
 
 create_device(#device{id=Id, brand_name=Brand_name, model_name=Model_name}) ->
 	{'device', [{id, Id}, {model_name,Model_name}, {brand_name,Brand_name}], []}.
@@ -189,17 +179,17 @@ get_all_capabilities("generic", #state{capabilities=Caps}) ->
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	{Fall_back, Capabilities} = wurfler_db:find_capabilities_by_id(devicesTbl, DeviceName),	
 	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
-
 %%------------------------------------------------------------------------------
 %% Here i can optimize the create_fun stuff.
 %% Perhaps i will use erl_scan and co.
 %%------------------------------------------------------------------------------
 create_fun(CheckName, CheckValue, '==')->
 	fun(Name, Value) ->
+%% 		error_logger:info_msg("Function(~p, ~p) ~p,~p~n", [Name, Value, CheckName, CheckValue]),
 		case Name of
 			CheckName ->  case Value == CheckValue of
-							 true -> {ok};
-							 false -> {nok}
+ 							 true -> {ok};
+							 false ->{nok}
 						 end;
 			_ -> {continue}
 		end
@@ -254,40 +244,67 @@ create_fun(CheckName, CheckValue, '>=')->
 			_ -> {continue}
 		end			
 	end.
-%% Run all funs for one capability
-%% Only if all funs return ok, its ok
-and_cond([Fun|Funs], {CheckName, CheckValue}) ->
-    case Fun(CheckName, CheckValue) of
-		{ok} -> and_cond({ok});
-		{nok} -> and_cond({nok});
-        {continue} -> and_cond(Funs, {CheckName, CheckValue})
+
+get_devices_for_caps(_List_Of_Funs, [], State) ->
+	State#state{devices=create_devices(State#state.devices)};
+	
+get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
+	Device = search_by_device_id(Key),
+	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State#state{capabilities=[]}),
+%%  error_logger:info_msg("Capse ~p~n", [Caps]),	
+	case run_funs_against_list(List_Of_Funs, Caps, {nok}) of
+		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, State#state{devices=[create_device(Device)|State#state.devices]});
+		{nok} -> get_devices_for_caps(List_Of_Funs, Keys, State)
+	end.
+
+run_funs_against_list(List_Of_Funs, [#capability{name=CheckName, value=CheckValue}|List_Of_Caps], Acc) ->
+%% 	error_logger:info_msg("run_funs_against_list ~p , ~p~n", [CheckName, CheckValue]),
+	case and_cond(List_Of_Funs, {CheckName, CheckValue}, []) of
+		{ok} -> run_funs_against_list(List_Of_Funs, List_Of_Caps, {ok});
+		{nok} -> run_funs_against_list(List_Of_Funs, [], {nok});
+		[] -> run_funs_against_list(List_Of_Funs, List_Of_Caps, Acc)
+	end;
+run_funs_against_list(_List_Of_Funs, [], Acc) ->
+%% 	error_logger:info_msg("Acc, ~p~n", [Acc]),
+	Acc.
+
+and_cond([Fun|Funs], {CheckName, CheckValue}, Acc) ->
+%% 	error_logger:info_msg("and_cond ~p , ~p~n", [CheckName, CheckValue]),
+	case Fun(CheckName, CheckValue) of
+		{ok} -> and_cond(Funs, {CheckName, CheckValue}, {ok});
+		{nok} -> and_cond([], {CheckName, CheckValue}, {nok});
+		_ -> and_cond(Funs, {CheckName, CheckValue}, Acc)
     end;
-and_cond([], {_CheckName, _CheckValue}) -> 
-	{continue}.
-and_cond(ReturnValue) ->
-	ReturnValue.	
+and_cond([], {_CheckName, _CheckValue}, Acc) -> 
+%% 	error_logger:info_msg("Acc, ~p~n", [Acc]),
+	Acc.
 
 create_funs_from_list(List) ->
 	[create_fun(Name, Value, Operator) || {Name, {Value, Operator}} <- List].
-
-run_funs_against_list(List_Of_Funs, [#capability{name=CheckName, value=CheckValue}|List_Of_Caps]) ->
-	case and_cond(List_Of_Funs, {CheckName, CheckValue}) of
-		{continue} -> run_funs_against_list(List_Of_Funs, List_Of_Caps);
-		{ok} -> run_funs_against_list(List_Of_Funs, List_Of_Caps);
-		{nok} -> {nok}
-	end;
-	
-run_funs_against_list(_List_Of_Funs, []) ->
-	{ok}.
 	
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+and_cond_test() ->
+	List=[{"device_os", {"iPhone OS", '=='}}],
+	List_Of_Funs = create_funs_from_list(List),
+	?assertEqual({ok}, and_cond(List_Of_Funs, {"device_os","iPhone OS"}, [])),	
+	?assertEqual({nok},and_cond(List_Of_Funs, {"device_os","unknown"}, [])),
+	
+	List1=[{"unknown", {"iPhone OS", '=='}}],
+	List_Of_Funs1 = create_funs_from_list(List1),
+	?assertEqual([], and_cond(List_Of_Funs1, {"device_os","iPhone OS"}, [])).
+	
 create_function_test() ->
 	A=create_fun("test", "123", '=='),
 	?assertEqual({ok}, A("test", "123")),
 	?assertEqual({nok}, A("test", "12")),
 	?assertEqual({continue}, A("unknown", "123")),
+
+	A1=create_fun("device_os", "iPhone", '=='),
+	?assertEqual({ok}, A1("device_os", "iPhone")),
+	?assertEqual({nok}, A1("device_os", "Android")),
+	?assertEqual({continue}, A1("unknown", "123")),
 	
 	B=create_fun("test", "123", '/='),
 	?assertEqual({ok}, B("test", "234")),
@@ -329,34 +346,37 @@ create_funs_from_list_test() ->
 	?assertEqual(3, erlang:length(create_funs_from_list(List))).
 
 run_funs_against_list_test()->
-	List_of_para=[{"handheldfriendly", {"true", '=='}},
-	 {"playback_mp4", {"false", '=='}},
-	 {"playback_wmv", {"none", '=='}}],
-	?assertEqual({ok},run_funs_against_list(create_funs_from_list(List_of_para), wurfler:getAllCapabilities("generic"))),
-	List_of_para1=[{"handheldfriendly", {"false", '=='}},
-	 {"playback_mp4", {"false", '=='}},
-	 {"playback_wmv", {"none", '=='}}],
-	?assertEqual({ok},run_funs_against_list(create_funs_from_list(List_of_para1), wurfler:getAllCapabilities("generic"))).
+	List_of_para=[{"jpg", {"true", '=='}},
+	 {"gif", {"true", '=='}},
+	 {"png", {"true", '=='}}],
+	Caps1=wurfler:getAllCapabilities("generic_xhtml"),
+	?assertEqual({ok},run_funs_against_list(create_funs_from_list(List_of_para), Caps1, [])),
 	
-	
+ 	List_of_para1=[{"handheldfriendly", {"false", '=='}},
+ 	 {"playback_mp4", {"false", '=='}},
+ 	 {"playback_wmv", {"none", '=='}}],
+ 	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para1), Caps1,{nok})),
+
+	List_of_para2=[{"jpg", {"true", '=='}},
+	 {"gif", {"true", '=='}},
+	 {"png", {"false", '=='}}],
+	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para2), Caps1, [])).
+
 search_by_capabilities_test() ->
 	List=[{"handheldfriendly", {"false", '=='}},
 	 {"playback_mp4", {"false", '=='}},
 	 {"playback_wmv", {"none", '=='}}],
 	search_by_capabilities(List, new_state()).
 
-search_by_capabilities_test_1() ->
-	List=[{"makes_good_coffee", {"false", '=='}}],
-	search_by_capabilities(List, new_state()).
-
-
 search_by_ua_test()->
 	Device = search_by_ua("Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", wurfler:new_state()),
 	?assertEqual("opera_nokia_7610_ver1", Device#device.id).
 	
-	
-search_by_device_id_test() ->
-	?assertEqual([],search_by_device_id("unknown")).
+search_by_capabilities_test_1() ->
+	List=[{"device_os", {"iPhone OS", '=='}}],
+	List_Of_Funs=create_funs_from_list(List),
+	Keys = ["apple_generic", "generic_xhtml"], 
+	get_devices_for_caps(List_Of_Funs, Keys, new_state()).
 
 
 

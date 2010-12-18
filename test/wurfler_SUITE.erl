@@ -176,5 +176,5 @@ get_device_by_ua(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/xml"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).
 
 post_cap_query(_Config) ->
-	A=<<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"==\"/></capabilities></query>">>,
-	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", [{"Content-Type", "text/xml"}], post, A ).
+	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"==\"/></capabilities></query>",
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", [{"Content-Type", "text/xml"}], post, A).

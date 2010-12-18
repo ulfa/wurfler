@@ -223,20 +223,20 @@ get_brand_and_model(Groups) ->
 get_brand_name(Groups) ->
 	case [Value || #capability{name="brand_name", value=Value } <- get_capabilities_for_groups(Groups)] of
 		[] -> {brand_name, undefined};
-		[Brand_name]  -> {brand_name, Brand_name}
+		[Brand_name]  -> {brand_name, lists:subtract(Brand_name, "'")}
 	end.
 get_model_name(Groups) ->
 	case [Value || #capability{name="model_name", value=Value} <- get_capabilities_for_groups(Groups)] of
 		[] -> {model_name, undefined};
-		[Model_name] -> {model_name, Model_name}
+		[Model_name] -> {model_name, lists:subtract(Model_name, "'")}
 	end.
 get_device_os(Groups) ->
 	case [Value || #capability{name="device_os", value=Value} <- get_capabilities_for_groups(Groups)] of
-		[] -> {model_name, undefined};
-		[Model_name] -> Model_name
+		[] -> {device_os, undefined};
+		[Device_Os] -> Device_Os
 	end.
 get_capabilities_for_groups(Groups) ->
-	lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)).
+	lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)).	
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

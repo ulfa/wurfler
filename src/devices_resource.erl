@@ -98,4 +98,3 @@ xml_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
 	A=lists:flatten(xmerl:export_simple_content(get_devices(get_capabilities(Xml_Bin)), xmerl_xml)),
 	?assertEqual(451787, erlang:length(A)).
-	

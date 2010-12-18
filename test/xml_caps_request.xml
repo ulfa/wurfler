@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <query>
 	<capabilities>
-<<<<<<< HEAD
 		<capability name="device_os" value="Android" operator="=="/>
-=======
-		<capability name="device_os" value="iPhone" operator="=="/>
-		
->>>>>>> 5cb453fe22dee708f097236bc488e216457e8f70
 	</capabilities>
 </query>

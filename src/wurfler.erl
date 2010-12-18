@@ -87,7 +87,7 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({search_by_capabilities, Capabilities}, _From, State) ->
-	Result=search_by_capabilities(Capabilities, State),
+	Result=search_by_capabilities(Capabilities, new_state()),
     {reply, Result#state.devices, State};
 handle_call({search_by_ua, Capabilities}, _From, State) ->
 	Result=search_by_ua(Capabilities, State),
@@ -154,7 +154,6 @@ search_by_capabilities(Capabilities, State) ->
 	Keys = wurfler_db:get_all_keys(devicesTbl),
 	get_devices_for_caps(List_Of_Funs, Keys, State).
 
-
 create_device(#device{id=Id, brand_name=Brand_name, model_name=Model_name}) ->
 	{'device', [{id, Id}, {model_name,Model_name}, {brand_name,Brand_name}], []}.
 create_devices(Devices)->
@@ -183,6 +182,9 @@ get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 %% Here i can optimize the create_fun stuff.
 %% Perhaps i will use erl_scan and co.
 %%------------------------------------------------------------------------------
+create_funs_from_list(List) ->
+	[create_fun(Name, Value, Operator) || {Name, {Value, Operator}} <- List].
+
 create_fun(CheckName, CheckValue, '==')->
 	fun(Name, Value) ->
 %% 		error_logger:info_msg("Function(~p, ~p) ~p,~p~n", [Name, Value, CheckName, CheckValue]),
@@ -248,6 +250,7 @@ create_fun(CheckName, CheckValue, '>=')->
 get_devices_for_caps(_List_Of_Funs, [], State) ->
 	State#state{devices=create_devices(State#state.devices)};
 	
+
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),
 	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State#state{capabilities=[]}),
@@ -278,10 +281,6 @@ and_cond([Fun|Funs], {CheckName, CheckValue}, Acc) ->
 and_cond([], {_CheckName, _CheckValue}, Acc) -> 
 %% 	error_logger:info_msg("Acc, ~p~n", [Acc]),
 	Acc.
-
-create_funs_from_list(List) ->
-	[create_fun(Name, Value, Operator) || {Name, {Value, Operator}} <- List].
-	
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -351,7 +350,7 @@ run_funs_against_list_test()->
 	 {"png", {"true", '=='}}],
 	Caps1=wurfler:getAllCapabilities("generic_xhtml"),
 	?assertEqual({ok},run_funs_against_list(create_funs_from_list(List_of_para), Caps1, [])),
-	
+		
  	List_of_para1=[{"handheldfriendly", {"false", '=='}},
  	 {"playback_mp4", {"false", '=='}},
  	 {"playback_wmv", {"none", '=='}}],
@@ -368,6 +367,7 @@ search_by_capabilities_test() ->
 	 {"playback_wmv", {"none", '=='}}],
 	search_by_capabilities(List, new_state()).
 
+
 search_by_ua_test()->
 	Device = search_by_ua("Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", wurfler:new_state()),
 	?assertEqual("opera_nokia_7610_ver1", Device#device.id).
@@ -377,6 +377,7 @@ search_by_capabilities_test_1() ->
 	List_Of_Funs=create_funs_from_list(List),
 	Keys = ["apple_generic", "generic_xhtml"], 
 	get_devices_for_caps(List_Of_Funs, Keys, new_state()).
+
 
 
 

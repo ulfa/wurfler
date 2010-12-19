@@ -56,7 +56,9 @@ suite() -> [{timetrap, {seconds, 20}}].
 %%
 %% Description: Returns a list of test case group definitions.
 %%--------------------------------------------------------------------
-groups() -> [{get_requests, [sequence], [get_device_by_id, get_device_by_id_404, get_device_by_ua, post_cap_query]}].
+groups() -> [{get_requests, [sequence], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
+			 {post_requests, [sequence], [post_cap_query_no_caps, post_cap_query]}
+			].
 
 %%--------------------------------------------------------------------
 %% Function: all() -> GroupsAndTestCases
@@ -70,7 +72,7 @@ groups() -> [{get_requests, [sequence], [get_device_by_id, get_device_by_id_404,
 %% Description: Returns the list of groups and test cases that
 %%              are to be executed.
 %%--------------------------------------------------------------------
-all() -> [{group, get_requests}].
+all() -> [{group, get_requests}, {group, post_requests}].
 
 %%--------------------------------------------------------------------
 %% Function: init_per_suite(Config0) ->
@@ -178,3 +180,9 @@ get_device_by_ua(_Config) ->
 post_cap_query(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"==\"/></capabilities></query>",
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", [{"Content-Type", "text/xml"}], post, A).
+
+post_cap_query_no_caps(_Config) ->
+	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
+	{ok, "200", _C, Body}=ibrowse:send_req("http://localhost:8000/devices", [{"Content-Type", "text/xml"}], post, A),
+	"<devices/>" == Body.
+

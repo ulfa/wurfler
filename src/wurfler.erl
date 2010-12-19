@@ -247,9 +247,11 @@ create_fun(CheckName, CheckValue, '>=')->
 		end			
 	end.
 
+get_devices_for_caps([], _Keys, State) ->
+	State#state{devices=create_devices(State#state.devices)};
+
 get_devices_for_caps(_List_Of_Funs, [], State) ->
 	State#state{devices=create_devices(State#state.devices)};
-	
 
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),
@@ -338,6 +340,7 @@ create_function_test() ->
 	%% 1234 >= 123
 	?assertEqual({ok}, F("test",1234)),
 	?assertEqual({continue}, F("unknow",123)).
+
 create_funs_from_list_test() ->
 	List=[{"handheldfriendly", {"false", '=='}},
 	 {"playback_mp4", {"false", '=='}},
@@ -361,16 +364,17 @@ run_funs_against_list_test()->
 	 {"png", {"false", '=='}}],
 	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para2), Caps1, [])).
 
+search_by_ua_test()->
+	Device = search_by_ua("Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", wurfler:new_state()),
+	?assertEqual("opera_nokia_7610_ver1", Device#device.id).
+
 search_by_capabilities_test() ->
 	List=[{"handheldfriendly", {"false", '=='}},
 	 {"playback_mp4", {"false", '=='}},
 	 {"playback_wmv", {"none", '=='}}],
-	search_by_capabilities(List, new_state()).
-
-
-search_by_ua_test()->
-	Device = search_by_ua("Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", wurfler:new_state()),
-	?assertEqual("opera_nokia_7610_ver1", Device#device.id).
+	State = search_by_capabilities(List, new_state()),
+	io:format("~p~n", [State#state.devices]),
+	?assertEqual(1, erlang:length(State#state.devices)).
 	
 search_by_capabilities_test_1() ->
 	List=[{"device_os", {"iPhone OS", '=='}}],

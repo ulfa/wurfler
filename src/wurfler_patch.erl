@@ -164,7 +164,11 @@ merge_device(DeviceXml, DeviceDb) ->
 	User_Agent = xml_factory:get_attribute("/device/@user_agent", DeviceXml),
 	Actual_device_root = xml_factory:get_attribute("/device/@actual_device_root", DeviceXml),
 	Fall_back = xml_factory:get_attribute("/device/@fall_back", DeviceXml),
-	DeviceDb#device{user_agent=User_Agent, actual_device_root=Actual_device_root, fall_back=Fall_back, groups=Groups}.
+	DeviceDb#device{user_agent=User_Agent, 
+					actual_device_root=Actual_device_root, 
+					fall_back=Fall_back, 
+					groups=Groups,
+					lastmodified=wurfler_date_util:get_uc_time()}.
 
 merge_groups(GroupsXml, GroupsDb) ->
 

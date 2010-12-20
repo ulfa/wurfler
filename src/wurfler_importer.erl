@@ -204,7 +204,9 @@ create_device(Attributes, Groups)->
 			fall_back=proplists:get_value(fall_back, Attributes),
 			brand_name=proplists:get_value(brand_name, Attributes),
 			model_name=proplists:get_value(model_name, Attributes),
-			groups=Groups}.
+			groups=Groups,
+			created=wurfler_date_util:get_uc_time(),
+			lastmodified=wurfler_date_util:get_uc_time()}.
 
 create_group(Attributes, Capabilities) ->
 	#group{id=proplists:get_value(id, Attributes), capabilites=Capabilities}.

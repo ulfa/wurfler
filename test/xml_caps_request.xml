@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <query>
 	<capabilities>
-		<capability name="device_os" value="Android" operator="=="/>
+		<capability name="device_os" value="Android" operator="="/>
 	</capabilities>
 </query>

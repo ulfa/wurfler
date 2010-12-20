@@ -56,7 +56,7 @@ suite() -> [{timetrap, {seconds, 20}}].
 %%
 %% Description: Returns a list of test case group definitions.
 %%--------------------------------------------------------------------
-groups() -> [{get_requests, [sequence], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
+groups() -> [{get_requests, [parallel], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
 			 {post_requests, [sequence], [post_cap_query_no_caps, post_cap_query]}
 			].
 

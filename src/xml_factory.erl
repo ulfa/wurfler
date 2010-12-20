@@ -31,7 +31,7 @@
 %%
 %% Exported Functions
 %%
--export([create_xml/2, parse/1, parse_file/1, get_attribute/2]).
+-export([create_xml/2, parse/1, parse_file/1, get_attribute/2, get_text/2]).
 
 %%
 %% API Functions
@@ -65,6 +65,11 @@ get_attribute(XPath, Node) ->
 		[#xmlAttribute{value = Value}] -> Value;
 		O -> O
 	end.
+get_text(XPath, Xml) ->
+	case xmerl_xpath:string(XPath, Xml) of
+		[#xmlText{value = Value}] -> Value;
+		Other -> Other
+	end.
 %%
 %% Local Functions
 %%
@@ -95,6 +100,7 @@ create_xml_device_test() ->
 create_device()->
 	#device{id="Nokia", user_agent="blahblahblah", actual_device_root=undefined, fall_back=undefined, 
 			groups=[create_group_1(), create_group_2()]}.
+
 create_goups() ->
 	[create_group_1(), create_group_2()].
 create_group_1() ->

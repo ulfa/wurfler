@@ -30,7 +30,7 @@
 %% External exports
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
--export([get_all_keys/1, find_capabilities_by_id/2]).
+-export([get_all_keys/1, find_capabilities_by_id/2,get_all_keys/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -85,6 +85,9 @@ find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(transaction, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
 get_all_keys(devicesTbl) ->
 	mnesia:dirty_select(devicesTbl,[{#device{id='$1', actual_device_root="true", _='_'}, [], ['$1']}]).
+get_all_keys(devicesTbl, Timestamp) ->
+	mnesia:dirty_select(devicesTbl,[{#device{id='$1', actual_device_root="true", lastmodified='$2', _='_'}, [{'>', '$2', Timestamp}], ['$1']}]).
+
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -98,3 +101,7 @@ find_capabilities_by_id_test()->
 	?assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")).
 get_all_keys_test() ->
 	?assertEqual(6337,erlang:length(get_all_keys(devicesTbl))).
+
+get_all_keys_test_with_timestamp_test() ->
+	?assertEqual(6337,erlang:length(get_all_keys(devicesTbl, {{2010, 01, 01}, {0,0,0}}))),
+	?assertEqual(0,erlang:length(get_all_keys(devicesTbl, {{2011, 01, 01}, {0,0,0}}))).

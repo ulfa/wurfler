@@ -65,7 +65,8 @@ resource_exists(ReqData, Context) ->
 process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
 	Caps=get_capabilities(Body),
-	D=lists:flatten(xmerl:export_simple_content(get_devices(Caps), xmerl_xml)),
+	Timestamp=get_timestamp(Body),
+	D=lists:flatten(xmerl:export_simple_content(get_devices(Caps, Timestamp), xmerl_xml)),
 	{true, wrq:append_to_response_body(D, ReqData), Context}.
 %%
 %% Local Functions
@@ -75,8 +76,17 @@ get_capabilities(Body) ->
 	Caps = xmerl_xpath:string ("/query/capabilities/capability", Xml),
 	[create_cap(Cap)||Cap <- Caps].	
 
-get_devices(Capabilities) ->
+get_devices(Capabilities, []) ->
+	Timestamp="01.01.1970",
+	wurfler:searchByCapabilities(Capabilities);
+
+get_devices(Capabilities, Timestamp) ->
 	wurfler:searchByCapabilities(Capabilities).
+
+
+get_timestamp(Body) ->
+	Xml = xml_factory:parse(Body),
+	xml_factory:get_text("/query/timestamp/text()", Xml).
 
 create_cap(Cap) ->
 	Name = xml_factory:get_attribute("/capability/@name", Cap),
@@ -89,10 +99,18 @@ create_cap(Cap) ->
 get_capabilities_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
 	?assertEqual([{"j2me_cldc_1_1",{"true",'=='}},{"j2me_midp_1_1",{"true",'=='}}],  get_capabilities(Xml_Bin)).
+get_timestamp_test() ->
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>19.12.2010</timestamp><capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
+	?assertEqual("19.12.2010",get_timestamp(Xml_Bin)).
+
+get_timestamp_not_present_test() ->
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
+	?assertEqual([],get_timestamp(Xml_Bin)).
+	
 
 get_devices_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
-	D=get_devices(get_capabilities(Xml_Bin)),
+	D=get_devices(get_capabilities(Xml_Bin), "01.01.2010"),
 	io:format("1... ~p~n", [D]),
 	D1=lists:flatten(xmerl:export_simple_content(D, xmerl_xml)),
 	io:format("2... ~p~n", [D1]),
@@ -100,5 +118,5 @@ get_devices_test() ->
 
 xml_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
-	A=lists:flatten(xmerl:export_simple_content(get_devices(get_capabilities(Xml_Bin)), xmerl_xml)),
+	A=lists:flatten(xmerl:export_simple_content(get_devices(get_capabilities(Xml_Bin), "01.01.2010"), xmerl_xml)),
 	?assertEqual(451787, erlang:length(A)).

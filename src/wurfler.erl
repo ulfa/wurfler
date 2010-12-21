@@ -287,22 +287,22 @@ and_cond([], {_CheckName, _CheckValue}, Acc) ->
 %%% Test functions
 %% --------------------------------------------------------------------
 and_cond_test() ->
-	List=[{"device_os", {"iPhone OS", '=='}}],
+	List=[{"device_os", {"iPhone OS", '='}}],
 	List_Of_Funs = create_funs_from_list(List),
 	?assertEqual({ok}, and_cond(List_Of_Funs, {"device_os","iPhone OS"}, [])),	
 	?assertEqual({nok},and_cond(List_Of_Funs, {"device_os","unknown"}, [])),
 	
-	List1=[{"unknown", {"iPhone OS", '=='}}],
+	List1=[{"unknown", {"iPhone OS", '='}}],
 	List_Of_Funs1 = create_funs_from_list(List1),
 	?assertEqual([], and_cond(List_Of_Funs1, {"device_os","iPhone OS"}, [])).
 	
 create_function_test() ->
-	A=create_fun("test", "123", '=='),
+	A=create_fun("test", "123", '='),
 	?assertEqual({ok}, A("test", "123")),
 	?assertEqual({nok}, A("test", "12")),
 	?assertEqual({continue}, A("unknown", "123")),
 
-	A1=create_fun("device_os", "iPhone", '=='),
+	A1=create_fun("device_os", "iPhone", '='),
 	?assertEqual({ok}, A1("device_os", "iPhone")),
 	?assertEqual({nok}, A1("device_os", "Android")),
 	?assertEqual({continue}, A1("unknown", "123")),
@@ -342,26 +342,26 @@ create_function_test() ->
 	?assertEqual({continue}, F("unknow",123)).
 
 create_funs_from_list_test() ->
-	List=[{"handheldfriendly", {"false", '=='}},
-	 {"playback_mp4", {"false", '=='}},
-	 {"playback_wmv", {"none", '=='}}],
+	List=[{"handheldfriendly", {"false", '='}},
+	 {"playback_mp4", {"false", '='}},
+	 {"playback_wmv", {"none", '='}}],
 	?assertEqual(3, erlang:length(create_funs_from_list(List))).
 
 run_funs_against_list_test()->
-	List_of_para=[{"jpg", {"true", '=='}},
-	 {"gif", {"true", '=='}},
-	 {"png", {"true", '=='}}],
+	List_of_para=[{"jpg", {"true", '='}},
+	 {"gif", {"true", '='}},
+	 {"png", {"true", '='}}],
 	Caps1=wurfler:getAllCapabilities("generic_xhtml"),
 	?assertEqual({ok},run_funs_against_list(create_funs_from_list(List_of_para), Caps1, [])),
 		
- 	List_of_para1=[{"handheldfriendly", {"false", '=='}},
- 	 {"playback_mp4", {"false", '=='}},
- 	 {"playback_wmv", {"none", '=='}}],
+ 	List_of_para1=[{"handheldfriendly", {"false", '='}},
+ 	 {"playback_mp4", {"false", '='}},
+ 	 {"playback_wmv", {"none", '='}}],
  	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para1), Caps1,{nok})),
 
-	List_of_para2=[{"jpg", {"true", '=='}},
-	 {"gif", {"true", '=='}},
-	 {"png", {"false", '=='}}],
+	List_of_para2=[{"jpg", {"true", '='}},
+	 {"gif", {"true", '='}},
+	 {"png", {"false", '='}}],
 	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para2), Caps1, [])).
 
 search_by_ua_test()->
@@ -369,15 +369,15 @@ search_by_ua_test()->
 	?assertEqual("opera_nokia_7610_ver1", Device#device.id).
 
 search_by_capabilities_test() ->
-	List=[{"handheldfriendly", {"false", '=='}},
-	 {"playback_mp4", {"false", '=='}},
-	 {"playback_wmv", {"none", '=='}}],
+	List=[{"handheldfriendly", {"false", '='}},
+	 {"playback_mp4", {"false", '='}},
+	 {"playback_wmv", {"none", '='}}],
 	State = search_by_capabilities(List, "01.01.2010", new_state()),
 	io:format("~p~n", [State#state.devices]),
 	?assertEqual(1, erlang:length(State#state.devices)).
 	
 search_by_capabilities_test_1() ->
-	List=[{"device_os", {"iPhone OS", '=='}}],
+	List=[{"device_os", {"iPhone OS", '='}}],
 	List_Of_Funs=create_funs_from_list(List),
 	Keys = ["apple_generic", "generic_xhtml"], 
 	get_devices_for_caps(List_Of_Funs, Keys, new_state()).

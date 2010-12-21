@@ -57,7 +57,7 @@ suite() -> [{timetrap, {seconds, 20}}].
 %% Description: Returns a list of test case group definitions.
 %%--------------------------------------------------------------------
 groups() -> [{get_requests, [parallel], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
-			 {post_requests, [sequence], [post_cap_query_no_caps, post_cap_query]}
+			 {post_requests, [sequence], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp]}
 			].
 
 %%--------------------------------------------------------------------
@@ -185,4 +185,8 @@ post_cap_query_no_caps(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
 	{ok, "200", _C, Body}=ibrowse:send_req("http://localhost:8000/devices", [{"Content-Type", "text/xml"}], post, A),
 	"<devices/>" == Body.
+
+post_cap_query_with_timestamp(_Config) ->
+	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>01.01.2010</timestamp><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"==\"/></capabilities></query>",
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", [{"Content-Type", "text/xml"}], post, A).
 

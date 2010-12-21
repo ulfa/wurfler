@@ -77,11 +77,9 @@ get_capabilities(Body) ->
 	[create_cap(Cap)||Cap <- Caps].	
 
 get_devices(Capabilities, []) ->
-	Timestamp="01.01.1970",
-	wurfler:searchByCapabilities(Capabilities);
-
+	wurfler:searchByCapabilities(Capabilities, "01.01.1970");
 get_devices(Capabilities, Timestamp) ->
-	wurfler:searchByCapabilities(Capabilities).
+	wurfler:searchByCapabilities(Capabilities, Timestamp).
 
 
 get_timestamp(Body) ->

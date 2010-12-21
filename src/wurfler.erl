@@ -151,7 +151,7 @@ search_by_ua(UserAgent, _State)->
 	end.
 search_by_capabilities(Capabilities, Timestamp, State) ->
 	List_Of_Funs=create_funs_from_list(Capabilities),
-	Keys = wurfler_db:get_all_keys(devicesTbl),
+	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
 	get_devices_for_caps(List_Of_Funs, Keys, State).
 
 create_device(#device{id=Id, brand_name=Brand_name, model_name=Model_name}) ->

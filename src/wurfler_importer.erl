@@ -170,9 +170,26 @@ process_device(Device) ->
 	{xmlElement,device,_,[],_,[_,_],_,Attributes,_,_,_,_} = Device,
 	Device_Attributes = process_attributes(device, Attributes),
 	Device_Record = create_device(add_attributes(Groups, Device_Attributes), Groups),
+	check_device(Device_Record),
 	store_device(Device_Record),
 	Device_Record.
-	
+
+check_device(#device{brand_name=Brand_name, model_name=Model_name, actual_device_root="true"}=Device) ->
+		check_device(brand_name, Device, Brand_name),
+		check_device(model_name, Device, Model_name);
+check_device(_Device_Record) ->
+	ok.
+		
+check_device(brand_name, Device, undefined) ->
+	error_logger:warning_msg("brand_name for device : ~p not set ~n", [Device#device.id] );
+check_device(brand_name, _Device, _Brand_name) ->
+	ok;
+check_device(model_name, Device, undefined) ->
+	error_logger:warning_msg("model_name for device : ~p not set ~n", [Device#device.id] );
+check_device(model_name, _Device, _Model_name) ->
+	ok.
+
+
 process_attributes(group, Attributes)->
 	[process_attribute(group, Attribute) || Attribute <- Attributes];
 process_attributes(device, Attributes)->
@@ -207,7 +224,7 @@ create_device(Attributes, Groups)->
 			groups=Groups,
 			created=wurfler_date_util:get_uc_time(),
 			lastmodified=wurfler_date_util:get_uc_time()}.
-
+	
 create_group(Attributes, Capabilities) ->
 	#group{id=proplists:get_value(id, Attributes), capabilites=Capabilities}.
 

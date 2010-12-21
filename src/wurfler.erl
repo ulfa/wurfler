@@ -185,7 +185,7 @@ get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 create_funs_from_list(List) ->
 	[create_fun(Name, Value, Operator) || {Name, {Value, Operator}} <- List].
 
-create_fun(CheckName, CheckValue, '==')->
+create_fun(CheckName, CheckValue, '=')->
 	fun(Name, Value) ->
 %% 		error_logger:info_msg("Function(~p, ~p) ~p,~p~n", [Name, Value, CheckName, CheckValue]),
 		case Name of

@@ -601,6 +601,10 @@ WMLProgramming mailing list
 	    </group>
 	  </device>
 		<device id="rocker" user_agent="rocker_ua" fall_back="generic">
+			<group id="product_info">
+				<capability name="brand_name" value="rocker_brand"/>
+				<capability name="model_name" value="rocker_model"/>
+			</group>
 			<group id="j2me">
 				<capability name="myVersion" value="6.1"/>
 				<capability name="myProfile" value="1.1"/>

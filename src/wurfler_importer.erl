@@ -36,7 +36,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0]).
 -export([start/0]).
--export([import/1, process_device/1, process_group/1, process_capability/1, store_device/1]).
+-export([import/1, process_device/1, process_group/1, process_capability/1, store_device/1, update_brand_model/0]).
 -record(state, {}).
 
 %% ====================================================================
@@ -121,12 +121,13 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 %% --------------------------------------------------------------------
 import_wurfl_file(Filename) ->
-	error_logger:info_msg("import started : ~p~n" ,[Filename]),
+	error_logger:info_msg("start import of : ~p~n" ,[Filename]),
 	Xml = parse(Filename),
 	DevicesXml = xmerl_xpath:string ("/wurfl/devices/device", Xml),
 	D = process_devices(DevicesXml),
 	Count = erlang:length(D),
-	error_logger:info_msg("import finished : ~p~n" ,[Count]),
+	error_logger:info_msg("end import : ~p ~n" ,[Count]),
+	update_brand_model(),
 	Count.
 
 parse(Filename) ->
@@ -170,25 +171,8 @@ process_device(Device) ->
 	{xmlElement,device,_,[],_,[_,_],_,Attributes,_,_,_,_} = Device,
 	Device_Attributes = process_attributes(device, Attributes),
 	Device_Record = create_device(add_attributes(Groups, Device_Attributes), Groups),
-	check_device(Device_Record),
 	store_device(Device_Record),
 	Device_Record.
-
-check_device(#device{brand_name=Brand_name, model_name=Model_name, actual_device_root="true"}=Device) ->
-		check_device(brand_name, Device, Brand_name),
-		check_device(model_name, Device, Model_name);
-check_device(_Device_Record) ->
-	ok.
-		
-check_device(brand_name, Device, undefined) ->
-	error_logger:warning_msg("brand_name for device : ~p not set ~n", [Device#device.id] );
-check_device(brand_name, _Device, _Brand_name) ->
-	ok;
-check_device(model_name, Device, undefined) ->
-	error_logger:warning_msg("model_name for device : ~p not set ~n", [Device#device.id] );
-check_device(model_name, _Device, _Model_name) ->
-	ok.
-
 
 process_attributes(group, Attributes)->
 	[process_attribute(group, Attribute) || Attribute <- Attributes];
@@ -256,10 +240,76 @@ get_device_os(Groups) ->
 		[Device_Os] -> Device_Os
 	end.
 get_capabilities_for_groups(Groups) ->
-	lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)).	
+	lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Groups)).
+
+update_brand_model() ->
+	error_logger:info_msg("start: update brand_model and model_name in devices~n"),
+	Keys = wurfler_db:get_all_keys(devicesTbl),
+	set_brand_name(Keys),
+ 	set_model_name(Keys),
+	error_logger:info_msg("end: update brand_model and model_name in devices~n"),
+	error_logger:info_msg("start : checking consistency ~n"),
+	check_devices(Keys),
+	error_logger:info_msg("end : checking consistency ~n").
+	
+set_brand_name([]) ->
+	ok;
+set_brand_name([Key|Keys]) ->
+	[#device{brand_name=Brand_Name}=Device] = wurfler_db:find_record_by_id(devicesTbl, Key),	
+	case Brand_Name of
+		undefined -> store_device(Device#device{brand_name=get_brand_name_from_db(Key)});
+		Brand_Name -> Brand_Name
+	end,
+	set_brand_name(Keys).
+
+get_brand_name_from_db(Key) ->
+	[#device{brand_name=Brand_Name, fall_back=Fall_Back}] = wurfler_db:find_record_by_id(devicesTbl, Key),
+	case Brand_Name of
+		undefined -> get_brand_name_from_db(Fall_Back);
+		Brand_Name -> Brand_Name
+	end.
+
+set_model_name([]) ->
+	ok;
+set_model_name([Key|Keys]) ->
+	[#device{model_name=Model_Name}=Device] = wurfler_db:find_record_by_id(devicesTbl, Key),	
+	case Model_Name of
+		undefined -> store_device(Device#device{model_name=get_model_name_from_db(Key)});
+		Model_Name -> Model_Name
+	end,
+	set_model_name(Keys).
+
+get_model_name_from_db(Key) ->
+	[#device{model_name=Model_Name, fall_back=Fall_Back}] = wurfler_db:find_record_by_id(devicesTbl, Key),
+	case Model_Name of
+		undefined -> get_model_name_from_db(Fall_Back);
+		Model_Name -> Model_Name
+	end.
+check_devices([]) ->
+	ok;
+check_devices([Key|Keys]) ->
+	[Device] = wurfler_db:find_record_by_id(devicesTbl, Key),
+	check_device(Device),
+	check_devices(Keys).
+
+check_device(#device{brand_name=Brand_name, model_name=Model_name, actual_device_root="true"}=Device) ->
+		check_device(brand_name, Device, Brand_name),
+		check_device(model_name, Device, Model_name);
+check_device(_Device_Record) ->
+	ok.
+check_device(brand_name, Device, undefined) ->
+	error_logger:warning_msg("brand_name for device : ~p not set ~n", [Device#device.id] );
+check_device(brand_name, _Device, _Brand_name) ->
+	ok;
+check_device(model_name, Device, undefined) ->
+	error_logger:warning_msg("model_name for device : ~p not set ~n", [Device#device.id] );
+check_device(model_name, _Device, _Model_name) ->
+	ok.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+get_brand_name_from_db_test() ->
+	?assertEqual("RIM", get_brand_name_from_db("blackberry6700_ver1")).
 process_group_test()->
 	GroupXml = xml_factory:parse_file("./test/group_xml"),
 	?assertMatch({group, "magical_powers", _},process_group(GroupXml)).

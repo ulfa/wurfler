@@ -30,7 +30,7 @@
 %% External exports
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
--export([find_capabilities_by_id/2,get_all_keys/2]).
+-export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -83,6 +83,8 @@ find_capabilities_by_id(devicesTbl, Id) ->
 	{Device#device.fall_back, Caps}.
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
+get_all_keys(devicesTbl) ->
+	get_all_keys(devicesTbl, "01.01.1970").
 get_all_keys(devicesTbl, "01.01.1970") ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root == "true" ])) end);
 get_all_keys(devicesTbl, Timestamp) ->

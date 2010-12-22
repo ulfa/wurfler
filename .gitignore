@@ -12,3 +12,5 @@
 /Mnesia.lilly@*
 /*.dump
 /*.DS_Store
+priv/.DS_Store
+priv/www/.DS_Store

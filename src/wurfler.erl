@@ -34,7 +34,6 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
-
 -compile([export_all]).
 %% ====================================================================
 %% Record definition

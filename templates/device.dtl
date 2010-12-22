@@ -1,0 +1,8 @@
+<html>
+    <head>
+        <title>no title</title>
+    </head>
+    <body>        
+    {{deviceModel}}
+    </body>
+</html>

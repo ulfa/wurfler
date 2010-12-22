@@ -13,8 +13,12 @@
              devices_resource,
              wurfler_db,             
              wurfler_file_poller,
-	 wurfler_patch,
-	wurfler_date_util
+	 		wurfler_patch,
+			wurfler_date_util,
+	% ErlyDTL templates
+			about_dtl,
+			device_dtl,
+			devices_dtl
             ]},
   {registered, [wurflerservice]},
   {applications, [

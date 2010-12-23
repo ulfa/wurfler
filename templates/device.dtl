@@ -2,7 +2,12 @@
     <head>
         <title>no title</title>
     </head>
-    <body>        
-    {{deviceModel}}
+    <body>
+    <ul>
+	{% for d in device %}
+    	<li>{{ id }}</li>
+	{% endfor %}
+	</ul>
+            
     </body>
 </html>

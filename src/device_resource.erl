@@ -44,7 +44,7 @@ allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
 to_html(ReqData, #context{device=Device}=Context) ->
-     {ok, Content} = device_dtl:render([{deviceModel, Device}]),
+     {ok, Content} = device_dtl:render([{device, record_to_tuple(device, Device)}]),
 	 
      {Content, ReqData, Context}.
 

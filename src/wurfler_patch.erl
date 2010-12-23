@@ -141,7 +141,11 @@ process_devices(Devices, State) ->
 process_device(DeviceXml, _State) ->
 	Id = xml_factory:get_attribute("/device/@id", DeviceXml),
 	case get_device(devicesTbl, Id) of
-		[] -> wurfler_importer:process_device(DeviceXml);
+		[] -> Device = wurfler_importer:process_device(DeviceXml),
+			  wurfler_importer:set_brand_name([Device#device.id]),
+			  wurfler_importer:set_model_name([Device#device.id]),
+			  wurfler_importer:check_devices([Device#device.id]),
+			  wurfler_importer:create_brand_index([Device#device.id]);
 		[DeviceDB] ->  D = merge_device(DeviceXml, DeviceDB),
 					   wurfler_importer:store_device(D)
 	end.

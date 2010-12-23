@@ -1,11 +1,19 @@
 <html>
     <head>
-        <title>no title</title>
+        <title>Handset details</title>
     </head>
     <body>
     <ul>
-	{% for d in device %}
-    	<li>{{ id }}</li>
+	{% for key, value in deviceDetail %}
+		{% ifnotequal key "groups" %}
+		
+		
+    	<li><label for="{{key}}">{{key}}</label>{{ value }}</li>
+		
+		
+		{% endifnotequal %}
+		
+
 	{% endfor %}
 	</ul>
             

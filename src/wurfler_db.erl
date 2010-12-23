@@ -30,7 +30,7 @@
 %% External exports
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
--export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2]).
+-export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -47,29 +47,28 @@ create_db() ->
 	mnesia:create_table(symbianTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(androidTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	mnesia:create_table(index,[{disc_copies, [node()]}, {index, [table]}, {attributes, record_info(fields, index)}]),
-	mnesia:wait_for_tables([devicesTbl, j2meTbl, symbianTbl, blackberryTbl, androidTbl, index], 100000),
+	mnesia:create_table(brand_index,[{disc_copies, [node()]}, {attributes, record_info(fields, brand_index)}]),
+	mnesia:wait_for_tables([devicesTbl, j2meTbl, symbianTbl, blackberryTbl, androidTbl, brand_index], 100000),
 	application:stop(mnesia).
 %% --------------------------------------------------------------------
 %% save functions
 %% --------------------------------------------------------------------
 save_device(devicesTbl, Device)->
-	mnesia:activity(transaction, fun() -> save_index(devices_tbl, Device), 
-										  mnesia:write(devicesTbl, Device, write) end);
+	mnesia:activity(transaction, fun() -> mnesia:write(devicesTbl, Device, write) end);
 save_device(j2meTbl, Device)->
-	mnesia:activity(transaction, fun() -> save_index(devices_tbl, Device),
-										  mnesia:write(j2meTbl, Device, write) end);
+	mnesia:activity(transaction, fun() -> mnesia:write(j2meTbl, Device, write) end);
 save_device(symbianTbl, Device)-> 
-	mnesia:activity(transaction, fun() -> save_index(devices_tbl, Device),
-										  mnesia:write(symbianTbl, Device, write) end);
+	mnesia:activity(transaction, fun() -> mnesia:write(symbianTbl, Device, write) end);
 save_device(blackberryTbl, Device)->
-	mnesia:activity(transaction, fun() -> save_index(devices_tbl, Device),
-										  mnesia:write(blackberryTbl, Device, write) end).
-save_index(Table, Device) ->
-	case mnesia:read({index, Device#device.id}) of
-		[] -> mnesia:write(#index{table=Table, device=Device#device.id});
-		[Index] -> mnesia:write(Index#index{table=[Table|Index#index.table]})
-	end.
+	mnesia:activity(transaction, fun() -> mnesia:write(blackberryTbl, Device, write) end).
+
+save_brand_index(Brand_Name, {Id, Model_Name}) ->
+	mnesia:activity(transaction, fun() ->
+		case mnesia:read(brand_index, Brand_Name) of
+			[] -> mnesia:write(brand_index, #brand_index{brand_name=Brand_Name, models=[{Id, Model_Name}]}, write);
+			[Record] -> mnesia:write(brand_index, Record#brand_index{models=[{Id, Model_Name}|Record#brand_index.models]}, write)
+		end
+	end).
 %% --------------------------------------------------------------------
 %% finder functions
 %% --------------------------------------------------------------------

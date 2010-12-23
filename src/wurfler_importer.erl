@@ -37,6 +37,7 @@
 -export([start_link/0]).
 -export([start/0]).
 -export([import/1, process_device/1, process_group/1, process_capability/1, store_device/1, update_brand_model/0]).
+-export([set_brand_name/1, set_model_name/1, check_devices/1, create_brand_index/1]).
 -record(state, {}).
 
 %% ====================================================================
@@ -250,7 +251,17 @@ update_brand_model() ->
 	error_logger:info_msg("end: update brand_model and model_name in devices~n"),
 	error_logger:info_msg("start : checking consistency ~n"),
 	check_devices(Keys),
-	error_logger:info_msg("end : checking consistency ~n").
+	error_logger:info_msg("end : checking consistency ~n"),
+	error_logger:info_msg("start : creating brand index ~n"),
+	create_brand_index(Keys),
+	error_logger:info_msg("end : creating brand index ~n").
+	
+create_brand_index([]) ->
+	ok;
+create_brand_index([Key|Keys]) ->
+	[#device{id=Id, brand_name=Brand_Name, model_name=Model_Name}] = wurfler_db:find_record_by_id(devicesTbl, Key),
+	wurfler_db:save_brand_index(Brand_Name, {Id, Model_Name}),
+	create_brand_index(Keys).
 	
 set_brand_name([]) ->
 	ok;

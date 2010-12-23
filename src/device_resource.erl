@@ -44,7 +44,7 @@ allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
 to_html(ReqData, #context{device=Device}=Context) ->
-     {ok, Content} = device_dtl:render([{device, record_to_tuple(device, Device)}]),
+     {ok, Content} = device_dtl:render([{deviceDetail, record_to_tuple(device, Device)}]),
 	 
      {Content, ReqData, Context}.
 
@@ -91,7 +91,6 @@ record_to_tuple(capabilities, [], Acc) ->
 	Acc;
 record_to_tuple(capabilities, [Capability|Capabilities], Acc) ->
 	record_to_tuple(capabilities, Capabilities, lists:merge(record_to_tuple(capability, Capability), Acc)).
-
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

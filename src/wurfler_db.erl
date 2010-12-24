@@ -30,7 +30,8 @@
 %% External exports
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
--export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2]).
+-export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2, get_all_brands/0]).
+-export([delete_record/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -62,6 +63,8 @@ save_device(symbianTbl, Device)->
 save_device(blackberryTbl, Device)->
 	mnesia:activity(transaction, fun() -> mnesia:write(blackberryTbl, Device, write) end).
 
+save_brand_index([], {Id, Model_Name}) ->
+	error_logger:error_msg("can't save the data, because of a missing brand_name for model : ~p and Id : ~p~n", [Model_Name, Id]);
 save_brand_index(Brand_Name, {Id, Model_Name}) ->
 	mnesia:activity(transaction, fun() ->
 		case mnesia:read(brand_index, Brand_Name) of
@@ -72,6 +75,11 @@ save_brand_index(Brand_Name, {Id, Model_Name}) ->
 %% --------------------------------------------------------------------
 %% finder functions
 %% --------------------------------------------------------------------
+delete_record(Id, Brand_Name) ->
+	mnesia:activity(transaction, fun() -> 
+										 mnesia:delete(devicesTbl, Id, write),
+										 mnesia:delete(brand_index, Brand_Name, write)
+								 end).
 find_record_by_id(devicesTbl, Id) ->
 	mnesia:dirty_read(devicesTbl, Id).
 find_groups_by_id(devicesTbl, Id) ->
@@ -91,10 +99,32 @@ get_all_keys(devicesTbl, Timestamp) ->
 	mnesia:activity(sync_dirty, fun() -> 
 								qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root == "true", P#device.lastmodified > T ])) 
 								end).
+get_all_brands()->
+	mnesia:activity(sync_dirty, fun() -> 
+								qlc:e(qlc:q([create_brand(P) || P <- mnesia:table(brand_index)]))
+								end).
 
+%% --------------------------------------------------------------------
+%%% builder functions
+%% --------------------------------------------------------------------
+create_brand(#brand_index{brand_name=Brand_Name, models=Models}) ->
+	{brand , [{name, Brand_Name}], create_models(Models, [])}.
+create_models([], Acc) ->
+	Acc;
+create_models([{Id, Model_Name}|Models], Acc) ->
+	Acc1 = [{model, [{id, Id}, {model_name, Model_Name}], []} | Acc],
+	create_models(Models, Acc1).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+create_brand_test() ->
+	A={brand,[{name,"testBrand"}],
+       [{model,[{id,"id2"},{model_name,"model2"}],[]},
+        {model,[{id,"id1"},{model_name,"model1"}],[]}]},
+	?assertEqual(A,create_brand(#brand_index{brand_name="testBrand", models=[{"id1", "model1"}, {"id2", "model2"}]})).
+create_models_test() ->
+	A=[{"A", "B"}, {"C", "D"}],
+	?assertEqual([{'model', [{id, "C"}, {model_name, "D"}], []},{'model', [{id, "A"}, {model_name, "B"}], []}] , create_models(A, [])).
 find_record_by_id_test() ->
 	?assertMatch([{device, "benq_s668c_ver1", _, _,_,_,_,_}], find_record_by_id(devicesTbl, "benq_s668c_ver1")).
 find_record_by_ua_test() ->

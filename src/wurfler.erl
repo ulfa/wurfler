@@ -34,6 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
+-export([get_brands/0]).
 -compile([export_all]).
 %% ====================================================================
 %% Record definition
@@ -52,6 +53,8 @@ searchByDeviceName(DeviceName) ->
 	gen_server:call(?MODULE, {search_by_device_id, DeviceName}).
 getAllCapabilities(DeviceName)->
 	gen_server:call(?MODULE, {get_all_capabilities, DeviceName}).
+get_brands() ->
+	gen_server:call(?MODULE, {get_brands}).
 getVersion() ->
 	gen_server:call(?MODULE, {version}).
 %% ====================================================================
@@ -97,6 +100,10 @@ handle_call({search_by_device_id, DeviceName}, _From, _State) ->
 handle_call({get_all_capabilities, DeviceName}, _From, State) ->
 	{ok, Result}=get_all_capabilities(DeviceName, State),
     {reply, Result#state.capabilities, new_state()};
+handle_call({get_brands}, _From, State) ->
+	{ok, Result}=get_all_brands(),
+    {reply, Result, State};
+
 handle_call({version}, _From, State) ->
     {reply, "0.1", State}.
 %% --------------------------------------------------------------------
@@ -153,6 +160,9 @@ search_by_capabilities(Capabilities, Timestamp, State) ->
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
 	get_devices_for_caps(List_Of_Funs, Keys, State).
 
+get_all_brands() ->
+	{ok, wurfler_db:get_all_brands()}.
+
 create_device(#device{id=Id, brand_name=Brand_name, model_name=Model_name}) ->
 	{'device', [{id, Id}, {model_name,Model_name}, {brand_name,Brand_name}], []}.
 create_devices(Devices)->
@@ -186,7 +196,6 @@ create_funs_from_list(List) ->
 
 create_fun(CheckName, CheckValue, '=')->
 	fun(Name, Value) ->
-%% 		error_logger:info_msg("Function(~p, ~p) ~p,~p~n", [Name, Value, CheckName, CheckValue]),
 		case Name of
 			CheckName ->  case Value == CheckValue of
  							 true -> {ok};

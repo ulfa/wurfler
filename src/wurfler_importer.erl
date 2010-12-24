@@ -319,6 +319,10 @@ check_device(model_name, _Device, _Model_name) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+filter_character_test()->
+	T="softbank_j_n03b_ver1",
+	W="J-N03&#x2161;".
+	
 get_brand_name_from_db_test() ->
 	?assertEqual("RIM", get_brand_name_from_db("blackberry6700_ver1")).
 process_group_test()->

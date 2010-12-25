@@ -20,7 +20,8 @@
 	% ErlyDTL templates
 			about_dtl,
 			device_dtl,
-			devices_dtl
+			devices_dtl,
+			brands_dtl
             ]},
   {registered, [wurflerservice]},
   {applications, [

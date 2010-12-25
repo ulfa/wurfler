@@ -43,17 +43,18 @@ init([]) ->
 	{ok, #context{brands=[]}}.
 
 content_types_provided(ReqData, Context) ->
-    {[{"text/xml", to_xml}, {"text/html", to_xml}],ReqData, Context}.
+    {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.
 
 allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
-to_html(ReqData, #context{brands=_Brands}=Context) ->	 
-     {[], ReqData, Context}.
-
-to_xml(ReqData, #context{brands=Brands}=Context)->
+to_xml(ReqData, #context{brands=Brands}=Context) ->
 	D=lists:flatten(xmerl:export_simple_content(Brands, xmerl_xml)),
 	{D, ReqData, Context}.
+
+to_html(ReqData, #context{brands=Brands}=Context)->
+	{ok, Content} = brands_dtl:render([{brands, Brands}]),
+	{Content, ReqData, Context}.
  
 resource_exists(ReqData, Context) ->
 	case get_brands() of
@@ -69,12 +70,3 @@ get_brands()->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-get_brands_test()->
-	A=wurfler:get_brands(),
-	C=(xmerl:export_simple_content(A, xmerl_xml)),
-%% 	io:format("~p~n", [C]),
-	D=lists:flatten(C),
-	io:format("~p~n", [D]),
-	erlang:list_to_binary(D).
-
-	

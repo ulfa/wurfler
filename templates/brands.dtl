@@ -1,0 +1,8 @@
+<html>
+    <head>
+        <title>Brands</title>
+    </head>
+    <body>
+	{{brands}}
+    </body>
+</html>

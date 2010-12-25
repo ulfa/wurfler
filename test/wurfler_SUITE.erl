@@ -20,7 +20,9 @@
 %%% -------------------------------------------------------------------
 -module(wurfler_SUITE).
 -compile(export_all).
-
+-include_lib("xmerl/include/xmerl.hrl").
+-define(HTML_CONTENT_TYPE, [{"Content-Type", "text/html"}, {"Accept", "text/html"}]).
+-define(XML_CONTENT_TYPE, [{"Content-Type", "text/html"}, {"Accept", "text/xml"}]).
 %%--------------------------------------------------------------------
 %% Function: suite() -> Info
 %%
@@ -56,8 +58,11 @@ suite() -> [{timetrap, {seconds, 20}}].
 %%
 %% Description: Returns a list of test case group definitions.
 %%--------------------------------------------------------------------
-groups() -> [{get_requests, [parallel], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
-			 {post_requests, [sequence], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp]}
+groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
+			 {device_get_requests_html, [parallel], [get_device_by_id_to_html, get_device_by_ua_to_html, get_device_by_id_404_to_html]},
+			 {devices_post_requests, [parallel], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp]},
+			 {brand_get_requests, [parallel], [get_brand_by_brand_name, get_all_brands, get_brand_by_brand_name_to_html]},
+			 {brand_get_requests_html, [parallel], [get_brand_by_brand_name_to_html]}
 			].
 
 %%--------------------------------------------------------------------
@@ -72,7 +77,9 @@ groups() -> [{get_requests, [parallel], [get_device_by_id, get_device_by_id_404,
 %% Description: Returns the list of groups and test cases that
 %%              are to be executed.
 %%--------------------------------------------------------------------
-all() -> [{group, get_requests}, {group, post_requests}].
+all() -> [{group, device_get_requests}, {group, device_get_requests_html}, {group, devices_post_requests},
+		  {group, brand_get_requests}, {group, brand_get_requests_html}
+		 ].
 
 %%--------------------------------------------------------------------
 %% Function: init_per_suite(Config0) ->
@@ -169,24 +176,39 @@ end_per_testcase(TestCase, Config) ->
     Config.
 
 get_device_by_id(_Config)->
-	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device/generic", [{"Content-Type", "text/xml"}], get).
-
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device/generic", ?XML_CONTENT_TYPE, get).
+get_device_by_id_to_html(_Config)->
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device/generic", ?HTML_CONTENT_TYPE, get).
 get_device_by_id_404(_Config) ->
-	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/device/unknown", [{"Content-Type", "text/xml"}], get).
+	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/device/unknown", ?XML_CONTENT_TYPE, get).
+get_device_by_id_404_to_html(_Config) ->
+	{ok, "404", _C, D}=ibrowse:send_req("http://localhost:8000/device/unknown", ?HTML_CONTENT_TYPE, get).
 
 get_device_by_ua(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/xml"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).
+get_device_by_ua_to_html(_Config) ->
+	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/html"}, {"Accept", "text/html"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).
+
 
 post_cap_query(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"=\"/></capabilities></query>",
-	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", [{"Content-Type", "text/xml"}], post, A).
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A).
 
 post_cap_query_no_caps(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
-	{ok, "200", _C, Body}=ibrowse:send_req("http://localhost:8000/devices", [{"Content-Type", "text/xml"}], post, A),
+	{ok, "200", _C, Body}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	"<devices/>" == Body.
 
 post_cap_query_with_timestamp(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>01.01.2010</timestamp><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"=\"/></capabilities></query>",
-	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", [{"Content-Type", "text/xml"}], post, A).
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A).
+
+get_brand_by_brand_name(_Config) ->
+	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/brand/RIM", ?XML_CONTENT_TYPE, get),
+	Brand = xml_factory:parse(D),
+	"RIM"=xml_factory:get_attribute("//brand/@name", Brand).
+get_brand_by_brand_name_to_html(_Config) ->
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/brand/RIM",?HTML_CONTENT_TYPE, get).
+get_all_brands(_Config) ->
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/brands", ?XML_CONTENT_TYPE, get).
 

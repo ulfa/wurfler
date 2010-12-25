@@ -31,25 +31,33 @@
 %%
 %% Exported Functions
 %%
--export([create_xml/2, parse/1, parse_file/1, get_attribute/2, get_text/2]).
+-export([create_xml/2, parse/1, parse_file/1,get_attribute/2, get_text/2]).
 
 %%
 %% API Functions
 %%
-create_xml(devices, Devices)->
-	[create_xml(device, Device) || Device <- Devices];
-create_xml(device, #device{id=Id, user_agent=U_A, actual_device_root=A_D_R, fall_back=F_B, groups=Groups})->
-	{'device', [{id, Id}, {user_agent, U_A}, {actual_device_root, A_D_R}, {fall_back, F_B}],
-	 create_xml(groups, Groups)};
-create_xml(groups, Groups)->
-	[create_xml(group, Group) || Group <- Groups];
-create_xml(capabilities, Capabilities)->
-	[create_xml(capability, Cap) || Cap <- Capabilities];
-create_xml(group, #group{id=Id, capabilites=Capabilites})->
-	Caps = create_xml(capabilities, Capabilites),
-	{'group', [{id, Id}], Caps};
-create_xml(capability, Capability)->
-	{'capability', [{name, Capability#capability.name}, {value, Capability#capability.value}], []}.
+create_xml(devices, Devices) ->
+    [create_xml(device, Device) || Device <- Devices];
+create_xml(device, #device{id = Id, user_agent = U_A, actual_device_root = A_D_R, fall_back = F_B, groups = Groups}) ->
+    {device, [{id, Id}, {user_agent, U_A}, {actual_device_root, A_D_R}, {fall_back, F_B}],
+     create_xml(groups, Groups)};
+create_xml(groups, Groups) ->
+    [create_xml(group, Group) || Group <- Groups];
+create_xml(capabilities, Capabilities) ->
+    [create_xml(capability, Cap) || Cap <- Capabilities];
+create_xml(group, #group{id = Id, capabilites = Capabilites}) ->
+    Caps = create_xml(capabilities, Capabilites),
+    {group, [{id, Id}], Caps};
+create_xml(capability, Capability) ->
+    {capability, [{name, Capability#capability.name}, {value, Capability#capability.value}], []};
+create_xml(brand, #brand_index{brand_name=Brand_Name, models=Models}) ->
+	{brand , [{name, Brand_Name}], create_models(Models, [])}.
+create_models([], Acc) ->
+	Acc;
+create_models([{Id, Model_Name}|Models], Acc) ->
+	Acc1 = [{model, [{id, Id}, {model_name, Model_Name}], []} | Acc],
+	create_models(Models, Acc1).
+
 
 parse(Bin) when is_binary(Bin) ->
 	{Xml,_Rest} = xmerl_scan:string(binary_to_list(Bin)),
@@ -76,27 +84,33 @@ get_text(XPath, Xml) ->
 %%
 %% Test Functions
 %%
+create_xml_brand_test() ->
+	Brand = #brand_index{brand_name="RIM", models=[{"blackberry5820_ver1","BlackBerry 5820"},{"blackberry5810_ver1","BlackBerry 5810"}]},
+	A={brand,[{name,"RIM"}],
+       [{model,[{id,"blackberry5810_ver1"},{model_name,"BlackBerry 5810"}],[]},
+        {model,[{id,"blackberry5820_ver1"},{model_name,"BlackBerry 5820"}],[]}]},
+	?assertEqual(A,create_xml(brand, Brand)).
 parse_filename_test() ->
 	Xml = parse_file("./test/wurlfpatch.xml"),
 	{xmlElement,wurfl_patch,wurfl_patch,[], {_, _, _}, _, _, _, _, _,_,_} = Xml.
 
 create_xml_capability_test() ->
-	Cap = #capability{name="myVersion", value="1.0"},
-	log_xml([create_xml(capability, Cap)]),
-	?assertEqual({capability,[{name,"myVersion"},{value,"1.0"}],[]}, create_xml(capability, Cap)).
+    Cap = #capability{name = "myVersion", value = "1.0"},
+    log_xml([create_xml(capability, Cap)]),
+    ?assertEqual({capability, [{name, "myVersion"}, {value, "1.0"}], []}, create_xml(capability, Cap)).
 
 create_xml_capabilities_test() ->
 	Caps = create_capabilities_1(),
 	?assertEqual(2, erlang:length(Caps)).
 
 create_xml_group_test() ->
-	G=create_xml(group, create_group_1()),
- 	?assertEqual("j2me", get_attribute("/group/@id", parse(tto_xml([G])))).
+    G = create_xml(group, create_group_1()),
+    ?assertEqual("j2me", get_attribute("/group/@id", parse(tto_xml([G])))).
 
 create_xml_device_test() ->
-	Device = create_device(),
-	D=create_xml(device, Device),
-	log_xml([D]).
+    Device = create_device(),
+    D = create_xml(device, Device),
+    log_xml([D]).
 create_device()->
 	#device{id="Nokia", user_agent="blahblahblah", actual_device_root=undefined, fall_back=undefined, 
 			groups=[create_group_1(), create_group_2()]}.

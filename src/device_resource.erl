@@ -48,9 +48,9 @@ to_html(ReqData, #context{device=Device}=Context) ->
 	 
      {Content, ReqData, Context}.
 
-to_xml(ReqData, #context{device=Device}=Context)->
-	D=lists:flatten(xmerl:export_simple_content([xml_factory:create_xml(device,Device)], xmerl_xml)),
-	{D, ReqData, Context}.
+to_xml(ReqData, #context{device = Device} = Context) ->
+    D = lists:flatten(xmerl:export_simple_content([xml_factory:create_xml(device, Device)], xmerl_xml)),
+    {D, ReqData, Context}.
 
  
 resource_exists(ReqData, Context) ->
@@ -104,7 +104,7 @@ record_to_tuple_test() ->
 					 groups=[#group{id="j2me", capabilites=[#capability{name="test", value="value"}, #capability{name="test_1", value="value_1"}]}],
 					 created=undefined,
 					 lastmodified=undefined},
-	record_to_tuple(device,Device).	
+	record_to_tuple(device,Device). 
 
 	
 

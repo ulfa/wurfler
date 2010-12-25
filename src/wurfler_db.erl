@@ -31,7 +31,7 @@
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
 -export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2, get_all_brands/0]).
--export([delete_record/2]).
+-export([delete_record/2, get_brand/1]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -101,30 +101,13 @@ get_all_keys(devicesTbl, Timestamp) ->
 								end).
 get_all_brands()->
 	mnesia:activity(sync_dirty, fun() -> 
-								qlc:e(qlc:q([create_brand(P) || P <- mnesia:table(brand_index)]))
+								qlc:e(qlc:q([P || P <- mnesia:table(brand_index)]))
 								end).
-
-%% --------------------------------------------------------------------
-%%% builder functions
-%% --------------------------------------------------------------------
-create_brand(#brand_index{brand_name=Brand_Name, models=Models}) ->
-	{brand , [{name, Brand_Name}], create_models(Models, [])}.
-create_models([], Acc) ->
-	Acc;
-create_models([{Id, Model_Name}|Models], Acc) ->
-	Acc1 = [{model, [{id, Id}, {model_name, Model_Name}], []} | Acc],
-	create_models(Models, Acc1).
+get_brand(Brand_Name) ->
+	mnesia:dirty_read(brand_index, Brand_Name).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-create_brand_test() ->
-	A={brand,[{name,"testBrand"}],
-       [{model,[{id,"id2"},{model_name,"model2"}],[]},
-        {model,[{id,"id1"},{model_name,"model1"}],[]}]},
-	?assertEqual(A,create_brand(#brand_index{brand_name="testBrand", models=[{"id1", "model1"}, {"id2", "model2"}]})).
-create_models_test() ->
-	A=[{"A", "B"}, {"C", "D"}],
-	?assertEqual([{'model', [{id, "C"}, {model_name, "D"}], []},{'model', [{id, "A"}, {model_name, "B"}], []}] , create_models(A, [])).
 find_record_by_id_test() ->
 	?assertMatch([{device, "benq_s668c_ver1", _, _,_,_,_,_}], find_record_by_id(devicesTbl, "benq_s668c_ver1")).
 find_record_by_ua_test() ->

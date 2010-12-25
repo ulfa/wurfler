@@ -24,18 +24,49 @@
 %% Include files
 %% --------------------------------------------------------------------
 -include_lib("eunit/include/eunit.hrl").
+-include("../include/wurfler.hrl").
 
+-export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2]).
+-compile([export_all]).
+-include_lib("../deps/webmachine/include/webmachine.hrl").
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
--export([]).
 %% --------------------------------------------------------------------
 %% record definitions
 %% --------------------------------------------------------------------
+-record(context, {brand}).
+%% --------------------------------------------------------------------
+%% API Functions
+%% --------------------------------------------------------------------
+init([]) -> 
+	{ok, #context{brand=[]}}.
+
+content_types_provided(ReqData, Context) ->
+    {[{"text/xml", to_xml}, {"text/html", to_html}], ReqData, Context}.
+
+allowed_methods(ReqData, Context) ->
+    {['GET'], ReqData, Context}.
+
+to_html(ReqData, #context{brand=Brand}=Context) ->
+     {ok, Content} = brand_dtl:render([{brand, Brand}]),
+	 
+     {Content, ReqData, Context}.
+
+to_xml(ReqData, #context{brand = [Brand]} = Context) ->
+    D = lists:flatten(xmerl:export_simple_content([xml_factory:create_xml(brand, Brand)], xmerl_xml)),
+    {D, ReqData, Context}.
+
+resource_exists(ReqData, Context) ->
+	case get_brand(wrq:path_info(brand, ReqData)) of
+		[] -> {false, ReqData, Context#context{brand=[]}};
+		Brand -> {true, ReqData, Context#context{brand=Brand}}
+	end.
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
-
+get_brand(Brand_Name) ->
+	wurfler:get_brand(Brand_Name).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

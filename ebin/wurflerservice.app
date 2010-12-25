@@ -21,7 +21,8 @@
 			about_dtl,
 			device_dtl,
 			devices_dtl,
-			brands_dtl
+			brands_dtl,
+			brand_dtl
             ]},
   {registered, [wurflerservice]},
   {applications, [

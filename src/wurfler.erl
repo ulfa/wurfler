@@ -95,8 +95,8 @@ init([]) ->
 handle_call({search_by_capabilities, Capabilities, Timestamp}, _From, State) ->
 	Result=search_by_capabilities(Capabilities, Timestamp, new_state()),
     {reply, Result#state.devices, State};
-handle_call({search_by_ua, Capabilities}, _From, State) ->
-	Result=search_by_ua(Capabilities, State),
+handle_call({search_by_ua, User_Agent}, _From, State) ->
+	Result = search_by_ua(User_Agent, State),
     {reply, Result, State};
 handle_call({search_by_device_id, DeviceName}, _From, _State) ->
 	Result=search_by_device_id(DeviceName),
@@ -162,7 +162,7 @@ search_by_device_id(DeviceName)->
 search_by_ua(UserAgent, _State)->
 	case wurfler_db:find_record_by_ua(devicesTbl, UserAgent) of
 		[] -> [];
-		[Device] -> Groups = get_all_groups(Device#device.id, new_state()),
+		[Device] -> {ok,#state{groups=Groups}} = get_all_groups(Device#device.id, new_state()),
 					Device#device{groups=Groups}
 	end.
 

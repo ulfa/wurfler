@@ -83,7 +83,8 @@ delete_record(Id, Brand_Name) ->
 find_record_by_id(devicesTbl, Id) ->
 	mnesia:dirty_read(devicesTbl, Id).
 find_groups_by_id(devicesTbl, Id) ->
-	[Device] = mnesia:dirty_read(devicesTbl, Id), {Device#device.fall_back, Device#device.groups}.
+	[Device] = mnesia:dirty_read(devicesTbl, Id), 
+	{Device#device.fall_back, Device#device.groups}.
 find_capabilities_by_id(devicesTbl, Id) ->
 	[Device] = mnesia:dirty_read(devicesTbl, Id),
 	Caps=lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),

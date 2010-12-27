@@ -9,6 +9,7 @@
 /test/wurfler_SUITE.beam
 /test/cover.spec
 /test/test.spec
+/test/.DS_Store
 /Mnesia.lilly@*
 /*.dump
 /*.DS_Store

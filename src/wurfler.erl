@@ -162,7 +162,8 @@ search_by_device_id(DeviceName)->
 search_by_ua(UserAgent, _State)->
 	case wurfler_db:find_record_by_ua(devicesTbl, UserAgent) of
 		[] -> [];
-		[Device] -> Device
+		[Device] -> Groups = get_all_groups(Device#device.id, new_state()),
+					Device#device{groups=Groups}
 	end.
 
 search_by_capabilities(Capabilities, Timestamp, State) ->
@@ -191,7 +192,7 @@ get_all_groups("root", #state{groups=Groups}) ->
 get_all_groups("generic", #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
 get_all_groups(DeviceName, #state{groups=AllGroups}) ->
-	[{Fall_back, Groups}] = wurfler_db:find_groups_by_id(devicesTbl, DeviceName),
+	{Fall_back, Groups} = wurfler_db:find_groups_by_id(devicesTbl, DeviceName),
 	get_all_groups(Fall_back, #state{groups=lists:append(AllGroups,Groups)}).
 
 get_all_capabilities([], #state{capabilities=Caps}) ->
@@ -399,7 +400,6 @@ run_funs_against_list_test()->
 	 {"gif", {"true", '='}},
 	 {"png", {"false", '='}}],
 	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para2), Caps1, [])).
-
 
 search_by_capabilities_test() ->
 	List=[{"handheldfriendly", {"false", '='}},

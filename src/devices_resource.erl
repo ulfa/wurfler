@@ -28,7 +28,7 @@
 %%
 %% Exported Functions
 %%
--export([init/1, to_xml/2, post_is_create/2, content_types_provided/2, process_post/2]).
+-export([init/1, to_xml/2, to_html/2, post_is_create/2, content_types_provided/2, process_post/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -record(context, {devices=[]}).
@@ -40,19 +40,19 @@ init([]) ->
 	{ok, #context{devices=[]}}.
 
 content_types_provided(ReqData, Context) ->
-    {[{"text/xml", to_xml}],ReqData, Context}.
+    {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.
 
 
 allowed_methods(ReqData, Context) ->
-    {['POST'], ReqData, Context}.
+    {['POST', 'GET'], ReqData, Context}.
 
-%% to_json(ReqData, Context) ->  
-%% 	error_logger:info_msg("to_json ~n"),
-%%     {"HBody", ReqData, Context}.
+to_xml(ReqData, #context{devices=Devices}=Context)->
+	Content = xml_factory:to_xml(Devices),
+	{Content, ReqData, Context}.
 
-
-to_xml(ReqData, Context)->
-	{ok, ReqData, Context}.
+to_html(ReqData, #context{devices=Devices}=Context) ->
+	{ok, Content} = devices_dtl:render([{devices, Devices}]),
+     {Content, ReqData, Context}.
 
 allow_missing_post(ReqData, Context) ->
 	{true, ReqData, Context}.
@@ -61,7 +61,10 @@ post_is_create(ReqData, Context) ->
 	{false, ReqData, Context}.
 
 resource_exists(ReqData, Context) ->
-	{true, ReqData, Context}.
+	case get_devices_by_model(wrq:path_info(model, ReqData)) of
+		[] -> {false, ReqData, Context#context{devices=[]}};
+		Devices -> {true, ReqData, Context#context{devices=Devices}}
+	end.
 
 process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
@@ -82,6 +85,8 @@ get_devices(Capabilities, []) ->
 get_devices(Capabilities, Timestamp) ->
 	wurfler:searchByCapabilities(Capabilities, Timestamp).
 
+get_devices_by_model(Model_Name) ->
+	wurfler:get_devices_by_model(Model_Name).
 
 get_timestamp(Body) ->
 	Xml = xml_factory:parse(Body),

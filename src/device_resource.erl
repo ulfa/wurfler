@@ -28,7 +28,7 @@
 %% Exported Functions
 %%
 -export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2]).
--compile([export_all]).
+%% -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -record(context, {device}).
 %%
@@ -44,8 +44,7 @@ allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
 to_html(ReqData, #context{device=Device}=Context) ->
-     {ok, Content} = device_dtl:render([{deviceDetail, record_to_tuple(device, Device)}]),
-	 
+     {ok, Content} = devices_dtl:render([{deviceDetail, record_to_tuple(device, Device)}]),
      {Content, ReqData, Context}.
 
 to_xml(ReqData, #context{device = Device} = Context) ->

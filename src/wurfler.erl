@@ -34,7 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
--export([get_brands/0, get_brand/1]).
+-export([get_brands/0, get_brand/1, get_devices_by_model/1]).
 -compile([export_all]).
 %% ====================================================================
 %% Record definition
@@ -57,7 +57,8 @@ get_brands() ->
 	gen_server:call(?MODULE, {get_brands}).
 get_brand(Brand_Name) ->
 	gen_server:call(?MODULE, {get_brand, Brand_Name}).
-
+get_devices_by_model(Model_Name) ->
+	gen_server:call(?MODULE, {get_devices_by_name, Model_Name}).
 getVersion() ->
 	gen_server:call(?MODULE, {version}).
 %% ====================================================================
@@ -109,6 +110,9 @@ handle_call({get_brands}, _From, State) ->
 handle_call({get_brand, Brand_Name}, _From, State) ->
 	{ok, Result}=getBrand(Brand_Name),
     {reply, Result, State};	
+handle_call({get_devices_by_name, Model_Name}, _From, _State) ->
+	{ok, Result} = getDeviceByModelName(Model_Name),
+	{reply, Result, new_state()};
 handle_call({version}, _From, State) ->
     {reply, "0.1", State}.
 %% --------------------------------------------------------------------
@@ -169,6 +173,10 @@ get_all_brands() ->
 	{ok, wurfler_db:get_all_brands()}.
 getBrand(Brand_Name) ->
 	{ok, wurfler_db:get_brand(Brand_Name)}.
+getDeviceByModelName(Model_Name) ->	
+	R =  wurfler_db:get_devices_by_model_name(devicesTbl, Model_Name),
+	Result =create_devices([create_device(D) || D <- R]),
+	{ok, Result}.
 
 create_device(#device{id=Id, brand_name=Brand_name, model_name=Model_name}) ->
 	{'device', [{id, Id}, {model_name,Model_name}, {brand_name,Brand_name}], []}.

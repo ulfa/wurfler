@@ -31,7 +31,7 @@
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
 -export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2, get_all_brands/0]).
--export([delete_record/2, get_brand/1]).
+-export([delete_record/2, get_brand/1, get_devices_by_model_name/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -105,6 +105,9 @@ get_all_brands()->
 								end).
 get_brand(Brand_Name) ->
 	mnesia:dirty_read(brand_index, Brand_Name).
+get_devices_by_model_name(devicesTbl, Model_Name) ->
+		mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.model_name == Model_Name ])) end).
+	
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

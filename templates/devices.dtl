@@ -3,6 +3,6 @@
         <title>Devices</title>
     </head>
     <body>
-        <h1>Devices</h1>
+	{{devices}}
     </body>
 </html>

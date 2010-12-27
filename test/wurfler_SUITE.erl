@@ -62,7 +62,9 @@ groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_
 			 {device_get_requests_html, [parallel], [get_device_by_id_to_html, get_device_by_ua_to_html, get_device_by_id_404_to_html]},
 			 {devices_post_requests, [parallel], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp]},
 			 {brand_get_requests, [parallel], [get_brand_by_brand_name, get_all_brands, get_brand_by_brand_name_to_html]},
-			 {brand_get_requests_html, [parallel], [get_brand_by_brand_name_to_html]}
+			 {brand_get_requests_html, [parallel], [get_brand_by_brand_name_to_html]},
+			 {model_get_requests, [parallel], [get_devices_by_model_name, get_devices_without_model_name]},
+			 {model_get_requests_html, [parallel], [get_devices_by_model_name_html, get_devices_without_model_name_html]}
 			].
 
 %%--------------------------------------------------------------------
@@ -78,7 +80,8 @@ groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_
 %%              are to be executed.
 %%--------------------------------------------------------------------
 all() -> [{group, device_get_requests}, {group, device_get_requests_html}, {group, devices_post_requests},
-		  {group, brand_get_requests}, {group, brand_get_requests_html}
+		  {group, brand_get_requests}, {group, brand_get_requests_html},{group, model_get_requests},
+		  {group, model_get_requests_html}
 		 ].
 
 %%--------------------------------------------------------------------
@@ -213,4 +216,11 @@ get_brand_by_brand_name_to_html(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/brand/RIM",?HTML_CONTENT_TYPE, get).
 get_all_brands(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/brands", ?XML_CONTENT_TYPE, get).
-
+get_devices_by_model_name(_Config) ->
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/model/MB200", ?XML_CONTENT_TYPE, get).
+get_devices_by_model_name_html(_Config) ->
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/model/MB200", ?HTML_CONTENT_TYPE, get).
+get_devices_without_model_name_html(_Config) ->
+	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/model", ?HTML_CONTENT_TYPE, get).
+get_devices_without_model_name(_Config) ->
+	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/model", ?XML_CONTENT_TYPE, get).

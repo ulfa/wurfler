@@ -3,19 +3,6 @@
         <title>Handset details</title>
     </head>
     <body>
-    <ul>
-	{% for key, value in deviceDetail %}
-		{% ifnotequal key "groups" %}
-		
-		
-    	<li><label for="{{key}}">{{key}}</label>{{ value }}</li>
-		
-		
-		{% endifnotequal %}
-		
-
-	{% endfor %}
-	</ul>
-            
+          {{device}}  
     </body>
 </html>

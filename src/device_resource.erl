@@ -44,7 +44,7 @@ allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
 to_html(ReqData, #context{device=Device}=Context) ->
-     {ok, Content} = devices_dtl:render([{deviceDetail, record_to_tuple(device, Device)}]),
+     {ok, Content} = device_dtl:render([{device, Device}]),
      {Content, ReqData, Context}.
 
 to_xml(ReqData, #context{device = Device} = Context) ->
@@ -55,8 +55,9 @@ to_xml(ReqData, #context{device = Device} = Context) ->
 resource_exists(ReqData, Context) ->
 	case get_device(wrq:path_info(device, ReqData), ReqData) of
 		[] -> {false, ReqData, Context#context{device=[]}};
-		Devices -> {true, ReqData, Context#context{device=Devices}}
+		Device -> {true, ReqData, Context#context{device=Device}}
 	end.
+
 %%
 %% Local Functions
 %%

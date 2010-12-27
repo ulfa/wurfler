@@ -34,7 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
--export([get_brands/0, get_brand/1, get_devices_by_model/1]).
+-export([get_brands/0, get_brand/1, get_devices_by_model/1, create_devices/1]).
 -compile([export_all]).
 %% ====================================================================
 %% Record definition
@@ -156,7 +156,7 @@ new_state() ->
 search_by_device_id(DeviceName)->	
 	case wurfler_db:find_record_by_id(devicesTbl, DeviceName) of
 		[] -> [];
-		[Device] -> Device
+		[Device] -> Device				
 	end.
 
 search_by_ua(UserAgent, _State)->
@@ -164,6 +164,7 @@ search_by_ua(UserAgent, _State)->
 		[] -> [];
 		[Device] -> Device
 	end.
+
 search_by_capabilities(Capabilities, Timestamp, State) ->
 	List_Of_Funs=create_funs_from_list(Capabilities),
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
@@ -311,6 +312,8 @@ and_cond([], {_CheckName, _CheckValue}, Acc) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+search_by_ua_test() ->
+	search_by_ua("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like Mac OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7", new_state()).
 add_device_to_devices_test() ->
 	Devices=[create_device(#device{id="1", brand_name="brand_1", model_name="model_1"}), 
 			 create_device(#device{id="2", brand_name="brand_2", model_name="model_2"})],
@@ -397,9 +400,6 @@ run_funs_against_list_test()->
 	 {"png", {"false", '='}}],
 	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para2), Caps1, [])).
 
-search_by_ua_test()->
-	Device = search_by_ua("Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", wurfler:new_state()),
-	?assertEqual("opera_nokia_7610_ver1", Device#device.id).
 
 search_by_capabilities_test() ->
 	List=[{"handheldfriendly", {"false", '='}},

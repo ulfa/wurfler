@@ -80,6 +80,8 @@ get_capabilities(Body) ->
 	Caps = xmerl_xpath:string ("/query/capabilities/capability", Xml),
 	[create_cap(Cap)||Cap <- Caps].	
 
+get_devices([], _Timestamp) ->
+	wurfler:create_devices([]);
 get_devices(Capabilities, []) ->
 	wurfler:searchByCapabilities(Capabilities, "01.01.1970");
 get_devices(Capabilities, Timestamp) ->

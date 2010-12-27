@@ -192,13 +192,13 @@ get_device_by_ua(_Config) ->
 get_device_by_ua_to_html(_Config) ->
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/html"}, {"Accept", "text/html"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).
 
-
 post_cap_query(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"=\"/></capabilities></query>",
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),
-	2708=erlang:length(Devices).
+	2727=erlang:length(Devices).
+
 post_cap_query_no_caps(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
 	{ok, "200", _C, Body}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),

@@ -192,8 +192,10 @@ get_device_by_ua_to_html(_Config) ->
 
 post_cap_query(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"=\"/></capabilities></query>",
-	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A).
-
+	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
+	Xml = xml_factory:parse(D),
+	Devices = xmerl_xpath:string("//devices/device", Xml),
+	2708=erlang:length(Devices).
 post_cap_query_no_caps(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
 	{ok, "200", _C, Body}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
@@ -206,7 +208,7 @@ post_cap_query_with_timestamp(_Config) ->
 get_brand_by_brand_name(_Config) ->
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/brand/RIM", ?XML_CONTENT_TYPE, get),
 	Brand = xml_factory:parse(D),
-	"RIM"=xml_factory:get_attribute("//brand/@name", Brand).
+	"RIM" = xml_factory:get_attribute("//brand/@name", Brand).
 get_brand_by_brand_name_to_html(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/brand/RIM",?HTML_CONTENT_TYPE, get).
 get_all_brands(_Config) ->

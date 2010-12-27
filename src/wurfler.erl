@@ -271,10 +271,16 @@ get_devices_for_caps(_List_Of_Funs, [], State) ->
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),
 	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State#state{capabilities=[]}),
-%%  error_logger:info_msg("Capse ~p~n", [Caps]),	
 	case run_funs_against_list(List_Of_Funs, Caps, {nok}) of
-		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, State#state{devices=[create_device(Device)|State#state.devices]});
+%%   		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, State#state{devices=[create_device(Device)|State#state.devices]});
+  		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, add_device_to_devices(?CONTAINS, Device, State));
 		{nok} -> get_devices_for_caps(List_Of_Funs, Keys, State)
+	end.
+
+add_device_to_devices(Fun, Device, #state{devices=Devices}=State) ->
+	case lists:any(Fun, Devices) of
+		false -> State#state{devices=[create_device(Device)|State#state.devices]};
+		true -> State
 	end.
 
 run_funs_against_list(List_Of_Funs, [#capability{name=CheckName, value=CheckValue}|List_Of_Caps], Acc) ->
@@ -301,6 +307,14 @@ and_cond([], {_CheckName, _CheckValue}, Acc) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+add_device_to_devices_test() ->
+	Devices=[create_device(#device{id="1", brand_name="brand_1", model_name="model_1"}), 
+			 create_device(#device{id="2", brand_name="brand_2", model_name="model_2"})],
+	Device = #device{id="1", brand_name="brand_1", model_name="model_1"},
+	State=add_device_to_devices(?CONTAINS, Device, #state{devices=Devices}),
+	?assertEqual(2, erlang:length(State#state.devices)).
+	
+	
 and_cond_test() ->
 	List=[{"device_os", {"iPhone OS", '='}}],
 	List_Of_Funs = create_funs_from_list(List),

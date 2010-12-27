@@ -49,7 +49,7 @@ to_html(ReqData, #context{device=Device}=Context) ->
      {Content, ReqData, Context}.
 
 to_xml(ReqData, #context{device = Device} = Context) ->
-    D = lists:flatten(xmerl:export_simple_content([xml_factory:create_xml(device, Device)], xmerl_xml)),
+    D = xml_factory:to_xml([xml_factory:create_xml(device, Device)]),
     {D, ReqData, Context}.
 
  

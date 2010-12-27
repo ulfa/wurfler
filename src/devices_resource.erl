@@ -65,9 +65,9 @@ resource_exists(ReqData, Context) ->
 
 process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
-	Caps=get_capabilities(Body),
-	Timestamp=get_timestamp(Body),
-	D=lists:flatten(xmerl:export_simple_content(get_devices(Caps, Timestamp), xmerl_xml)),
+	Caps = get_capabilities(Body),
+	Timestamp = get_timestamp(Body),
+	D = xml_factory:to_xml(get_devices(Caps, Timestamp)),
 	{true, wrq:append_to_response_body(D, ReqData), Context}.
 %%
 %% Local Functions

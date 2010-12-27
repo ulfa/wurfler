@@ -25,7 +25,7 @@
 %% --------------------------------------------------------------------
 -include_lib("eunit/include/eunit.hrl").
 -include("../include/wurfler.hrl").
-
+-include_lib("xmerl/include/xmerl.hrl").
 -export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
@@ -54,7 +54,7 @@ to_html(ReqData, #context{brand=Brand}=Context) ->
      {Content, ReqData, Context}.
 
 to_xml(ReqData, #context{brand = [Brand]} = Context) ->
-    D = lists:flatten(xmerl:export_simple_content([xml_factory:create_xml(brand, Brand)], xmerl_xml)),
+    D = xml_factory:to_xml([xml_factory:create_xml(brand, Brand)]),
     {D, ReqData, Context}.
 
 resource_exists(ReqData, Context) ->

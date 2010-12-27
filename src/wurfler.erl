@@ -284,25 +284,21 @@ add_device_to_devices(Fun, Device, #state{devices=Devices}=State) ->
 	end.
 
 run_funs_against_list(List_Of_Funs, [#capability{name=CheckName, value=CheckValue}|List_Of_Caps], Acc) ->
-%% 	error_logger:info_msg("run_funs_against_list ~p , ~p~n", [CheckName, CheckValue]),
 	case and_cond(List_Of_Funs, {CheckName, CheckValue}, []) of
 		{ok} -> run_funs_against_list(List_Of_Funs, List_Of_Caps, {ok});
 		{nok} -> run_funs_against_list(List_Of_Funs, [], {nok});
 		[] -> run_funs_against_list(List_Of_Funs, List_Of_Caps, Acc)
 	end;
 run_funs_against_list(_List_Of_Funs, [], Acc) ->
-%% 	error_logger:info_msg("Acc, ~p~n", [Acc]),
 	Acc.
 
 and_cond([Fun|Funs], {CheckName, CheckValue}, Acc) ->
-%% 	error_logger:info_msg("and_cond ~p , ~p~n", [CheckName, CheckValue]),
 	case Fun(CheckName, CheckValue) of
 		{ok} -> and_cond(Funs, {CheckName, CheckValue}, {ok});
 		{nok} -> and_cond([], {CheckName, CheckValue}, {nok});
 		_ -> and_cond(Funs, {CheckName, CheckValue}, Acc)
     end;
 and_cond([], {_CheckName, _CheckValue}, Acc) -> 
-%% 	error_logger:info_msg("Acc, ~p~n", [Acc]),
 	Acc.
 %% --------------------------------------------------------------------
 %%% Test functions

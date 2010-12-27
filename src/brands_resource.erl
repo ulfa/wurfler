@@ -50,7 +50,7 @@ allowed_methods(ReqData, Context) ->
 
 to_xml(ReqData, #context{brands=Brands}=Context) ->
 	Brands_Xml = [xml_factory:create_xml(brand, Brand)|| Brand <- Brands],
-	D=lists:flatten(xmerl:export_simple_content(Brands_Xml, xmerl_xml)),
+	D = xml_factory:to_xml(Brands_Xml),
 	{D, ReqData, Context}.
 
 to_html(ReqData, #context{brands=Brands}=Context)->

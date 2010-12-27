@@ -31,7 +31,7 @@
 %%
 %% Exported Functions
 %%
--export([create_xml/2, parse/1, parse_file/1,get_attribute/2, get_text/2]).
+-export([create_xml/2, parse/1, parse_file/1,get_attribute/2, get_text/2, to_xml/1]).
 
 %%
 %% API Functions
@@ -78,6 +78,8 @@ get_text(XPath, Xml) ->
 		[#xmlText{value = Value}] -> Value;
 		Other -> Other
 	end.
+to_xml(Data) ->
+	lists:flatten(xmerl:export_simple_content(Data, xmerl_xml)).
 %%
 %% Local Functions
 %%

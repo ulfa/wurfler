@@ -79,7 +79,8 @@ get_text(XPath, Xml) ->
 		Other -> Other
 	end.
 to_xml(Data) ->
-	lists:flatten(xmerl:export_simple_content(Data, xmerl_xml)).
+	D = lists:flatten(xmerl:export_simple_content(Data, xmerl_xml)),
+	iolist_to_binary([<<X/utf8>> || X <- D]).
 %%
 %% Local Functions
 %%

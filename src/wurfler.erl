@@ -311,9 +311,8 @@ and_cond([Fun|Funs], {CheckName, CheckValue}, Acc) ->
 and_cond([], {_CheckName, _CheckValue}, Acc) -> 
 	Acc.
 
-overwrite(Generic, #capability{name=Name}=Capability) ->
-	G=lists:keydelete(Name, 2,  Generic),
-	[Capability|G];
+overwrite(Generic, #capability{name=Name}=Capability) ->	
+	lists:keyreplace(Name, 2, Generic, Capability);
 
 overwrite(Generic, List_Of_Capabilities) ->
 	overwrite(Generic, List_Of_Capabilities, Generic).

@@ -8,9 +8,3 @@
 					    true -> false
 					end
 			   	  end).
-
--define(CONTAINS_CAP,fun(#capability{name=Name_Org}) ->					   					   
-		if Name_Org == Name_New -> true;
-						   true -> false
-		end
-	end ).

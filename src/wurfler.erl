@@ -36,7 +36,7 @@
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
 -export([get_brands/0, get_brand/1, get_devices_by_model/1, create_devices/1]).
 -compile([export_all]).
--define(TIMEOUT, 50000).
+-define(TIMEOUT, infinity).
 %% ====================================================================
 %% Record definition
 %% ====================================================================
@@ -288,13 +288,13 @@ get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),
 	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State),
 	case run_funs_against_list(List_Of_Funs, Caps, {nok}) of
-%%   		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, State#state{devices=[create_device(Device)|State#state.devices]});
+%%  	{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, State#state{devices=[create_device(Device)|State#state.devices]});
   		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, add_device_to_devices(?CONTAINS, Device, State));
 		{nok} -> get_devices_for_caps(List_Of_Funs, Keys, State)
 	end.
 
 add_device_to_devices(Fun, Device, #state{devices=Devices}=State) ->
-	case lists:any(Fun, Devices) of
+ 	case lists:any(Fun, Devices) of 
 		false -> State#state{devices=[create_device(Device)|State#state.devices]};
 		true -> State
 	end.
@@ -317,24 +317,6 @@ and_cond([Fun|Funs], {CheckName, CheckValue}, Acc) ->
 and_cond([], {_CheckName, _CheckValue}, Acc) -> 
 	Acc.
 
-
-%% not used yet
-contains(List, #capability{name=Name_New}) ->
-	lists:any(?CONTAINS_CAP, List).
-
-append(List, #capability{}=Capability) ->
-	case contains(List, Capability) of
-		false -> [Capability|List];
-		true -> List
-	end;
-append(List_Org, List_New) ->
-	append(List_Org, List_New, List_Org).
-append(_List_Org, [], Acc) ->
-	Acc;
-append(List_Org, [Capability|List_New], Acc) ->
-	Acc1 = append(Acc, Capability),
-	append(List_Org, List_New, Acc1).
-
 overwrite(Generic, #capability{name=Name}=Capability) ->
 	G=lists:keydelete(Name, 2,  Generic),
 	[Capability|G];
@@ -345,8 +327,6 @@ overwrite(_Generic, [], Acc) ->
 	Acc;
 overwrite(Generic, [Capability|List_Of_Capabilities], Acc) ->
 	overwrite(Generic, List_Of_Capabilities, overwrite(Acc, Capability)).
-	
-		
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -452,31 +432,11 @@ search_by_capabilities_test_1() ->
 	Keys = ["apple_generic", "generic_xhtml"], 
 	get_devices_for_caps(List_Of_Funs, Keys, new_state()).
 
-contains_capabilities_test() ->
-	C1 = [#capability{name="device_os", value="iPhone"}],
-	C2 = #capability{name="device_os", value=[]},
-	?assertEqual(true,contains(C1, C2)),
-	C3 = #capability{name="device_os_version", value=[]},
-	?assertEqual(false,contains(C1, C3)).
-
-append_capability_test() ->
-	C1 = [#capability{name="device_os", value="iPhone"}],
-	C2 = #capability{name="device_os", value=[]},
-	?assertEqual(1, erlang:length(append(C1, C2))),
-	C3 = #capability{name="device_os_version", value=[]},
-	?assertEqual(2, erlang:length(append(C1, C3))).
-
-append_list_of_capabilities_test() ->
-	C1 = [#capability{name="device_os", value="iPhone"}],
-	C2 = [#capability{name="device_os", value=[]}],
-	?assertEqual(1, erlang:length(append(C1, C2))),
-	C3 = [#capability{name="device_os_version", value=[]}],
-	?assertEqual(2, erlang:length(append(C1, C3))).
 
 overwrite_test() ->
-	{ok, #state{capabilities=Generic}} = get_all_capabilities("generic", #state{capabilities=[]}),
+	Generic = get_generic_capabilities(),
 	C=[#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
-	overwrite(Generic, C).
+	?assertEqual(497,erlang:length(overwrite(Generic, C))).
 	
 	
 	

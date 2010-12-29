@@ -81,7 +81,7 @@ get_capabilities(Body) ->
 	[create_cap(Cap)||Cap <- Caps].	
 
 get_devices([], _Timestamp) ->
-	wurfler:create_devices([]);
+	xml_factory:create_devices([]);
 get_devices(Capabilities, []) ->
 	wurfler:searchByCapabilities(Capabilities, "01.01.1970");
 get_devices(Capabilities, Timestamp) ->

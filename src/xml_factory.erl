@@ -31,7 +31,7 @@
 %%
 %% Exported Functions
 %%
--export([create_xml/2, parse/1, parse_file/1,get_attribute/2, get_text/2, to_xml/1]).
+-export([create_xml/2, parse/1, parse_file/1,get_attribute/2, get_text/2, to_xml/1, create_device/1, create_devices/1]).
 
 %%
 %% API Functions
@@ -57,6 +57,12 @@ create_models([], Acc) ->
 create_models([{Id, Model_Name}|Models], Acc) ->
 	Acc1 = [{model, [{id, Id}, {model_name, Model_Name}], []} | Acc],
 	create_models(Models, Acc1).
+
+create_device(#device{id=Id, brand_name=Brand_name, model_name=Model_name}) ->
+	{'device', [{id, Id}, {model_name,Model_name}, {brand_name,Brand_name}], []}.
+create_devices(Devices)->
+	[{'devices', [], Devices}].
+
 
 
 parse(Bin) when is_binary(Bin) ->

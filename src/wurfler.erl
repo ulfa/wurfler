@@ -34,7 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
--export([get_brands/0, get_brand/1, get_devices_by_model/1, create_devices/1]).
+-export([get_brands/0, get_brand/1, get_devices_by_model/1]).
 -compile([export_all]).
 -define(TIMEOUT, infinity).
 %% ====================================================================
@@ -179,13 +179,8 @@ getBrand(Brand_Name) ->
 	{ok, wurfler_db:get_brand(Brand_Name)}.
 getDeviceByModelName(Model_Name) ->	
 	R =  wurfler_db:get_devices_by_model_name(devicesTbl, Model_Name),
-	Result =create_devices([create_device(D) || D <- R]),
+	Result = xml_factory:create_devices([xml_factory:create_device(D) || D <- R]),
 	{ok, Result}.
-
-create_device(#device{id=Id, brand_name=Brand_name, model_name=Model_name}) ->
-	{'device', [{id, Id}, {model_name,Model_name}, {brand_name,Brand_name}], []}.
-create_devices(Devices)->
-	[{'devices', [], Devices}].
 
 get_all_groups([], #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
@@ -279,10 +274,10 @@ create_fun(CheckName, CheckValue, '>=')->
 	end.
 
 get_devices_for_caps([], _Keys, State) ->
-	State#state{devices=create_devices(State#state.devices)};
+	State#state{devices = xml_factory:create_devices(State#state.devices)};
 
 get_devices_for_caps(_List_Of_Funs, [], State) ->
-	State#state{devices=create_devices(State#state.devices)};
+	State#state{devices = xml_factory:create_devices(State#state.devices)};
 
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),
@@ -295,7 +290,7 @@ get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 
 add_device_to_devices(Fun, Device, #state{devices=Devices}=State) ->
  	case lists:any(Fun, Devices) of 
-		false -> State#state{devices=[create_device(Device)|State#state.devices]};
+		false -> State#state{devices=[xml_factory:create_device(Device)|State#state.devices]};
 		true -> State
 	end.
 
@@ -333,8 +328,8 @@ overwrite(Generic, [Capability|List_Of_Capabilities], Acc) ->
 search_by_ua_test() ->
 	search_by_ua("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like Mac OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7", new_state()).
 add_device_to_devices_test() ->
-	Devices=[create_device(#device{id="1", brand_name="brand_1", model_name="model_1"}), 
-			 create_device(#device{id="2", brand_name="brand_2", model_name="model_2"})],
+	Devices=[xml_factory:create_device(#device{id="1", brand_name="brand_1", model_name="model_1"}), 
+			 xml_factory:create_device(#device{id="2", brand_name="brand_2", model_name="model_2"})],
 	Device = #device{id="1", brand_name="brand_1", model_name="model_1"},
 	State=add_device_to_devices(?CONTAINS, Device, #state{devices=Devices}),
 	?assertEqual(2, erlang:length(State#state.devices)).

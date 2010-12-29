@@ -4,8 +4,13 @@
 -record(index, {device, table=[]}).
 -record(brand_index, {brand_name, models=[]}).
 -define(CONTAINS, fun({device, [_,{model_name, Model_Name},_], []}) ->					   					   
-					if 
-						Device#device.model_name == Model_Name -> true;
+					if Device#device.model_name == Model_Name -> true;
 					    true -> false
 					end
-			   end).
+			   	  end).
+
+-define(CONTAINS_CAP,fun(#capability{name=Name_Org}) ->					   					   
+		if Name_Org == Name_New -> true;
+						   true -> false
+		end
+	end ).

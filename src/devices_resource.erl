@@ -103,19 +103,19 @@ create_cap(Cap) ->
 %% Test functions
 %% --------------------------------------------------------------------
 get_capabilities_test() ->
-	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	?assertEqual([{"j2me_cldc_1_1",{"true",'=='}},{"j2me_midp_1_1",{"true",'=='}}],  get_capabilities(Xml_Bin)).
 get_timestamp_test() ->
-	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>19.12.2010</timestamp><capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>19.12.2010</timestamp><capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	?assertEqual("19.12.2010",get_timestamp(Xml_Bin)).
 
 get_timestamp_not_present_test() ->
-	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	?assertEqual([],get_timestamp(Xml_Bin)).
 	
 
 get_devices_test() ->
-	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	D=get_devices(get_capabilities(Xml_Bin), "01.01.2010"),
 	io:format("1... ~p~n", [D]),
 	D1=lists:flatten(xmerl:export_simple_content(D, xmerl_xml)),
@@ -123,6 +123,6 @@ get_devices_test() ->
  	?assertEqual(1, erlang:length(D)).
 
 xml_test() ->
-	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"==\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"==\"/>\t</capabilities></query>">>,
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	A=lists:flatten(xmerl:export_simple_content(get_devices(get_capabilities(Xml_Bin), "01.01.2010"), xmerl_xml)),
 	?assertEqual(451787, erlang:length(A)).

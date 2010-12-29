@@ -35,7 +35,7 @@
 %% Note: The suite/0 function is only meant to be used to return
 %% default data values, not perform any other operations.
 %%--------------------------------------------------------------------
-suite() -> [{timetrap, {seconds, 20}}].
+suite() -> [{timetrap, {seconds, 200}}].
 
 %%--------------------------------------------------------------------
 %% Function: groups() -> [Group]
@@ -60,7 +60,8 @@ suite() -> [{timetrap, {seconds, 20}}].
 %%--------------------------------------------------------------------
 groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
 			 {device_get_requests_html, [parallel], [get_device_by_id_to_html, get_device_by_ua_to_html, get_device_by_id_404_to_html]},
-			 {devices_post_requests, [parallel], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp]},
+			 {devices_post_requests, [sequence], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp,
+												  post_cap_query_device_os_version]},
 			 {brand_get_requests, [parallel], [get_brand_by_brand_name, get_all_brands, get_brand_by_brand_name_to_html]},
 			 {brand_get_requests_html, [parallel], [get_brand_by_brand_name_to_html]},
 			 {model_get_requests, [parallel], [get_devices_by_model_name, get_devices_without_model_name]},
@@ -159,7 +160,7 @@ end_per_group(_group, Config) ->
 %% Note: This function is free to add any key/value pairs to the Config
 %% variable, but should NOT alter/remove any existing entries.
 %%--------------------------------------------------------------------
-init_per_testcase(TestCase, Config) ->
+init_per_testcase(_TestCase, Config) ->
     Config.
 
 %%--------------------------------------------------------------------
@@ -175,7 +176,7 @@ init_per_testcase(TestCase, Config) ->
 %%
 %% Description: Cleanup after each test case.
 %%--------------------------------------------------------------------
-end_per_testcase(TestCase, Config) ->
+end_per_testcase(_TestCase, Config) ->
     Config.
 
 get_device_by_id(_Config)->
@@ -185,19 +186,20 @@ get_device_by_id_to_html(_Config)->
 get_device_by_id_404(_Config) ->
 	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/device/unknown", ?XML_CONTENT_TYPE, get).
 get_device_by_id_404_to_html(_Config) ->
-	{ok, "404", _C, D}=ibrowse:send_req("http://localhost:8000/device/unknown", ?HTML_CONTENT_TYPE, get).
+	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/device/unknown", ?HTML_CONTENT_TYPE, get).
 
 get_device_by_ua(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/xml"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).
 get_device_by_ua_to_html(_Config) ->
-	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/html"}, {"Accept", "text/html"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/html"}, {"Accept", "text/html"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).
 
+%% Tests for the device service (POST)
 post_cap_query(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"=\"/></capabilities></query>",
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),
-	2727=erlang:length(Devices).
+	1743=erlang:length(Devices).
 
 post_cap_query_no_caps(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
@@ -206,8 +208,19 @@ post_cap_query_no_caps(_Config) ->
 
 post_cap_query_with_timestamp(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>01.01.2010</timestamp><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"=\"/></capabilities></query>",
-	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A).
+	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
+	Xml = xml_factory:parse(D),
+	Devices = xmerl_xpath:string("//devices/device", Xml),
+	1743=erlang:length(Devices).
 
+post_cap_query_device_os_version(_Config) ->
+	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>01.01.2010</timestamp><capabilities><capability name=\"device_os\" value=\"iPhone OS\" operator=\"=\"/><capability name=\"device__os_version\" value=\"0.0\" operator=\">\"/></capabilities></query>",
+	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
+	Xml = xml_factory:parse(D),
+	Devices = xmerl_xpath:string("//devices/device", Xml),
+	4 = erlang:length(Devices).
+	
+%% Tests for the brand service
 get_brand_by_brand_name(_Config) ->
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/brand/RIM", ?XML_CONTENT_TYPE, get),
 	Brand = xml_factory:parse(D),
@@ -216,6 +229,7 @@ get_brand_by_brand_name_to_html(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/brand/RIM",?HTML_CONTENT_TYPE, get).
 get_all_brands(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/brands", ?XML_CONTENT_TYPE, get).
+%% Tests for the model service
 get_devices_by_model_name(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/model/MB200", ?XML_CONTENT_TYPE, get).
 get_devices_by_model_name_html(_Config) ->

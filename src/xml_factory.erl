@@ -118,8 +118,7 @@ create_device()->
 	#device{id="Nokia", user_agent="blahblahblah", actual_device_root=undefined, fall_back=undefined, 
 			groups=[create_group_1(), create_group_2()]}.
 
-create_goups() ->
-	[create_group_1(), create_group_2()].
+
 create_group_1() ->
 	#group{id="j2me", capabilites=create_capabilities_1()}.
 create_group_2() ->

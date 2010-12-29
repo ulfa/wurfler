@@ -36,29 +36,30 @@
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
 -export([get_brands/0, get_brand/1, get_devices_by_model/1, create_devices/1]).
 -compile([export_all]).
+-define(TIMEOUT, 50000).
 %% ====================================================================
 %% Record definition
 %% ====================================================================
--record(state, {devices=[], groups=[], capabilities=[], modell=[]}).
+-record(state, {devices=[], groups=[], capabilities=[], generic=[]}).
 %% ====================================================================
 %% External functions
 %% ====================================================================
 import_wurfl(Filename) ->
 	gen_server:cast(?MODULE, {import_wurfl, Filename}).
 searchByCapabilities(Capabilities, Timestamp) ->
-	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp}).
+	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp}, ?TIMEOUT).
 searchByUA(UserAgent)->
-	gen_server:call(?MODULE, {search_by_ua, UserAgent}).
+	gen_server:call(?MODULE, {search_by_ua, UserAgent}, ?TIMEOUT).
 searchByDeviceName(DeviceName) ->
-	gen_server:call(?MODULE, {search_by_device_id, DeviceName}).
+	gen_server:call(?MODULE, {search_by_device_id, DeviceName}, ?TIMEOUT).
 getAllCapabilities(DeviceName)->
-	gen_server:call(?MODULE, {get_all_capabilities, DeviceName}).
+	gen_server:call(?MODULE, {get_all_capabilities, DeviceName}, ?TIMEOUT).
 get_brands() ->
-	gen_server:call(?MODULE, {get_brands}).
+	gen_server:call(?MODULE, {get_brands}, ?TIMEOUT).
 get_brand(Brand_Name) ->
-	gen_server:call(?MODULE, {get_brand, Brand_Name}).
+	gen_server:call(?MODULE, {get_brand, Brand_Name}, ?TIMEOUT).
 get_devices_by_model(Model_Name) ->
-	gen_server:call(?MODULE, {get_devices_by_name, Model_Name}).
+	gen_server:call(?MODULE, {get_devices_by_name, Model_Name}, ?TIMEOUT).
 getVersion() ->
 	gen_server:call(?MODULE, {version}).
 %% ====================================================================
@@ -101,8 +102,9 @@ handle_call({search_by_ua, User_Agent}, _From, State) ->
 handle_call({search_by_device_id, DeviceName}, _From, _State) ->
 	Result=search_by_device_id(DeviceName),
     {reply, Result, new_state()};
-handle_call({get_all_capabilities, DeviceName}, _From, State) ->
-	{ok, Result}=get_all_capabilities(DeviceName, State),
+handle_call({get_all_capabilities, DeviceName}, _From, _State) ->
+	Generic = get_generic_capabilities(),
+	{ok, Result}=get_all_capabilities(DeviceName, #state{capabilities=Generic}),
     {reply, Result#state.capabilities, new_state()};
 handle_call({get_brands}, _From, State) ->
 	{ok, Result}=get_all_brands(),
@@ -169,7 +171,7 @@ search_by_ua(UserAgent, _State)->
 search_by_capabilities(Capabilities, Timestamp, State) ->
 	List_Of_Funs=create_funs_from_list(Capabilities),
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
-	get_devices_for_caps(List_Of_Funs, Keys, State).
+	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=get_generic_capabilities()}).
 
 get_all_brands() ->
 	{ok, wurfler_db:get_all_brands()}.
@@ -190,7 +192,7 @@ get_all_groups([], #state{groups=Groups}) ->
 get_all_groups("root", #state{groups=Groups}) ->
 	{ok, #state{groups=Groups}};
 get_all_groups("generic", #state{groups=Groups}) ->
-	{ok, #state{groups=Groups}};
+ 	{ok, #state{groups=Groups}};
 get_all_groups(DeviceName, #state{groups=AllGroups}) ->
 	{Fall_back, Groups} = wurfler_db:find_groups_by_id(devicesTbl, DeviceName),
 	get_all_groups(Fall_back, #state{groups=lists:append(AllGroups,Groups)}).
@@ -200,10 +202,14 @@ get_all_capabilities([], #state{capabilities=Caps}) ->
 get_all_capabilities("root", #state{capabilities=Caps}) ->
 	{ok, #state{capabilities=Caps}};
 get_all_capabilities("generic", #state{capabilities=Caps}) ->
- 	{ok, #state{capabilities=Caps}};
+   	{ok, #state{capabilities=Caps}};
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 	{Fall_back, Capabilities} = wurfler_db:find_capabilities_by_id(devicesTbl, DeviceName),	
-	get_all_capabilities(Fall_back, #state{capabilities=lists:append(Caps,Capabilities)}).
+	get_all_capabilities(Fall_back, #state{capabilities=overwrite(Caps, Capabilities)}).
+
+get_generic_capabilities() ->
+	{_Fall_back, Generic} = wurfler_db:find_capabilities_by_id(devicesTbl, "generic"),
+	Generic.
 %%------------------------------------------------------------------------------
 %% Here i can optimize the create_fun stuff.
 %% Perhaps i will use erl_scan and co.
@@ -280,7 +286,7 @@ get_devices_for_caps(_List_Of_Funs, [], State) ->
 
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),
-	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State#state{capabilities=[]}),
+	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State),
 	case run_funs_against_list(List_Of_Funs, Caps, {nok}) of
 %%   		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, State#state{devices=[create_device(Device)|State#state.devices]});
   		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, add_device_to_devices(?CONTAINS, Device, State));
@@ -310,6 +316,37 @@ and_cond([Fun|Funs], {CheckName, CheckValue}, Acc) ->
     end;
 and_cond([], {_CheckName, _CheckValue}, Acc) -> 
 	Acc.
+
+
+%% not used yet
+contains(List, #capability{name=Name_New}) ->
+	lists:any(?CONTAINS_CAP, List).
+
+append(List, #capability{}=Capability) ->
+	case contains(List, Capability) of
+		false -> [Capability|List];
+		true -> List
+	end;
+append(List_Org, List_New) ->
+	append(List_Org, List_New, List_Org).
+append(_List_Org, [], Acc) ->
+	Acc;
+append(List_Org, [Capability|List_New], Acc) ->
+	Acc1 = append(Acc, Capability),
+	append(List_Org, List_New, Acc1).
+
+overwrite(Generic, #capability{name=Name}=Capability) ->
+	G=lists:keydelete(Name, 2,  Generic),
+	[Capability|G];
+
+overwrite(Generic, List_Of_Capabilities) ->
+	overwrite(Generic, List_Of_Capabilities, Generic).
+overwrite(_Generic, [], Acc) ->
+	Acc;
+overwrite(Generic, [Capability|List_Of_Capabilities], Acc) ->
+	overwrite(Generic, List_Of_Capabilities, overwrite(Acc, Capability)).
+	
+		
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -415,6 +452,35 @@ search_by_capabilities_test_1() ->
 	Keys = ["apple_generic", "generic_xhtml"], 
 	get_devices_for_caps(List_Of_Funs, Keys, new_state()).
 
+contains_capabilities_test() ->
+	C1 = [#capability{name="device_os", value="iPhone"}],
+	C2 = #capability{name="device_os", value=[]},
+	?assertEqual(true,contains(C1, C2)),
+	C3 = #capability{name="device_os_version", value=[]},
+	?assertEqual(false,contains(C1, C3)).
+
+append_capability_test() ->
+	C1 = [#capability{name="device_os", value="iPhone"}],
+	C2 = #capability{name="device_os", value=[]},
+	?assertEqual(1, erlang:length(append(C1, C2))),
+	C3 = #capability{name="device_os_version", value=[]},
+	?assertEqual(2, erlang:length(append(C1, C3))).
+
+append_list_of_capabilities_test() ->
+	C1 = [#capability{name="device_os", value="iPhone"}],
+	C2 = [#capability{name="device_os", value=[]}],
+	?assertEqual(1, erlang:length(append(C1, C2))),
+	C3 = [#capability{name="device_os_version", value=[]}],
+	?assertEqual(2, erlang:length(append(C1, C3))).
+
+overwrite_test() ->
+	{ok, #state{capabilities=Generic}} = get_all_capabilities("generic", #state{capabilities=[]}),
+	C=[#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
+	overwrite(Generic, C).
+	
+	
+	
+	
 
 
 

@@ -171,7 +171,7 @@ search_by_ua(UserAgent, _State)->
 search_by_capabilities(Capabilities, Timestamp, State) ->
 	List_Of_Funs=create_funs_from_list(Capabilities),
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
-	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=get_generic_capabilities()}).
+	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
 get_all_brands() ->
 	{ok, wurfler_db:get_all_brands()}.
@@ -283,7 +283,6 @@ get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),
 	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State),
 	case run_funs_against_list(List_Of_Funs, Caps, {nok}) of
-%%  	{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, State#state{devices=[create_device(Device)|State#state.devices]});
   		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, add_device_to_devices(?CONTAINS, Device, State));
 		{nok} -> get_devices_for_caps(List_Of_Funs, Keys, State)
 	end.
@@ -322,6 +321,14 @@ overwrite(_Generic, [], Acc) ->
 	Acc;
 overwrite(Generic, [Capability|List_Of_Capabilities], Acc) ->
 	overwrite(Generic, List_Of_Capabilities, overwrite(Acc, Capability)).
+
+extract_only_need_capabilities(Generic, List_Of_Capabilities) ->
+	lists:flatten([extract_one_capabilty(Generic, Capability) || Capability <- List_Of_Capabilities]).
+extract_one_capabilty(Generic, {Name, {_,_}}) ->
+	case lists:keyfind(Name, 2, Generic) of
+		false -> [];
+		Cap -> Cap
+	end.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -430,11 +437,15 @@ search_by_capabilities_test_1() ->
 
 overwrite_test() ->
 	Generic = get_generic_capabilities(),
-	C=[#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
+	C = [#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
 	?assertEqual(497,erlang:length(overwrite(Generic, C))).
 	
-	
-	
+optimization_test() ->
+	Generic = get_generic_capabilities(),
+	C = [{"device_os_version", {"3.0", "="}}, {"device_os", {"Test", "="}}, {"device_os1", {"Test", ">"}}],
+	Result = extract_only_need_capabilities(Generic, C),
+	io:format("~p~n", [Result]),
+	?assertEqual(2, erlang:length(Result)).
 	
 
 

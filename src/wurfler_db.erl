@@ -87,7 +87,7 @@ find_groups_by_id(devicesTbl, Id) ->
 	{Device#device.fall_back, Device#device.groups}.
 find_capabilities_by_id(devicesTbl, Id) ->
 	[Device] = mnesia:dirty_read(devicesTbl, Id),
-	Caps=lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
+	Caps = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
 	{Device#device.fall_back, Caps}.
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).

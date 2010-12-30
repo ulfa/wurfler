@@ -60,7 +60,7 @@ suite() -> [{timetrap, {seconds, 200}}].
 %%--------------------------------------------------------------------
 groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
 			 {device_get_requests_html, [parallel], [get_device_by_id_to_html, get_device_by_ua_to_html, get_device_by_id_404_to_html]},
-			 {devices_post_requests, [sequence], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp,
+			 {devices_post_requests, [parallel], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp,
 												  post_cap_query_device_os_version]},
 			 {brand_get_requests, [parallel], [get_brand_by_brand_name, get_all_brands, get_brand_by_brand_name_to_html]},
 			 {brand_get_requests_html, [parallel], [get_brand_by_brand_name_to_html]},

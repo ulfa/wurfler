@@ -19,4 +19,4 @@ then
 fi
 
 
-erl -sname lilly +K true -pa $PWD/ebin $PWD/deps/*/ebin -s wurfler_db -s init stop
+erl -name wurflerservice@127.0.0.1 +K true -pa $PWD/ebin $PWD/deps/*/ebin -s wurfler_db -s init stop

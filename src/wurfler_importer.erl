@@ -127,8 +127,8 @@ import_wurfl_file(Filename) ->
 	DevicesXml = xmerl_xpath:string ("/wurfl/devices/device", Xml),
 	D = process_devices(DevicesXml),
 	Count = erlang:length(D),
-	error_logger:info_msg("end import : ~p ~n" ,[Count]),
 	update_brand_model(),
+	error_logger:info_msg("end import : ~p ~n" ,[Count]),
 	Count.
 
 parse(Filename) ->

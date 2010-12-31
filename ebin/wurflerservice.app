@@ -1,7 +1,7 @@
 {application, wurflerservice,
  [
   {description, "A Wurfl file service"},
-  {vsn, "0.1"},
+  {vsn, "0.1.0"},
   {modules, [
   			 wurfler_config,
              wurfler,

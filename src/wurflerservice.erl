@@ -24,7 +24,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
-
 %% --------------------------------------------------------------------
 %% Behavioural exports
 %% --------------------------------------------------------------------
@@ -92,7 +91,7 @@ init([]) ->
                  {ip, Ip},
                  {backlog, 1000},
                  {port, 8000},
-                 {log_dir, "priv/log"},
+                 {log_dir, "logs/weblog"},
                  {dispatch, Dispatch}],
     Web = {webmachine_mochiweb,
            {webmachine_mochiweb, start, [WebConfig]},
@@ -119,7 +118,7 @@ start() ->
 	ensure_started(crypto),
 	ensure_started(mnesia),
     ensure_started(webmachine),
-	ensure_started(erlbuild),
+%% 	ensure_started(erlbuild),
 	application:start(?MODULE).
 
 start_link(_Type, _Args) ->
@@ -139,7 +138,7 @@ start(_Type, _Args) ->
 stop() ->
 	application:stop(crypto),
 	application:stop(webmachine),
-	application:stop(erlbuild),
+%% 	application:stop(erlbuild),
 	application:stop(mnesia),
     application:stop(?MODULE).
 %% --------------------------------------------------------------------

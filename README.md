@@ -13,7 +13,7 @@ curl -H "Accept: text/xml" -v http://localhost:8000/device/generic
 
 response:
 
-<device id="generic" user_agent="" actual_device_root="undefined" fall_back="root"><group id="product_info">
+\<device id="generic" user_agent="" actual_device_root="undefined" fall_back="root"><group id="product_info">
 	<capability name="device_os" value=""/>
 	<capability name="nokia_series" value="0"/>
 </device>

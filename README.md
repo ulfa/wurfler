@@ -6,25 +6,32 @@
 ### get device by id
  
 request:  
+
 <code>
 curl -H "Accept: text/xml" -v http://localhost:8000/device/generic
 </code>
+
 response:
+
 <code>
+
 <device id="generic" user_agent="" actual_device_root="undefined" fall_back="root"><group id="product_info">
 	<capability name="device_os" value=""/>
 	<capability name="nokia_series" value="0"/>
 </device
+
 </code>
 
 ### get device by user agent
 
 request:
+
 <code>
 curl -H "Accept: text/xml" -A "AUDIOVOX-CDM180" -v http://localhost:8000/device
 </code>
 
 response:
+
 <code>
 <device id="generic" user_agent="" actual_device_root="undefined" fall_back="root"><group id="product_info">
 	<capability name="device_os" value=""/>

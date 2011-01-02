@@ -45,7 +45,9 @@ request:
 <code>
 curl -d '@test/xml_caps_request.xml' -H "Accept: text/xml" -v http://localhost:8000/devices
 </code>
+
 where the content of xml_caps_request.xml is : 
+
 <code>
 <?xml version="1.0" encoding="utf-8"?>
 <query>

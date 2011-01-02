@@ -1,33 +1,117 @@
 # actual version
 
-In this version of the wurfler you can query by user-agent and you can
-query by capabilities. Also, it is possible to get information of device by
-sending the device id to the service.
 
-If the test/wurfltest.xml is configurerd than you can test it with :
+## Feature which are implemented and working
 
-curl -H "Accept: text/xml" -v http://localhost:8000/device/rocker
+### get device by id
+ 
+request:  
+<code>
+curl -H "Accept: text/xml" -v http://localhost:8000/device/generic
+</code>
+response:
+<code>
+<device id="generic" user_agent="" actual_device_root="undefined" fall_back="root"><group id="product_info">
+	<capability name="device_os" value=""/>
+	<capability name="nokia_series" value="0"/>
+</device
+</code>
 
-and 
+### get device by user agent
 
+request:
+<code>
+curl -H "Accept: text/xml" -A "AUDIOVOX-CDM180" -v http://localhost:8000/device
+</code>
+
+response:
+<code>
+<device id="generic" user_agent="" actual_device_root="undefined" fall_back="root"><group id="product_info">
+	<capability name="device_os" value=""/>
+	<capability name="nokia_series" value="0"/>
+</device
+</code>
+
+### get devices by capabilities
+
+request:
+<code>
 curl -d '@test/xml_caps_request.xml' -H "Accept: text/xml" -v http://localhost:8000/devices
+</code>
+where the content of xml_caps_request.xml is : 
+<code>
+<?xml version="1.0" encoding="utf-8"?>
+<query>
+	<capabilities>
+		<capability name="device_os" value="iPhone OS" operator="="/>
+		<capability name="device_os_version" value="0.0" operator=">"/>
+	</capabilities>
+</query>
+</code>
 
-or
+response:
 
-curl -H "Accept: text/xml" -A "rocker_ua" -v http://localhost:8000/device
+<code>
+<devices>
+	<device model_name="iPad" brand_name="Apple"/>
+	<device model_name="QuickTime Agent" brand_name="Apple"/>
+	<device model_name="iPhone" brand_name="Apple"/>
+	<device model_name="iPod Touch" brand_name="Apple"/>
+</devices>
+</code>
 
-The first request will send a get request to the service and will return the information 
-of the device with the id.
+### get devices by model name
 
-The second post will send capabilities to the service and will return the devices which
-have the capabilities.
-In the current version the information model_name and brand_name is missing. 
 
-The third request will analyze the given user agent and will return the device information.
+request: 
 
-# Migration to mnesia
+<code>
+curl -H "Accept: text/xml" -v http://localhost:8000/model/MB200
+</code>
 
-The new version uses mnesia instead of ets tables.
+response:
+
+<code>
+<devices>
+	<device model_name="MB200" brand_name="Motorola"/>
+</devices>
+</code>
+
+### get all brands
+
+request:
+ 
+<code>
+curl -H "Accept: text/xml" -v http://localhost:8000/brands
+</code>
+
+response:
+
+<code>
+<brand name="Motorola">
+	<model id="mot_w377g_ver1" model_name="MOT-W377g"/>
+	<model id="mot_ex300_ver1" model_name="EX300"/>
+</brand>
+</code>
+
+### get brand by brand name
+
+request: 
+
+<code>
+curl -H "Accept: text/xml" -v http://localhost:8000/brand/Motorola
+</code>
+
+response:
+
+<code>
+<brand name="Motorola">
+	<model id="mot_w377g_ver1" model_name="MOT-W377g"/>
+	<model id="mot_ex300_ver1" model_name="EX300"/>
+</brand>
+</code>
+
+
 
 ## Installation
 
@@ -60,4 +144,8 @@ In the cover.spec you also have to specify the name of your node.
 
 Then you can run : 
 
-ct_run -spec test/test.spec -pa deps/*/ebin/ ./ebin -cover test/cover.spec 
+ct_run -spec test/test.spec -pa deps/*/ebin/ ./ebin 
+
+To start the server 
+
+ct_run -vts -spec test/test.spec -pa deps/*/ebin/ ./ebin -dir test  

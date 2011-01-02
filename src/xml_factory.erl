@@ -59,7 +59,7 @@ create_models([{Id, Model_Name}|Models], Acc) ->
 	create_models(Models, Acc1).
 
 create_device(#device{id=Id, brand_name=Brand_name, model_name=Model_name}) ->
-	{'device', [{id, Id}, {model_name,Model_name}, {brand_name,Brand_name}], []}.
+	{'device', [{model_name,Model_name}, {brand_name,Brand_name}], []}.
 create_devices(Devices)->
 	[{'devices', [], Devices}].
 

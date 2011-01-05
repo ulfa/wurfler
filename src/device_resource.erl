@@ -44,7 +44,7 @@ allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
 to_html(ReqData, #context{device=Device}=Context) ->
-     {ok, Content} = device_dtl:render([{device, Device}]),
+     {ok, Content} = device_dtl:render(record_to_tuple(device, Device)),
      {Content, ReqData, Context}.
 
 to_xml(ReqData, #context{device = Device} = Context) ->
@@ -76,9 +76,9 @@ record_to_tuple(device, Record) ->
 	lists:zip(Keys, Data);
 record_to_tuple(group, Record) ->	
 	Capabilities = record_to_tuple(capabilities, Record#group.capabilites, []),
-	Keys = record_info(fields, group),
 	Data = lists:nthtail(1,tuple_to_list(Record#group{capabilites=Capabilities})),
-	lists:zip(Keys, Data);
+%% 	lists:zip(Keys, Data);
+	{lists:nth(1, Data), lists:nth(2, Data)};
 record_to_tuple(capability, Record)->									  
 	Keys = record_info(fields, capability),
 	Data = lists:nthtail(1,tuple_to_list(Record)),
@@ -86,7 +86,7 @@ record_to_tuple(capability, Record)->
 record_to_tuple(groups, [], Acc) ->
 	Acc;
 record_to_tuple(groups, [Group|Groups], Acc) ->
-	record_to_tuple(groups, Groups, lists:merge(record_to_tuple(group, Group), Acc));
+	record_to_tuple(groups, Groups, [record_to_tuple(group, Group)| Acc]);
 record_to_tuple(capabilities, [], Acc) ->
 	Acc;
 record_to_tuple(capabilities, [Capability|Capabilities], Acc) ->
@@ -104,7 +104,7 @@ record_to_tuple_test() ->
 					 groups=[#group{id="j2me", capabilites=[#capability{name="test", value="value"}, #capability{name="test_1", value="value_1"}]}],
 					 created=undefined,
 					 lastmodified=undefined},
-	record_to_tuple(device,Device). 
+	io:format("2... : ~p~n" ,[record_to_tuple(device,Device)]). 
 
 	
 

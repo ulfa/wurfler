@@ -3,6 +3,22 @@
         <title>Handset details</title>
     </head>
     <body>
-          {{device}}  
+    	<h1>Device</h1>
+		<ul>
+			<li>Id            : {{id}}</li>  
+			<li>Brand name    : {{brand_name}}</li>
+			<li>Model name    : {{model_name}}</li>
+			<li>User Agent    : {{user_agent}}</li>
+			<li>Actual device : {{actual_device}}</li>
+			<li>Fallback      : {{fall_back}}</li>
+			<li>created       : {{created}}</li>
+			<li>last modified : {{lastmodified}}</li>
+		</ul>
+		<h1>Groups</h1>
+		<ul>
+		{% for id, caps in groups %}
+		<li>{{ id }}</li>
+		{% endfor %}
+		</ul>
     </body>
 </html>

@@ -54,7 +54,7 @@ to_xml(ReqData, #context{brands=Brands}=Context) ->
 	{D, ReqData, Context}.
 
 to_html(ReqData, #context{brands=Brands}=Context)->
-	{ok, Content} = brands_dtl:render([{brands, Brands}]),
+	{ok, Content} = brands_dtl:render(record_to_tuple(brands, Brands)),
 	{Content, ReqData, Context}.
  
 resource_exists(ReqData, Context) ->
@@ -67,7 +67,27 @@ resource_exists(ReqData, Context) ->
 %% --------------------------------------------------------------------
 get_brands()->
 	wurfler:get_brands().
-	
+
+
+record_to_tuple(brands, [], Acc) ->
+
+	[{brands, lists:keysort(1,Acc)}];
+record_to_tuple(brands, [Record|Records], Acc) ->
+	record_to_tuple(brands, Records, [record_to_tuple(brand, Record) |Acc]).
+record_to_tuple(brands, Records) ->
+	record_to_tuple(brands, Records, []);
+record_to_tuple(brand, Record) ->
+	{element(2, Record), element(3, Record)}.
+
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+record_to_tuple_brand_test() ->
+	Record={brand_index,"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]},
+	?assertEqual({"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]}, record_to_tuple(brand, Record)).
+record_to_tuple_brands_test() ->
+	Records=[{brand_index,"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]},
+			 {brand_index,"Nintendo1", [{"nintendo_ds_ver11","DS1"}, {"nintendo_wii_browser1","Wii1"}, {"nintendo_dsi_ver11","DSi1"}]}
+			 ],
+	?assertEqual(2, erlang:length(record_to_tuple(brands, Records))).
+									

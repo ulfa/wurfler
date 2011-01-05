@@ -7,6 +7,7 @@
              wurfler,
              wurflerservice,
              wurfler_importer,
+             wurfler_update,
              wurfler_deps,
              xml_factory,
              device_resource,

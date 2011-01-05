@@ -25,7 +25,7 @@
 %% Include files
 %% --------------------------------------------------------------------
 -include_lib("eunit/include/eunit.hrl").
-
+-include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
 %% External exports
 
@@ -92,9 +92,11 @@ handle_call(Request, From, State) ->
 %% --------------------------------------------------------------------
 handle_cast({create_device, Device}, State) ->
 	error_logger:info_msg("create device : ~p~n", [Device]),
+	D = read_device(Device),
     {noreply, State};
 handle_cast({update_device, Device}, State) ->
 	error_logger:info_msg("update device : ~p~n", [Device]),
+	D = read_device(Device),
     {noreply, State}.
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
@@ -125,6 +127,8 @@ code_change(OldVsn, State, Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+read_device(#device{id=Id}) ->
+	wurfler:searchByDeviceName(Id).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

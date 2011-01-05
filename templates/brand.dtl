@@ -10,7 +10,7 @@
 	<h2>Models</h2>
 	<ul>
 	{% for id, model in models %}
-	<li><a href="/device/{{id}}">{{brand}}</a></li>
+	<li><a href="/device/{{id}}">{{model}}</a></li>
 	{% endfor %}
 	</ul>	
     </body>

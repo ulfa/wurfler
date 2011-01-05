@@ -68,7 +68,7 @@ resource_exists(ReqData, Context) ->
 get_brand(Brand_Name) ->
 	wurfler:get_brand(Brand_Name).
 record_to_tuple(brand, [Brand]) ->
-	[{brand, element(2, Brand)}, {models ,element(3, Brand)}].
+	[{brand, element(2, Brand)}, {models ,lists:keysort(2,element(3, Brand))}].
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

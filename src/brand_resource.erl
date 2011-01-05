@@ -49,8 +49,8 @@ allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
 to_html(ReqData, #context{brand=Brand}=Context) ->
-     {ok, Content} = brand_dtl:render([{brand, Brand}]),
-	 
+	io:format("1... ~p~n", [Brand]),
+     {ok, Content} = brand_dtl:render(record_to_tuple(brand, Brand)),	 
      {Content, ReqData, Context}.
 
 to_xml(ReqData, #context{brand = [Brand]} = Context) ->
@@ -67,6 +67,11 @@ resource_exists(ReqData, Context) ->
 %% --------------------------------------------------------------------
 get_brand(Brand_Name) ->
 	wurfler:get_brand(Brand_Name).
+record_to_tuple(brand, [Brand]) ->
+	[{brand, element(2, Brand)}, {models ,element(3, Brand)}].
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+record_to_tuple_test() ->
+	Brand = [{brand_index,"AI",[{"teleepoch_s570_ver1","S570"}]}] ,
+	?assertEqual([{brand, "AI"},{models, [{"teleepoch_s570_ver1","S570"}]}], record_to_tuple(brand, Brand)).

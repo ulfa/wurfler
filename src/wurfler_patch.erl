@@ -145,9 +145,11 @@ process_device(DeviceXml, _State) ->
 			  wurfler_importer:set_brand_name([Device#device.id]),
 			  wurfler_importer:set_model_name([Device#device.id]),
 			  wurfler_importer:check_devices([Device#device.id]),
-			  wurfler_importer:create_brand_index([Device#device.id]);
+			  wurfler_importer:create_brand_index([Device#device.id]),
+			  wurfler_update:create_device(Device);
 		[DeviceDB] ->  D = merge_device(DeviceXml, DeviceDB),
-					   wurfler_importer:store_device(D)
+					   wurfler_importer:store_device(D),
+					   wurfler_update:update_device(D)
 	end.
 
 get_device(devicesTbl, Id) ->

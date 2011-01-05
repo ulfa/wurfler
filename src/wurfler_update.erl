@@ -91,8 +91,10 @@ handle_call(Request, From, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_cast({create_device, Device}, State) ->
+	error_logger:info_msg("create device : ~p~n", [Device]),
     {noreply, State};
 handle_cast({update_device, Device}, State) ->
+	error_logger:info_msg("update device : ~p~n", [Device]),
     {noreply, State}.
 %% --------------------------------------------------------------------
 %% Function: handle_info/2

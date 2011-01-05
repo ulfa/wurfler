@@ -49,7 +49,6 @@ allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
 to_html(ReqData, #context{brand=Brand}=Context) ->
-	io:format("1... ~p~n", [Brand]),
      {ok, Content} = brand_dtl:render(record_to_tuple(brand, Brand)),	 
      {Content, ReqData, Context}.
 

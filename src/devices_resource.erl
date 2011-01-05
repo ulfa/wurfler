@@ -70,7 +70,9 @@ process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
 	Caps = get_capabilities(Body),
 	Timestamp = get_timestamp(Body),
-	D = xml_factory:to_xml(get_devices(Caps, Timestamp)),
+	Devices = get_devices(Caps, Timestamp),
+	save_caps_devices(Caps, Devices),
+	D = xml_factory:to_xml(Devices),
 	{true, wrq:append_to_response_body(D, ReqData), Context}.
 %%
 %% Local Functions
@@ -90,6 +92,8 @@ get_devices(Capabilities, Timestamp) ->
 get_devices_by_model(Model_Name) ->
 	wurfler:get_devices_by_model(Model_Name).
 
+save_caps_devices(Caps, Devices) ->
+	wurfler:save_caps_devices(Caps, Devices).
 get_timestamp(Body) ->
 	Xml = xml_factory:parse(Body),
 	xml_factory:get_text("/query/timestamp/text()", Xml).

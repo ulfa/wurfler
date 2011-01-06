@@ -128,7 +128,9 @@ code_change(OldVsn, State, Extra) ->
 %%% Internal functions
 %% --------------------------------------------------------------------
 read_device(#device{id=Id}) ->
-	wurfler:searchByDeviceName(Id).
+	wurfler:searchByDeviceName(Id).	
+getAllKeys() ->
+	wurfler_db:get_all_keys(capabilities_devices).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

@@ -173,6 +173,10 @@ search_by_capabilities(Capabilities, Timestamp, State) ->
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
 	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
+check_device(Capabilities, Key, State) ->
+	List_Of_Funs=create_funs_from_list(Capabilities),
+	get_devices_for_caps(List_Of_Funs, Key, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
+
 get_all_brands() ->
 	{ok, wurfler_db:get_all_brands()}.
 getBrand(Brand_Name) ->
@@ -433,6 +437,12 @@ search_by_capabilities_test_1() ->
 	Keys = ["apple_generic", "generic_xhtml"], 
 	get_devices_for_caps(List_Of_Funs, Keys, new_state()).
 
+check_device_test() ->
+	Caps=[{"handheldfriendly", {"true", '='}},
+	 {"playback_mp4", {"false", '='}},
+	 {"playback_wmv", {"none", '='}}],
+	A=check_device(Caps, ["benq_s668c_ver1"], new_state()),
+	io:format("2... :  ~p~n", [A]).
 
 overwrite_test() ->
 	Generic = get_generic_capabilities(),

@@ -94,14 +94,16 @@ find_capabilities_by_id(devicesTbl, Id) ->
 	{Device#device.fall_back, Caps}.
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
+get_all_keys(capabilities_devices) ->
+	mnesia:dirty_all_keys(capabilities_devices);
 get_all_keys(devicesTbl) ->
 	get_all_keys(devicesTbl, "01.01.1970").
 get_all_keys(devicesTbl, "01.01.1970") ->
-	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root == "true" ])) end);
+	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl) ])) end);
 get_all_keys(devicesTbl, Timestamp) ->
 	T=wurfler_date_util:parse_to_datetime(Timestamp),
 	mnesia:activity(sync_dirty, fun() -> 
-								qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root == "true", P#device.lastmodified > T ])) 
+								qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.lastmodified > T ])) 
 								end).
 get_all_brands()->
 	mnesia:activity(sync_dirty, fun() -> 

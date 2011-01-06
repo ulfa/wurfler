@@ -10,7 +10,7 @@
 			<li>Brand name    : {{brand_name}}</li>
 			<li>Model name    : {{model_name}}</li>
 			<li>User Agent    : {{user_agent}}</li>
-			<li>Actual device : {{actual_device}}</li>
+			<li>Actual device : {{actual_device_root}}</li>
 			<li>Fallback      : {{fall_back}}</li>
 			<li>created       : {{created|date:"r"}}</li>
 			<li>last modified : {{lastmodified|date:"r"}}</li>

@@ -34,6 +34,7 @@
 -export([start_link/0]).
 -export([start/0]).
 -export([save_caps_devices/2, read_caps_devices/1]).
+
 %% ====================================================================
 %% External functions
 %% ====================================================================
@@ -81,7 +82,6 @@ init([]) ->
 handle_call({read_caps_devices, Caps}, _From, State) ->
 	Caps_Devices=wurfler_db:read_capabilities_devices(Caps),
     {reply, Caps_Devices, State}.
-
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages

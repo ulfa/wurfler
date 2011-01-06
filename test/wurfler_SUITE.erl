@@ -199,7 +199,7 @@ post_cap_query(_Config) ->
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),
-	1743=erlang:length(Devices).
+	1856=erlang:length(Devices).
 
 post_cap_query_no_caps(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
@@ -211,14 +211,14 @@ post_cap_query_with_timestamp(_Config) ->
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),
-	1743=erlang:length(Devices).
+	1856=erlang:length(Devices).
 
 post_cap_query_device_os_version(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>01.01.2010</timestamp><capabilities><capability name=\"device_os\" value=\"iPhone OS\" operator=\"=\"/><capability name=\"device__os_version\" value=\"0.0\" operator=\">\"/></capabilities></query>",
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
-	Devices = xmerl_xpath:string("//devices/device", Xml),
-	4 = erlang:length(Devices).
+	Devices = xmerl_xpath:string("//devices/device", Xml),	
+	5= erlang:length(Devices).
 	
 %% Tests for the brand service
 get_brand_by_brand_name(_Config) ->

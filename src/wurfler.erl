@@ -34,7 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
--export([get_brands/0, get_brand/1, get_devices_by_model/1]).
+-export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/2]).
 -compile([export_all]).
 -define(TIMEOUT, infinity).
 %% ====================================================================
@@ -62,6 +62,8 @@ get_devices_by_model(Model_Name) ->
 	gen_server:call(?MODULE, {get_devices_by_name, Model_Name}, ?TIMEOUT).
 getVersion() ->
 	gen_server:call(?MODULE, {version}).
+check_device(Capabilities, DeviceKey) ->
+	gen_server:call(?MODULE, {check_device, Capabilities, DeviceKey}, ?TIMEOUT).
 %% ====================================================================
 %% Server functions
 %% ====================================================================
@@ -114,6 +116,9 @@ handle_call({get_brand, Brand_Name}, _From, State) ->
     {reply, Result, State};	
 handle_call({get_devices_by_name, Model_Name}, _From, _State) ->
 	{ok, Result} = getDeviceByModelName(Model_Name),
+	{reply, Result, new_state()};
+handle_call({check_device, Capabilities, DeviceKey}, _From, _State) ->
+	Result = check_device(Capabilities, DeviceKey, new_state()),
 	{reply, Result, new_state()};
 handle_call({version}, _From, State) ->
     {reply, "0.1", State}.
@@ -173,9 +178,9 @@ search_by_capabilities(Capabilities, Timestamp, State) ->
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
 	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
-check_device(Capabilities, Key, State) ->
+check_device(Capabilities, DeviceKey, State) ->
 	List_Of_Funs=create_funs_from_list(Capabilities),
-	get_devices_for_caps(List_Of_Funs, Key, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
+	get_devices_for_caps(List_Of_Funs, DeviceKey, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
 get_all_brands() ->
 	{ok, wurfler_db:get_all_brands()}.
@@ -441,7 +446,7 @@ check_device_test() ->
 	Caps=[{"handheldfriendly", {"true", '='}},
 	 {"playback_mp4", {"false", '='}},
 	 {"playback_wmv", {"none", '='}}],
-	A=check_device(Caps, ["benq_s668c_ver1"], new_state()),
+	A=wurfler:check_device(Caps, ["benq_s668c_ver1"]),
 	io:format("2... :  ~p~n", [A]).
 
 overwrite_test() ->

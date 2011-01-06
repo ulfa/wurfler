@@ -3,6 +3,7 @@
         <title>Handset details</title>
     </head>
     <body>
+    	<img src="/lib/images/erlang.jpg"/>
     	<h1>Device</h1>
 		<ul>
 			<li>Id            : {{id}}</li>  

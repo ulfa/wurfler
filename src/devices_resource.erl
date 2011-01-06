@@ -93,7 +93,8 @@ get_devices_by_model(Model_Name) ->
 	wurfler:get_devices_by_model(Model_Name).
 
 save_caps_devices(Caps, Devices) ->
-	wurfler:save_caps_devices(Caps, Devices).
+	wurfler_cache:save_caps_devices(Caps, Devices).
+
 get_timestamp(Body) ->
 	Xml = xml_factory:parse(Body),
 	xml_factory:get_text("/query/timestamp/text()", Xml).
@@ -121,10 +122,10 @@ get_timestamp_not_present_test() ->
 get_devices_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	D=get_devices(get_capabilities(Xml_Bin), "01.01.2010"),
-	io:format("1... ~p~n", [D]),
-	D1=lists:flatten(xmerl:export_simple_content(D, xmerl_xml)),
-	io:format("2... ~p~n", [D1]),
- 	?assertEqual(1, erlang:length(D)).
+	D1=xml_factory:to_xml(D),
+	binary_to_list(D1),
+%% 	xmerl_xpath:string("/device", D2),
+ 	?assertEqual(1841, erlang:length(D)).
 
 xml_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,

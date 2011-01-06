@@ -5,6 +5,7 @@
   {modules, [
   			 wurfler_config,
              wurfler,
+             wurfler_cache,
              wurflerservice,
              wurfler_importer,
              wurfler_update,

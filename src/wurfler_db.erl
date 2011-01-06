@@ -31,7 +31,7 @@
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
 -export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2, get_all_brands/0]).
--export([delete_record/2, get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1]).
+-export([delete_record/2, get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1, get_capablities_devices/1]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -50,7 +50,7 @@ create_db() ->
 	mnesia:create_table(androidTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(brand_index,[{disc_copies, [node()]}, {attributes, record_info(fields, brand_index)}]),
 	mnesia:create_table(capabilities_devices,[{disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
-	mnesia:wait_for_tables([devicesTbl, j2meTbl, symbianTbl, blackberryTbl, androidTbl, brand_index], 100000),
+	mnesia:wait_for_tables([devicesTbl, j2meTbl, symbianTbl, blackberryTbl, androidTbl, brand_index, capabilities_devices], 100000),
 	application:stop(mnesia).
 %% --------------------------------------------------------------------
 %% save functions
@@ -110,7 +110,9 @@ get_all_brands()->
 get_brand(Brand_Name) ->
 	mnesia:dirty_read(brand_index, Brand_Name).
 get_devices_by_model_name(devicesTbl, Model_Name) ->
-		mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.model_name == Model_Name ])) end).	
+		mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.model_name == Model_Name ])) end).
+get_capablities_devices(Capapbilities) ->
+	mnesia:dirty_read(Capapbilities).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

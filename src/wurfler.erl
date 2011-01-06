@@ -34,7 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
--export([get_brands/0, get_brand/1, get_devices_by_model/1, save_caps_devices/2]).
+-export([get_brands/0, get_brand/1, get_devices_by_model/1]).
 -compile([export_all]).
 -define(TIMEOUT, infinity).
 %% ====================================================================
@@ -62,8 +62,6 @@ get_devices_by_model(Model_Name) ->
 	gen_server:call(?MODULE, {get_devices_by_name, Model_Name}, ?TIMEOUT).
 getVersion() ->
 	gen_server:call(?MODULE, {version}).
-save_caps_devices(Caps, Devices) ->
-	gen_server:cast(?MODULE, {save_caps_devices, Caps, Devices}).
 %% ====================================================================
 %% Server functions
 %% ====================================================================
@@ -126,8 +124,7 @@ handle_call({version}, _From, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_cast({save_caps_devices, Caps, Devices}, State) ->
-	wurfler_db:save_capabilities_devices(#capabilities_devices{capabilities=Caps, devices=Devices, created=wurfler_date_util:get_uc_time()}),
+handle_cast(_Msg, State) ->
     {noreply, State}.
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
@@ -182,7 +179,7 @@ getBrand(Brand_Name) ->
 	{ok, wurfler_db:get_brand(Brand_Name)}.
 getDeviceByModelName(Model_Name) ->	
 	R =  wurfler_db:get_devices_by_model_name(devicesTbl, Model_Name),
-	Result = xml_factory:create_devices([xml_factory:create_device(D) || D <- R]),
+	Result = [xml_factory:create_device(D) || D <- R],
 	{ok, Result}.
 
 get_all_groups([], #state{groups=Groups}) ->
@@ -426,9 +423,9 @@ search_by_capabilities_test() ->
 	List=[{"handheldfriendly", {"false", '='}},
 	 {"playback_mp4", {"false", '='}},
 	 {"playback_wmv", {"none", '='}}],
-	State = search_by_capabilities(List, "01.01.2010", new_state()),
+	State = search_by_capabilities(List, "01.01.2011", new_state()),
 	io:format("~p~n", [State#state.devices]),
-	?assertEqual(1, erlang:length(State#state.devices)).
+	?assertEqual(4448, erlang:length(State#state.devices)).
 	
 search_by_capabilities_test_1() ->
 	List=[{"device_os", {"iPhone OS", '='}}],

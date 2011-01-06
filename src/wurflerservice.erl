@@ -69,6 +69,12 @@ init([]) ->
               	10000,
               	worker,
               	[wurfler]},
+	WurflerCache={wurfler_cache,
+				{wurfler_cache, start_link, []},
+              	permanent,
+              	10000,
+              	worker,
+              	[wurfler_cache]},
 	WurflerFilePoller={wurfler_file_poller,
 				{wurfler_file_poller, start_link, []},
               	permanent,
@@ -106,6 +112,7 @@ init([]) ->
 		   [
 			WurflerConfig,
 			Wurfler,
+			WurflerCache,
 			WurflerFilePoller,
 			WurflerImporter,
 			WurflerUpdate,
@@ -125,7 +132,6 @@ start() ->
 	ensure_started(crypto),
 	ensure_started(mnesia),
     ensure_started(webmachine),
-%% 	ensure_started(erlbuild),
 	application:start(?MODULE).
 
 start_link(_Type, _Args) ->
@@ -145,7 +151,6 @@ start(_Type, _Args) ->
 stop() ->
 	application:stop(crypto),
 	application:stop(webmachine),
-%% 	application:stop(erlbuild),
 	application:stop(mnesia),
     application:stop(?MODULE).
 %% --------------------------------------------------------------------

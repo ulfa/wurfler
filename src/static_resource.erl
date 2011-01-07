@@ -10,8 +10,7 @@
 -include_lib("kernel/include/file.hrl").
 -record(context, {docroot,fullpath,fileinfo}).
  
-init(DocRoot) ->
-	io:format("1.... ~p~n", [DocRoot]), 
+init(DocRoot) -> 
 	{ok, #context{docroot=DocRoot}}.
  
 resource_exists(ReqData, Context) ->
@@ -40,7 +39,6 @@ last_modified(ReqData, Context) ->
   {(Context#context.fileinfo)#file_info.mtime, ReqData, Context}.
  
 provide_content(ReqData, Context) ->
-  util:puts(Context),
   {ok, Value} = file:read_file(Context#context.fullpath),
   {Value, ReqData, Context}.
 % ------------------ PRIVATE ------------------------

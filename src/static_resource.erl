@@ -10,7 +10,9 @@
 -include_lib("kernel/include/file.hrl").
 -record(context, {docroot,fullpath,fileinfo}).
  
-init(DocRoot) -> {ok, #context{docroot=DocRoot}}.
+init(DocRoot) ->
+	io:format("1.... ~p~n", [DocRoot]), 
+	{ok, #context{docroot=DocRoot}}.
  
 resource_exists(ReqData, Context) ->
   case get_full_path(Context#context.docroot, wrq:disp_path(ReqData)) of

@@ -3,17 +3,26 @@
         <title>Handset details</title>
     </head>
     <body>
-    	<img src="/images/erlang.jpg"/>
+    	<header>
+			<figure>
+				<a href="http://www.erlang.org" title="Erlang"><img src="/images/erlang.jpg" alt="powered by Erlang" /></a>
+			</figure>
+			<hgroup>
+				<h1>Wurfler</h1>
+				<h3>Find all the information you want to know from wurfler</h3>
+			</hgroup>
+		</header>    
+		
     	<h1>Device</h1>
 		<ul>
-			<li>Id            : {{id}}</li>  
-			<li>Brand name    : {{brand_name}}</li>
-			<li>Model name    : {{model_name}}</li>
-			<li>User Agent    : {{user_agent}}</li>
-			<li>Actual device : {{actual_device_root}}</li>
-			<li>Fallback      : {{fall_back}}</li>
-			<li>created       : {{created|date:"r"}}</li>
-			<li>last modified : {{lastmodified|date:"r"}}</li>
+			<li><label for="{{id}}">Id : </label>{{id}}</li>  
+			<li><label for="{{brand_name}}">Brand name :</label>{{brand_name}}</li>
+			<li><label for="{{model_name}}">Model name :</label>{{brand_name}}</li>
+			<li><label for="{{user_agent}}">User Agent :</label>{{user_agent}}</li>
+			<li><label for="{{actual_device_root}}">Actual device :</label>{{actual_device_root}}</li>
+			<li><label for="{{fall_back}}">Fallback :</label>{{fall_back}}</li>
+			<li><label for="{{created}}">created :</label>{{created|date:"r"}}</li>
+			<li><label for="{{lastmodified}}">last modified :</label>{{lastmodified|date:"r"}}</li>
 		</ul>
 		<h1>Groups</h1>
 		<ul>

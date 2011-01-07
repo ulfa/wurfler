@@ -119,7 +119,7 @@ handle_call({get_devices_by_name, Model_Name}, _From, _State) ->
 	{reply, Result, new_state()};
 handle_call({check_device, Capabilities, DeviceKey}, _From, _State) ->
 	Result = check_device(Capabilities, DeviceKey, new_state()),
-	{reply, Result, new_state()};
+	{reply, Result#state.devices, new_state()};
 handle_call({version}, _From, State) ->
     {reply, "0.1", State}.
 %% --------------------------------------------------------------------
@@ -332,9 +332,9 @@ overwrite(Generic, [Capability|List_Of_Capabilities], Acc) ->
 
 extract_only_need_capabilities(Generic, List_Of_Capabilities) ->
 	lists:flatten([extract_one_capabilty(Generic, Capability) || Capability <- List_Of_Capabilities]).
-extract_one_capabilty(Generic, {Name, {_,_}}) ->
+extract_one_capabilty(Generic, {Name, {_Value,_Operator}}) ->
 	case lists:keyfind(Name, 2, Generic) of
-		false -> [];
+ 		false -> [];
 		Cap -> Cap
 	end.
 %% --------------------------------------------------------------------

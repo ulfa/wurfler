@@ -92,7 +92,9 @@ handle_call(Request, From, State) ->
 %% --------------------------------------------------------------------
 handle_cast({create_device, Device}, State) ->
 	error_logger:info_msg("create device : ~p~n", [Device]),
-	D = read_device(Device),
+	#device{id=Id} = read_device(Device),
+	Result = [wurfler:check_device(Capabilities, [Id]) || Capabilities <- wurfler_db:get_all_keys(capabilities_devices)],
+	error_logger:info_msg("treffer : ~p~n", [Result]),
     {noreply, State};
 handle_cast({update_device, Device}, State) ->
 	error_logger:info_msg("update device : ~p~n", [Device]),
@@ -134,4 +136,6 @@ getAllKeys() ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-
+insert_new_device_test() ->
+	D = #device{id="apple_iphone_ver1"},
+	handle_cast({create_device, D}, #state{}).

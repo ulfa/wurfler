@@ -33,7 +33,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0]).
 -export([start/0]).
--export([save_caps_devices/2, read_caps_devices/1]).
+-export([save_caps_devices/2, read_caps_devices/1, clear/0]).
 
 %% ====================================================================
 %% External functions
@@ -42,6 +42,8 @@ save_caps_devices(Caps, Devices) ->
 	gen_server:cast(?MODULE, {save_caps_devices, Caps, Devices}).
 read_caps_devices(Caps) ->
 	gen_server:call(?MODULE, {read_caps_devices, Caps}).
+clear() ->
+	gen_server:call(?MODULE, {clear}).
 %% --------------------------------------------------------------------
 %% record definitions
 %% --------------------------------------------------------------------
@@ -81,7 +83,11 @@ init([]) ->
 %% --------------------------------------------------------------------
 handle_call({read_caps_devices, Caps}, _From, State) ->
 	Caps_Devices=wurfler_db:read_capabilities_devices(Caps),
-    {reply, Caps_Devices, State}.
+    {reply, Caps_Devices, State};
+handle_call({read_caps_devices, Caps}, _From, State) ->
+	Result = wurfler_db:clear_capabilities_devices(),
+    {reply, Result, State}.
+
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages

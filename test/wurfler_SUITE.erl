@@ -113,7 +113,6 @@ init_per_suite(Config) ->
 end_per_suite(_Config) ->
 	ibrowse:stop(),
 	ok.
-
 %%--------------------------------------------------------------------
 %% Function: init_per_group(GroupName, Config0) ->
 %%               Config1 | {skip,Reason} | {skip_and_save,Reason,Config1}
@@ -129,7 +128,6 @@ end_per_suite(_Config) ->
 %%--------------------------------------------------------------------
 init_per_group(_group, Config) ->
 	Config.
-
 %%--------------------------------------------------------------------
 %% Function: end_per_group(GroupName, Config0) ->
 %%               void() | {save_config,Config1}
@@ -143,7 +141,6 @@ init_per_group(_group, Config) ->
 %%--------------------------------------------------------------------
 end_per_group(_group, Config) ->
 	Config.
-
 %%--------------------------------------------------------------------
 %% Function: init_per_testcase(TestCase, Config0) ->
 %%               Config1 | {skip,Reason} | {skip_and_save,Reason,Config1}
@@ -214,7 +211,7 @@ post_cap_query_with_timestamp(_Config) ->
 	1856=erlang:length(Devices).
 
 post_cap_query_device_os_version(_Config) ->
-	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>01.01.2010</timestamp><capabilities><capability name=\"device_os\" value=\"iPhone OS\" operator=\"=\"/><capability name=\"device__os_version\" value=\"0.0\" operator=\">\"/></capabilities></query>",
+	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>01.01.2010</timestamp><capabilities><capability name=\"device_os\" value=\"iPhone OS\" operator=\"=\"/><capability name=\"device_os_version\" value=\"0.0\" operator=\">\"/></capabilities></query>",
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),	

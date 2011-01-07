@@ -32,6 +32,7 @@
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
 -export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2, get_all_brands/0]).
 -export([delete_record/2, get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1, get_capablities_devices/1]).
+-export([clear_capabilities_devices/0]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -115,6 +116,11 @@ get_devices_by_model_name(devicesTbl, Model_Name) ->
 		mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.model_name == Model_Name ])) end).
 get_capablities_devices(Capapbilities) ->
 	mnesia:dirty_read(Capapbilities).
+%% --------------------------------------------------------------------
+%%% Other functions
+%% --------------------------------------------------------------------
+clear_capabilities_devices() ->
+	mnesia:activity(transaction, fun() -> mnesia:clear_table(capabilities_devices) end).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

@@ -11,6 +11,7 @@
              wurfler_update,
              wurfler_deps,
              xml_factory,
+             static_resource,
              device_resource,
              devices_resource,
 	     brand_resource,

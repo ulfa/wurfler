@@ -6,7 +6,7 @@
     	<h1>Brands</h1>
 		<ul>
 		{% for brand, models in brands %}
-		<li><a href="/brand/{{brand}}">{{brand}}</a>({{models|length}})</li>
+		<li><a href="/brand/{{brand|urlencode}}">{{brand}}</a>({{models|length}})</li>
 		{% endfor %}
 		</ul>
     </body>

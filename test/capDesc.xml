@@ -1,0 +1,2228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wurfl_capability_descriptions>
+  <capability>
+    <name>brand_name</name>
+    <type>string</type>
+    <description>Brand</description>
+  </capability>
+  <capability>
+    <name>model_name</name>
+    <type>string</type>
+    <description>Model</description>
+  </capability>
+  <capability>
+    <name>is_wireless_device</name>
+    <type>true/false</type>
+    <description>Tells you if a device is wireless or not. Specifically a mobile phone or a PDA are considered wireless devices, a desktop PC or a laptop are not</description>
+  </capability>
+  <capability>
+    <name>device_claims_web_support</name>
+    <type>true/false</type>
+    <description>Wether the device is wireless or not, the browser may claim web support or not. Opera for Symbian is an example of a browser that claims web support (and tries to render at best) a page that was developed for web presentation independently from the device.</description>
+  </capability>
+  <capability>
+    <name>proportional_font</name>
+    <type>true/false</type>
+    <description>The standard font is proportional</description>
+  </capability>
+  <capability>
+    <name>built_in_back_button_support</name>
+    <type>true/false</type>
+    <description>User may always click on a button to go back</description>
+  </capability>
+  <capability>
+    <name>card_title_support</name>
+    <type>true/false</type>
+    <description>The device displays the title on the screen</description>
+  </capability>
+  <capability>
+    <name>softkey_support</name>
+    <type>true/false</type>
+    <description>Softkeys are supported</description>
+  </capability>
+  <capability>
+    <name>table_support</name>
+    <type>true/false</type>
+    <description>The browser displays tables formatted "correctly" (rather than 1 cell per line)</description>
+  </capability>
+  <capability>
+    <name>numbered_menus</name>
+    <type>true/false</type>
+    <description>The browser lists numbers to pick an element from a list</description>
+  </capability>
+  <capability>
+    <name>menu_with_select_element_recommended</name>
+    <type>true/false</type>
+    <description>A select element is the most usable menu format</description>
+  </capability>
+  <capability>
+    <name>menu_with_list_of_links_recommended</name>
+    <type>true/false</type>
+    <description>A list of links is the most usable menu format</description>
+  </capability>
+  <capability>
+    <name>icons_on_menu_items_support</name>
+    <type>true/false</type>
+    <description>Links may be associated with icons</description>
+  </capability>
+  <capability>
+    <name>break_list_of_links_with_br_element_recommended</name>
+    <type>true/false</type>
+    <description>When presenting a list of links the use of &lt;br/&gt; is suggested for better presentation</description>
+  </capability>
+  <capability>
+    <name>access_key_support</name>
+    <type>true/false</type>
+    <description>respects the "accesskey" attribute of the anchor tag</description>
+  </capability>
+  <capability>
+    <name>wrap_mode_support</name>
+    <type>true/false</type>
+    <description>The browser can be forced to wrap or not lines</description>
+  </capability>
+  <capability>
+    <name>times_square_mode_support</name>
+    <type>true/false</type>
+    <description>"time_square_mode_support" is an Openwave browser specific feature related to what happens with code that looks like &lt;p mode="nowrap"&gt;. The Openwave browser will present the text in this block on a single line that will only scroll (like marquee) when the line has been activated (has focus). Other browser either cropped such blocks, or force ths user to scroll horizontally on the page. </description>
+  </capability>
+  <capability>
+    <name>deck_prefetch_support</name>
+    <type>true/false</type>
+    <description>Prefetching of other decks is supported</description>
+  </capability>
+  <capability>
+    <name>elective_forms_recommended</name>
+    <type>true/false</type>
+    <description>input and select elements can/should be placed in a single card rather than on discrete cards</description>
+  </capability>
+  <capability>
+    <name>wizards_recommended</name>
+    <type>true/false</type>
+    <description>wizards_recommended</description>
+  </capability>
+  <capability>
+    <name>image_as_link_support</name>
+    <type>true/false</type>
+    <description>You may use images to present a link</description>
+  </capability>
+  <capability>
+    <name>insert_br_element_after_widget_recommended</name>
+    <type>true/false</type>
+    <description>The use of a break is suggested after widgets</description>
+  </capability>
+  <capability>
+    <name>wml_can_display_images_and_text_on_same_line</name>
+    <type>true/false</type>
+    <description>Some devices not display an image and text on the same line. Set this to true if the device supports it</description>
+  </capability>
+  <capability>
+    <name>wml_displays_image_in_center</name>
+    <type>true/false</type>
+    <description>Some devices will show images aligned in center by default, true if this happens</description>
+  </capability>
+  <capability>
+    <name>opwv_wml_extensions_support</name>
+    <type>true/false</type>
+    <description>This is specific for Openwave browsers and possibly third party browsers that are compatible. As WML extensions we mean pictograms and other tags that were never formalized by the WAP forum</description>
+  </capability>
+  <capability>
+    <name>wml_make_phone_call_string</name>
+    <type>string</type>
+    <description>Prefix to initiate a voice call</description>
+  </capability>
+  <capability>
+    <name>chtml_display_accesskey</name>
+    <type>true/false</type>
+    <description>The device displays a number when you use an accesskey</description>
+  </capability>
+  <capability>
+    <name>emoji</name>
+    <type>true/false</type>
+    <description>Emoji are special characters which appear in i-Mode pages as small icons</description>
+  </capability>
+  <capability>
+    <name>chtml_can_display_images_and_text_on_same_line</name>
+    <type>true/false</type>
+    <description>As for WML, this is set to true if the device can display images and text on the same line</description>
+  </capability>
+  <capability>
+    <name>chtml_displays_image_in_center</name>
+    <type>true/false</type>
+    <description>As for WML, this is set to true if the device will align images in center by default</description>
+  </capability>
+  <capability>
+    <name>imode_region</name>
+    <type>string</type>
+    <description>This field describes the market region for the device, useful for emoji's and other possible localizations. Possible values as "ja" for Japan, "eu" for Europe, "us" for USA "as" for Asia. "none" means unknown or not set.</description>
+  </capability>
+  <capability>
+    <name>chtml_make_phone_call_string</name>
+    <type>string</type>
+    <description>Prefix to initiate a voice call</description>
+  </capability>
+  <capability>
+    <name>chtml_table_support</name>
+    <type>true/false</type>
+    <description>Tables are not supported by default on i-mode/chtml devices. This capability tells you if the device supports this "extra" feature</description>
+  </capability>
+  <capability>
+    <name>xhtml_honors_bgcolor</name>
+    <type>true/false</type>
+    <description>Background colour can be set</description>
+  </capability>
+  <capability>
+    <name>xhtml_supports_forms_in_table</name>
+    <type>true/false</type>
+    <description>Form entry within a table is possible</description>
+  </capability>
+  <capability>
+    <name>xhtml_support_wml2_namespace</name>
+    <type>true/false</type>
+    <description>The WML version 2.0 namespace is supported, so the device will successfully render WML2.0 content</description>
+  </capability>
+  <capability>
+    <name>xhtml_autoexpand_select</name>
+    <type>true/false</type>
+    <description>Some device automatically expand select's (MOT T720, for example)</description>
+  </capability>
+  <capability>
+    <name>xhtml_select_as_dropdown</name>
+    <type>true/false</type>
+    <description>The device displays select's as dropdown lists</description>
+  </capability>
+  <capability>
+    <name>xhtml_select_as_radiobutton</name>
+    <type>true/false</type>
+    <description>The device displays select's as radio buttons</description>
+  </capability>
+  <capability>
+    <name>xhtml_select_as_popup</name>
+    <type>true/false</type>
+    <description>The device displays select's as popup lists, similar to the Openwave GUI extension</description>
+  </capability>
+  <capability>
+    <name>xhtml_display_accesskey</name>
+    <type>true/false</type>
+    <description>The device displays a number when you use an accesskey</description>
+  </capability>
+  <capability>
+    <name>xhtml_supports_invisible_text</name>
+    <type>true/false</type>
+    <description></description>
+  </capability>
+  <capability>
+    <name>xhtml_supports_inline_input</name>
+    <type>true/false</type>
+    <description>Some browsers let you type text locally. Others bring you to a separate data entry control. </description>
+  </capability>
+  <capability>
+    <name>xhtml_supports_monospace_font</name>
+    <type>true/false</type>
+    <description>Does device support monospace fonts only? </description>
+  </capability>
+  <capability>
+    <name>xhtml_supports_table_for_layout</name>
+    <type>true/false</type>
+    <description>This device support for tables is solid enough that you can use tables to layout content on the screen.Used in WALL) </description>
+  </capability>
+  <capability>
+    <name>xhtml_supports_css_cell_table_coloring</name>
+    <type>true/false</type>
+    <description>CSS support in this device is good enough that table cells are correctly colored when the color is defined through CSS (Used in WALL) </description>
+  </capability>
+  <capability>
+    <name>xhtml_format_as_css_property</name>
+    <type>true/false</type>
+    <description>This field is true if the device supports a css property to define the format of an input field. This is what the "format" attribute was in WML. Follows the same rules as "format" used to do. Example: style= "-wap-input-format:NNNN" (Used in WALL)</description>
+  </capability>
+  <capability>
+    <name>xhtml_format_as_attribute</name>
+    <type>true/false</type>
+    <description>This is set true if the device supports the "format" attribute in input fields (Used in WALL)</description>
+  </capability>
+  <capability>
+    <name>xhtml_nowrap_mode</name>
+    <type>true/false</type>
+    <description>Does device support wrap mode as a XHTML attribute? (Used by WALL)</description>
+  </capability>
+  <capability>
+    <name>xhtml_marquee_as_css_property</name>
+    <type>true/false</type>
+    <description>Does device support MARQUEE though CSS syntax? (used by WALL) </description>
+  </capability>
+  <capability>
+    <name>xhtml_readable_background_color1</name>
+    <type>string</type>
+    <description>This and the following properties lets you define 2 colors which interoperate visually on the device. For example, by using one of these two colors as background, you don't risk that an hyperlink disappears against its background. (Used by WALL) against </description>
+  </capability>
+  <capability>
+    <name>xhtml_readable_background_color2</name>
+    <type>string</type>
+    <description>refer to xhtml_readable_background_ color1 for description (Used by WALL)</description>
+  </capability>
+  <capability>
+    <name>xhtml_allows_disabled_form_elements</name>
+    <type>true/false</type>
+    <description>XHTML lets you define "disabled" form elements. If this actually works on the different devices is tracked down by this capability. </description>
+  </capability>
+  <capability>
+    <name>xhtml_document_title_support</name>
+    <type>true/false</type>
+    <description>While one can define the document title with the title tag, not all devices actually render the title. This capability keeps track of that behavior (Used by WALL) </description>
+  </capability>
+  <capability>
+    <name>xhtml_preferred_charset</name>
+    <type>string</type>
+    <description>UTF-8 should be supported by default, but some devices have problems. Here you may find alternative charsets such as iso8859. This field does not present the exact charset because with ISO charsets you may need to specify the one of your region (1, 15, other) - Capability mentor: Pau Aliagas</description>
+  </capability>
+  <capability>
+    <name>opwv_xhtml_extensions_support</name>
+    <type>true/false</type>
+    <description>The Openwave browser has some supports some useful extensions. Tracked by this capability (used by WALL) </description>
+  </capability>
+  <capability>
+    <name>xhtml_make_phone_call_string</name>
+    <type>string</type>
+    <description>Prefix to initiate a voice call (Used by WALL)</description>
+  </capability>
+  <capability>
+    <name>xhtmlmp_preferred_mime_type</name>
+    <type>string</type>
+    <description>Most devices should support both text/html and the specific XHTML MP mime type. Some are a little pickie, here you should find a mime type that always works. Default is text/html</description>
+  </capability>
+  <capability>
+    <name>xhtml_table_support</name>
+    <type>true/false</type>
+    <description>tables SHOULD be supported as syntax, but are often rendered poorly. This tag tells you if the browser is able to render tables decently</description>
+  </capability>
+  <capability>
+    <name>preferred_markup</name>
+    <type>string</type>
+    <description>This field identifies which markup is best supported by the device. This field is filled on personal experiences of our contributors and is used by the WALL library. Values for this capability look like: wml_1_1, html_wi_imode_compact_ generic and html_wi_oma_xhtmlmp_1_0. Just like any other capability, you may override this value in the patch file</description>
+  </capability>
+  <capability>
+    <name>wml_1_1</name>
+    <type>true/false</type>
+    <description>Supports WML version 1.1</description>
+  </capability>
+  <capability>
+    <name>wml_1_2</name>
+    <type>true/false</type>
+    <description>Supports WML version 1.2</description>
+  </capability>
+  <capability>
+    <name>wml_1_3</name>
+    <type>true/false</type>
+    <description>Supports WML version 1.3</description>
+  </capability>
+  <capability>
+    <name>wmlscript_1_0</name>
+    <type>true/false</type>
+    <description>Supports WML script version 1.0</description>
+  </capability>
+  <capability>
+    <name>wmlscript_1_1</name>
+    <type>true/false</type>
+    <description>Supports WML script version 1.1</description>
+  </capability>
+  <capability>
+    <name>wmlscript_1_2</name>
+    <type>true/false</type>
+    <description>Supports WML script version 1.2</description>
+  </capability>
+  <capability>
+    <name>wmlscript_1_3</name>
+    <type>true/false</type>
+    <description>Supports WML script version 1.3</description>
+  </capability>
+  <capability>
+    <name>html_wi_w3_xhtmlbasic</name>
+    <type>true/false</type>
+    <description>XHTML basic is XHTML reduced to a minimal set of tags, and was introduced to serve as a basis for a markup which would work on devices with very limited capabilities.</description>
+  </capability>
+  <capability>
+    <name>html_wi_oma_xhtmlmp_1_0</name>
+    <type>true/false</type>
+    <description>XHTML MP is XHTML Basic with the addition of a few extra tags to allow for the application of WCSS ('style' attribute and tag, 'hr' tag)</description>
+  </capability>
+  <capability>
+    <name>html_wi_imode_html_1</name>
+    <type>true/false</type>
+    <description>Supports DoCoMo's iHTML version 1.0</description>
+  </capability>
+  <capability>
+    <name>html_wi_imode_html_2</name>
+    <type>true/false</type>
+    <description>Supports DoCoMo's iHTML version 2.0</description>
+  </capability>
+  <capability>
+    <name>html_wi_imode_html_3</name>
+    <type>true/false</type>
+    <description>Supports DoCoMo's iHTML version 3.0</description>
+  </capability>
+  <capability>
+    <name>html_wi_imode_html_4</name>
+    <type>true/false</type>
+    <description>Supports DoCoMo's iHTML version 4.0</description>
+  </capability>
+  <capability>
+    <name>html_wi_imode_html_5</name>
+    <type>true/false</type>
+    <description>Supports DoCoMo's iHTML version 5.0</description>
+  </capability>
+  <capability>
+    <name>html_wi_imode_htmlx_1</name>
+    <type>true/false</type>
+    <description>Supports DoCoMo's xHTML version 1.0</description>
+  </capability>
+  <capability>
+    <name>html_wi_imode_htmlx_1_1</name>
+    <type>true/false</type>
+    <description>Supports DoCoMo's xHTML version 1.1</description>
+  </capability>
+  <capability>
+    <name>html_wi_imode_compact_generic</name>
+    <type>true/false</type>
+    <description>Supports generic compact HTML (cHTML)</description>
+  </capability>
+  <capability>
+    <name>html_web_3_2</name>
+    <type>true/false</type>
+    <description>Supports HTML version 3.2</description>
+  </capability>
+  <capability>
+    <name>html_web_4_0</name>
+    <type>true/false</type>
+    <description>Supports HTML version 4</description>
+  </capability>
+  <capability>
+    <name>voicexml</name>
+    <type>true/false</type>
+    <description>Supports voice XML</description>
+  </capability>
+  <capability>
+    <name>multipart_support</name>
+    <type>true/false</type>
+    <description>Supports multipart contents</description>
+  </capability>
+  <capability>
+    <name>total_cache_disable_support</name>
+    <type>true/false</type>
+    <description>possibility to disable the browser's cache completely</description>
+  </capability>
+  <capability>
+    <name>time_to_live_support</name>
+    <type>true/false</type>
+    <description>Device support 'time to live'(TLL) or not. The length of time that a device keeps a deck in cache is called the time to live (TTL). The default TTL is 30 days (or until memory is exhausted) for Openwave browsers. If a deck contains time-sensitive information, you can specify a shorter TTL so that the device will reload the deck from the server more frequently.</description>
+  </capability>
+  <capability>
+    <name>resolution_width</name>
+    <type>integer</type>
+    <description>This field represents the display's usable width</description>
+  </capability>
+  <capability>
+    <name>resolution_height</name>
+    <type>integer</type>
+    <description>This field represents the display's usable height</description>
+  </capability>
+  <capability>
+    <name>columns</name>
+    <type>integer</type>
+    <description>Number of columns presented</description>
+  </capability>
+  <capability>
+    <name>rows</name>
+    <type>integer</type>
+    <description>Number of lines presented</description>
+  </capability>
+  <capability>
+    <name>max_image_width</name>
+    <type>integer</type>
+    <description>Width of the images viewable</description>
+  </capability>
+  <capability>
+    <name>max_image_height</name>
+    <type>integer</type>
+    <description>Height of the images viewable</description>
+  </capability>
+  <capability>
+    <name>wbmp</name>
+    <type>true/false</type>
+    <description>supports wbmp format</description>
+  </capability>
+  <capability>
+    <name>bmp</name>
+    <type>true/false</type>
+    <description>Supports bmp format</description>
+  </capability>
+  <capability>
+    <name>epoc_bmp</name>
+    <type>true/false</type>
+    <description>Supports the EPOC (Symbian) bitmap format, also known as mbm</description>
+  </capability>
+  <capability>
+    <name>gif</name>
+    <type>true/false</type>
+    <description>supports gif format</description>
+  </capability>
+  <capability>
+    <name>gif_animated</name>
+    <type>true/false</type>
+    <description>supports animated gif (gif89a) format</description>
+  </capability>
+  <capability>
+    <name>jpg</name>
+    <type>true/false</type>
+    <description>supports jpg format</description>
+  </capability>
+  <capability>
+    <name>png</name>
+    <type>true/false</type>
+    <description>supports png format</description>
+  </capability>
+  <capability>
+    <name>tiff</name>
+    <type>true/false</type>
+    <description>supports tif format</description>
+  </capability>
+  <capability>
+    <name>flash_lite</name>
+    <type>true/false</type>
+    <description>supports flash lite format version 1.0</description>
+  </capability>
+  <capability>
+    <name>flash_lite_1_1</name>
+    <type>true/false</type>
+    <description>supports flash lite format version 1.1</description>
+  </capability>
+  <capability>
+    <name>flash_lite_download_limit</name>
+    <type>integer</type>
+    <description>Defines the download limit in bytes for flash lite files</description>
+  </capability>
+  <capability>
+    <name>svgt_1_1</name>
+    <type>true/false</type>
+    <description>supports SVGT v1.1 - Capability mentor: Antoine Quint</description>
+  </capability>
+  <capability>
+    <name>svgt_1_1_plus</name>
+    <type>true/false</type>
+    <description>supports SVGT v1.1+ - Capability mentor: Antoine Quint</description>
+  </capability>
+  <capability>
+    <name>greyscale</name>
+    <type>true/false</type>
+    <description>supports greyscale format</description>
+  </capability>
+  <capability>
+    <name>colors</name>
+    <type>integer</type>
+    <description>In general the number of colors used by the phone</description>
+  </capability>
+  <capability>
+    <name>post_method_support</name>
+    <type>true/false</type>
+    <description>If true the phone supports HTTP POST method</description>
+  </capability>
+  <capability>
+    <name>basic_authentication_support</name>
+    <type>true/false</type>
+    <description>basic authentication support (login and password)</description>
+  </capability>
+  <capability>
+    <name>emptyok</name>
+    <type>true/false</type>
+    <description>An empty select is allowed</description>
+  </capability>
+  <capability>
+    <name>empty_option_value_support</name>
+    <type>true/false</type>
+    <description>If true the phone will allow the user to pick an empty value from a select</description>
+  </capability>
+  <capability>
+    <name>nokia_voice_call</name>
+    <type>true/false</type>
+    <description>Supports the Nokia 'make call' function</description>
+  </capability>
+  <capability>
+    <name>wta_voice_call</name>
+    <type>true/false</type>
+    <description>Supports the standard WML call function</description>
+  </capability>
+  <capability>
+    <name>wta_phonebook</name>
+    <type>true/false</type>
+    <description>The WTA implementation supports access to the device's phonebook</description>
+  </capability>
+  <capability>
+    <name>wta_misc</name>
+    <type>true/false</type>
+    <description>The WTA implementation supports the miscellaneous features of the WTAI specification</description>
+  </capability>
+  <capability>
+    <name>wta_pdc</name>
+    <type>true/false</type>
+    <description>Supports WTA over a PDC network</description>
+  </capability>
+  <capability>
+    <name>https_support</name>
+    <type>true/false</type>
+    <description>support for HTTPS protocol (SSL connections)</description>
+  </capability>
+  <capability>
+    <name>https_detectable</name>
+    <type>true/false</type>
+    <description>The device can detect when a request is made to an HTTPS resource</description>
+  </capability>
+  <capability>
+    <name>phone_id_provided</name>
+    <type>true/false</type>
+    <description>The IMEI number is accessible</description>
+  </capability>
+  <capability>
+    <name>max_deck_size</name>
+    <type>integer</type>
+    <description>Maximum allowed size for a deck in bytes</description>
+  </capability>
+  <capability>
+    <name>max_url_length_in_requests</name>
+    <type>integer</type>
+    <description>Maximum allowed URL length</description>
+  </capability>
+  <capability>
+    <name>max_url_length_homepage</name>
+    <type>integer</type>
+    <description>Maximum allowed URL length for the browser's homepage</description>
+  </capability>
+  <capability>
+    <name>max_url_length_bookmark</name>
+    <type>integer</type>
+    <description>Maximum allowed URL length for a bookmark</description>
+  </capability>
+  <capability>
+    <name>max_url_length_cached_page</name>
+    <type>integer</type>
+    <description>Maximum allowed URL length for a cached page</description>
+  </capability>
+  <capability>
+    <name>max_no_of_connection_settings</name>
+    <type>integer</type>
+    <description>Number of connection profiles supported</description>
+  </capability>
+  <capability>
+    <name>max_no_of_bookmarks</name>
+    <type>integer</type>
+    <description>Number of bookmarks the browser can store</description>
+  </capability>
+  <capability>
+    <name>max_length_of_username</name>
+    <type>integer</type>
+    <description>Maximum allowed length for a username</description>
+  </capability>
+  <capability>
+    <name>max_length_of_password</name>
+    <type>integer</type>
+    <description>Maximum allowed length for a password</description>
+  </capability>
+  <capability>
+    <name>max_object_size</name>
+    <type>integer</type>
+    <description>The maximum filesize supported when downloading using WTP-SAR</description>
+  </capability>
+  <capability>
+    <name>downloadfun_support</name>
+    <type>true/false</type>
+    <description>if true the phone supports downloadfun features</description>
+  </capability>
+  <capability>
+    <name>directdownload_support</name>
+    <type>true/false</type>
+    <description>if true the phone supports object downloading in an anchor</description>
+  </capability>
+  <capability>
+    <name>inline_support</name>
+    <type>true/false</type>
+    <description>if true the phone has the possibility to save an image or object shown in a page</description>
+  </capability>
+  <capability>
+    <name>oma_support</name>
+    <type>true/false</type>
+    <description>if true the phone supports OMA specifications for object downloading</description>
+  </capability>
+  <capability>
+    <name>ringtone</name>
+    <type>true/false</type>
+    <description>if true the phone supports the download of ringtones</description>
+  </capability>
+  <capability>
+    <name>ringtone_midi_monophonic</name>
+    <type>true/false</type>
+    <description>support for monophonic (type 0) midi files</description>
+  </capability>
+  <capability>
+    <name>ringtone_midi_polyphonic</name>
+    <type>true/false</type>
+    <description>support for polyphonic midi files</description>
+  </capability>
+  <capability>
+    <name>ringtone_imelody</name>
+    <type>true/false</type>
+    <description>support for the download of iMelody files</description>
+  </capability>
+  <capability>
+    <name>ringtone_digiplug</name>
+    <type>true/false</type>
+    <description>support for the download of digiplug files</description>
+  </capability>
+  <capability>
+    <name>ringtone_compactmidi</name>
+    <type>true/false</type>
+    <description>support for the download of compact-midi files</description>
+  </capability>
+  <capability>
+    <name>ringtone_mmf</name>
+    <type>true/false</type>
+    <description>support for the download of MMF/SMAF files (Yamaha)</description>
+  </capability>
+  <capability>
+    <name>ringtone_rmf</name>
+    <type>true/false</type>
+    <description>support for the download of RMF files (Beatnik)</description>
+  </capability>
+  <capability>
+    <name>ringtone_xmf</name>
+    <type>true/false</type>
+    <description>support for the download of XMF files (Beatink - midi approved)</description>
+  </capability>
+  <capability>
+    <name>ringtone_amr</name>
+    <type>true/false</type>
+    <description>support for the download of AMR files</description>
+  </capability>
+  <capability>
+    <name>ringtone_awb</name>
+    <type>true/false</type>
+    <description>support for the download of AMR wide band files</description>
+  </capability>
+  <capability>
+    <name>ringtone_aac</name>
+    <type>true/false</type>
+    <description>support for the download of AAC files</description>
+  </capability>
+  <capability>
+    <name>ringtone_wav</name>
+    <type>true/false</type>
+    <description>support for the download of WAV files</description>
+  </capability>
+  <capability>
+    <name>ringtone_mp3</name>
+    <type>true/false</type>
+    <description>support for the download of MP3 files</description>
+  </capability>
+  <capability>
+    <name>ringtone_spmidi</name>
+    <type>true/false</type>
+    <description>support for the download of SPmidi files</description>
+  </capability>
+  <capability>
+    <name>ringtone_qcelp</name>
+    <type>true/false</type>
+	 <description>support for the download of qcelp (Qualcomm format) files</description>
+  </capability>
+  <capability>
+    <name>ringtone_voices</name>
+    <type>integer</type>
+    <description>Represents the maximum number of voices for a downloaded ringtone</description>
+  </capability>
+  <capability>
+    <name>ringtone_df_size_limit</name>
+    <type>integer</type>
+    <description>Size limit in bytes of downloadable ringtones through downloadfun</description>
+  </capability>
+  <capability>
+    <name>ringtone_directdownload_size_limit</name>
+    <type>integer</type>
+    <description>Size limit in bytes of downloadable ringtones through direct download</description>
+  </capability>
+  <capability>
+    <name>ringtone_inline_size_limit</name>
+    <type>integer</type>
+    <description>Size limit in bytes of downloadable ringtones for inline objects</description>
+  </capability>
+  <capability>
+    <name>ringtone_oma_size_limit</name>
+    <type>integer</type>
+    <description>Size limit in bytes of downloadable ringtones through OMA DD</description>
+  </capability>
+  <capability>
+    <name>wallpaper</name>
+    <type>true/false</type>
+    <description>if true the phone supports the download of wallpapers</description>
+  </capability>
+  <capability>
+    <name>wallpaper_wbmp</name>
+    <type>true/false</type>
+    <description>support for wbmp images</description>
+  </capability>
+  <capability>
+    <name>wallpaper_bmp</name>
+    <type>true/false</type>
+    <description>support for bmp images</description>
+  </capability>
+  <capability>
+    <name>wallpaper_gif</name>
+    <type>true/false</type>
+    <description>support for gif images</description>
+  </capability>
+  <capability>
+    <name>wallpaper_jpg</name>
+    <type>true/false</type>
+    <description>support for jpg images</description>
+  </capability>
+  <capability>
+    <name>wallpaper_png</name>
+    <type>true/false</type>
+    <description>support for png images</description>
+  </capability>
+  <capability>
+    <name>wallpaper_tiff</name>
+    <type>true/false</type>
+    <description>support for tiff images</description>
+  </capability>
+  <capability>
+    <name>wallpaper_greyscale</name>
+    <type>true/false</type>
+    <description>true if the phone users a greyscale</description>
+  </capability>
+  <capability>
+    <name>wallpaper_colors</name>
+    <type>integer</type>
+    <description>This is the number in bit of displayable colors. Note: if a phone uses 8 tones of grey, you should set wallpaper_greyscale to true and wallpaper_colors to 3</description>
+  </capability>
+  <capability>
+    <name>wallpaper_max_width</name>
+    <type>integer</type>
+    <description>Maximum width supported for a wallpaper</description>
+  </capability>
+  <capability>
+    <name>wallpaper_max_height</name>
+    <type>integer</type>
+    <description>Maximum height supported for a wallpaper</description>
+  </capability>
+  <capability>
+    <name>wallpaper_preferred_width</name>
+    <type>integer</type>
+    <description>Maximum width suggested for a wallpaper</description>
+  </capability>
+  <capability>
+    <name>wallpaper_preferred_height</name>
+    <type>integer</type>
+    <description>Maximum height suggested for a wallpaper</description>
+  </capability>
+  <capability>
+    <name>wallpaper_df_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a wallpaper</description>
+  </capability>
+  <capability>
+    <name>wallpaper_directdownload_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a wallpaper</description>
+  </capability>
+  <capability>
+    <name>wallpaper_inline_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a wallpaper</description>
+  </capability>
+  <capability>
+    <name>wallpaper_oma_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a wallpaper</description>
+  </capability>
+  <capability>
+    <name>wallpaper_resize</name>
+    <type>string</type>
+    <description>Describes if and how the device resizes a downloaded wallpaper if not exactly the same size of the screen. Possible values are "none", "fixed_ratio" (rescale respecting original proportions), "crop_centered", "crop_top_left".</description>
+  </capability>
+  <capability>
+    <name>screensaver</name>
+    <type>true/false</type>
+    <description>if true the phone supports the download of screensavers</description>
+  </capability>
+  <capability>
+    <name>screensaver_wbmp</name>
+    <type>true/false</type>
+    <description>support for wbmp images</description>
+  </capability>
+  <capability>
+    <name>screensaver_bmp</name>
+    <type>true/false</type>
+    <description>support for bmp images</description>
+  </capability>
+  <capability>
+    <name>screensaver_gif</name>
+    <type>true/false</type>
+    <description>support for gif images</description>
+  </capability>
+  <capability>
+    <name>screensaver_jpg</name>
+    <type>true/false</type>
+    <description>support for jpg images</description>
+  </capability>
+  <capability>
+    <name>screensaver_png</name>
+    <type>true/false</type>
+    <description>support for png images</description>
+  </capability>
+  <capability>
+    <name>screensaver_greyscale</name>
+    <type>true/false</type>
+    <description>true if the phone users a greyscale</description>
+  </capability>
+  <capability>
+    <name>screensaver_colors</name>
+    <type>integer</type>
+    <description>This is the number in bit of displayable colors. Note: if a phone uses 8 tones of grey, you should set wallpaper_greyscale to true and wallpaper_colors to 3</description>
+  </capability>
+  <capability>
+    <name>screensaver_max_width</name>
+    <type>integer</type>
+    <description>Maximum width supported for a screensaver</description>
+  </capability>
+  <capability>
+    <name>screensaver_max_height</name>
+    <type>integer</type>
+    <description>Maximum height supported for a screensaver</description>
+  </capability>
+  <capability>
+    <name>screensaver_preferred_width</name>
+    <type>integer</type>
+    <description>Maximum width suggested for a screensaver</description>
+  </capability>
+  <capability>
+    <name>screensaver_preferred_height</name>
+    <type>integer</type>
+    <description>Maximum height suggested for a screensaver</description>
+  </capability>
+  <capability>
+    <name>screensaver_df_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a screensaver through downloadfun</description>
+  </capability>
+  <capability>
+    <name>screensaver_directdownload_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a screensave through direct download</description>
+  </capability>
+  <capability>
+    <name>screensaver_inline_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a screensaver for an inline object</description>
+  </capability>
+  <capability>
+    <name>screensaver_oma_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a screensaver through OMA DD</description>
+  </capability>
+  <capability>
+    <name>screensaver_resize</name>
+    <type>string</type>
+    <description>Describes if and how the device resizes a downloaded screensaver if not exactly the same size of the screen. Possible values are "none", "fixed_ratio" (rescale respecting original proportions), "crop_centered", "crop_top_left".</description>
+  </capability>
+  <capability>
+    <name>picture</name>
+    <type>true/false</type>
+    <description>if true the phone supports the download of picture files</description>
+  </capability>
+  <capability>
+    <name>picture_wbmp</name>
+    <type>true/false</type>
+    <description>support for wbmp images</description>
+  </capability>
+  <capability>
+    <name>picture_bmp</name>
+    <type>true/false</type>
+    <description>support for bmp images</description>
+  </capability>
+  <capability>
+    <name>picture_gif</name>
+    <type>true/false</type>
+    <description>support for gif images</description>
+  </capability>
+  <capability>
+    <name>picture_jpg</name>
+    <type>true/false</type>
+    <description>support for jpg images</description>
+  </capability>
+  <capability>
+    <name>picture_png</name>
+    <type>true/false</type>
+    <description>support for png images</description>
+  </capability>
+  <capability>
+    <name>picture_greyscale</name>
+    <type>true/false</type>
+    <description>true if the phone users a greyscale</description>
+  </capability>
+  <capability>
+    <name>picture_colors</name>
+    <type>integer</type>
+    <description>This is the number in bit of displayable colors. Note: if a phone uses 8 tones of grey, you should set wallpaper_greyscale to true and wallpaper_colors to 3</description>
+  </capability>
+  <capability>
+    <name>picture_max_width</name>
+    <type>integer</type>
+    <description>Maximum width supported for a picture</description>
+  </capability>
+  <capability>
+    <name>picture_max_height</name>
+    <type>integer</type>
+    <description>Maximum height supported for a picture</description>
+  </capability>
+  <capability>
+    <name>picture_preferred_width</name>
+    <type>integer</type>
+    <description>Maximum width suggested for a picture</description>
+  </capability>
+  <capability>
+    <name>picture_preferred_height</name>
+    <type>integer</type>
+    <description>Maximum height suggested for a picture</description>
+  </capability>
+  <capability>
+    <name>picture_df_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a picture throught downloadfun</description>
+  </capability>
+  <capability>
+    <name>picture_directdownload_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a picture throught direct download</description>
+  </capability>
+  <capability>
+    <name>picture_inline_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a picture for an inline object</description>
+  </capability>
+  <capability>
+    <name>picture_oma_size_limit</name>
+    <type>integer</type>
+    <description>Maximum size in bytes of a picture through OMA DD</description>
+  </capability>
+  <capability>
+    <name>picture_resize</name>
+    <type>string</type>
+    <description>Describes if and how the device resizes a downloaded picture if not exactly the same size of the screen. Possible values are "none", "fixed_ratio" (rescale respecting original proportions), "crop_centered", "crop_top_left".</description>
+  </capability>
+  <capability>
+    <name>video</name>
+    <type>true/false</type>
+    <description>true if the phone may download video clips</description>
+  </capability>
+  <capability>
+    <name>video_real_media_8</name>
+    <type>true/false</type>
+    <description>true if the phone supports real media V8</description>
+  </capability>
+  <capability>
+    <name>video_real_media_9</name>
+    <type>true/false</type>
+    <description>true if the phone supports real media V9</description>
+  </capability>
+  <capability>
+    <name>video_real_media_10</name>
+    <type>true/false</type>
+    <description>true if the phone supports real media V10</description>
+  </capability>
+  <capability>
+    <name>video_3gpp</name>
+    <type>true/false</type>
+    <description>true if the phone supports 3GPP videos (including H.263)</description>
+  </capability>
+  <capability>
+    <name>video_3gpp2</name>
+    <type>true/false</type>
+    <description>true if the phone supports 3GPP 2 videos (for CDMA devices)</description>
+  </capability>
+  <capability>
+    <name>video_mp4</name>
+    <type>true/false</type>
+    <description>true if the phone supports MP4 videos</description>
+  </capability>
+  <capability>
+    <name>video_wmv</name>
+    <type>true/false</type>
+    <description>true if the phone supports WMV videos</description>
+  </capability>
+  <capability>
+    <name>video_mov</name>
+    <type>true/false</type>
+    <description>true if the phone supports MOV videos</description>
+  </capability>
+  <capability>
+    <name>video_max_frame_rate</name>
+    <type>integer</type>
+    <description>Max frame rate supported. 0 is the default</description>
+  </capability>
+  <capability>
+    <name>video_max_width</name>
+    <type>integer</type>
+    <description>Max width. 0 is the default</description>
+  </capability>
+  <capability>
+    <name>video_max_height</name>
+    <type>integer</type>
+    <description>Max height. 0 is the default</description>
+  </capability>
+  <capability>
+    <name>video_qcif</name>
+    <type>true/false</type>
+    <description>True if the device can play QCIF videos</description>
+  </capability>
+  <capability>
+    <name>video_sqcif</name>
+    <type>true/false</type>
+    <description>True if the device can play SQCIF videos</description>
+  </capability>
+  <capability>
+    <name>video_preferred_width</name>
+    <type>integer</type>
+    <description>Suggested max height so that the device will not need any resizing. 0 is the default</description>
+  </capability>
+  <capability>
+    <name>video_preferred_height</name>
+    <type>integer</type>
+    <description>Suggested max height so that the device will not need any resizing. 0 is the default</description>
+  </capability>
+  <capability>
+    <name>video_df_size_limit</name>
+    <type>integer</type>
+    <description>Max size in bytes for downloadfun. 0 is the default</description>
+  </capability>
+  <capability>
+    <name>video_directdownload_size_limit</name>
+    <type>integer</type>
+    <description>Max size in bytes for directdownload. 0 is the default</description>
+  </capability>
+  <capability>
+    <name>video_inline_size_limit</name>
+    <type>integer</type>
+    <description>Max size in bytes for inline download. 0 is the default</description>
+  </capability>
+  <capability>
+    <name>video_oma_size_limit</name>
+    <type>integer</type>
+    <description>Max size in bytes for OMA DD. 0 is the default</description>
+  </capability>
+  <capability>
+    <name>video_vcodec_h263_0</name>
+    <type>true/false</type>
+    <description>True if the device can play videos encoded using H.263 type 0</description>
+  </capability>
+  <capability>
+    <name>video_vcodec_h263_3</name>
+    <type>true/false</type>
+    <description>True if the device can play videos encoded using H.263 type 3</description>
+  </capability>
+  <capability>
+    <name>video_vcodec_mpeg4</name>
+    <type>true/false</type>
+    <description>True if the device can play videos encoded using MPEG 4</description>
+  </capability>
+  <capability>
+    <name>video_acodec_amr</name>
+    <type>true/false</type>
+    <description>True if the device can play videos with AMR audio</description>
+  </capability>
+  <capability>
+    <name>video_acodec_awb</name>
+    <type>true/false</type>
+    <description>True if the device can play videos with AMR Wide-Band audio</description>
+  </capability>
+  <capability>
+    <name>video_acodec_aac</name>
+    <type>true/false</type>
+    <description>True if the device can play videos with AAC audio</description>
+  </capability>
+  <capability>
+    <name>video_acodec_aac_ltp</name>
+    <type>true/false</type>
+    <description>True if the device can play videos with AAC LTP audio</description>
+  </capability>
+  <capability>
+    <name>video_acodec_qcelp</name>
+    <type>true/false</type>
+    <description>True if the device can play videos with Qualcomm Code Excited Linear Predictive waveform audio format</description>
+  </capability>
+  <capability>
+    <name>oma_v_1_0_forwardlock</name>
+    <type>true/false</type>
+    <description>true if the phone support OMA DRM ForwardLock V1.0</description>
+  </capability>
+  <capability>
+    <name>oma_v_1_0_combined_delivery</name>
+    <type>true/false</type>
+    <description>true if the phone support OMA DRM Combined Delivery V1.0</description>
+  </capability>
+  <capability>
+    <name>oma_v_1_0_separate_delivery</name>
+    <type>true/false</type>
+    <description>true if the phone support OMA DRM Separate Delivery V1.0</description>
+  </capability>
+  <capability>
+    <name>streaming_video</name>
+    <type>true/false</type>
+    <description>true if the phone supports video streaming</description>
+  </capability>
+  <capability>
+    <name>streaming_real_media_8</name>
+    <type>true/false</type>
+    <description>true if the phone supports Real media V8</description>
+  </capability>
+  <capability>
+    <name>streaming_real_media_9</name>
+    <type>true/false</type>
+    <description>true if the phone supports Real media V9</description>
+  </capability>
+  <capability>
+    <name>streaming_real_media_10</name>
+    <type>true/false</type>
+    <description>true if the phone supports Real media V10</description>
+  </capability>
+  <capability>
+    <name>streaming_3gpp</name>
+    <type>true/false</type>
+    <description>true if the phone supports 3GPP</description>
+  </capability>
+  <capability>
+    <name>streaming_mp4</name>
+    <type>true/false</type>
+    <description>true if the phone supports MP4</description>
+  </capability>
+  <capability>
+    <name>streaming_wmv</name>
+    <type>true/false</type>
+    <description>true if the phone supports WMV</description>
+  </capability>
+  <capability>
+    <name>streaming_mov</name>
+    <type>true/false</type>
+    <description>true if the phone supports MOV</description>
+  </capability>
+  <capability>
+    <name>streaming_video_qcif</name>
+    <type>true/false</type>
+    <description>true if the phone supports QCIF standard</description>
+  </capability>
+  <capability>
+    <name>streaming_video_qcif_max_width</name>
+    <type>integer</type>
+    <description>Max (suggested) width for QCIF videos</description>
+  </capability>
+  <capability>
+    <name>streaming_video_qcif_max_height</name>
+    <type>integer</type>
+    <description>Max (suggested) height for QCIF videos</description>
+  </capability>
+  <capability>
+    <name>streaming_video_sqcif</name>
+    <type>true/false</type>
+    <description>true if the phone supports SQCIF standard</description>
+  </capability>
+  <capability>
+    <name>streaming_video_sqcif_max_width</name>
+    <type>integer</type>
+    <description>Max (suggested) width for SQCIF videos</description>
+  </capability>
+  <capability>
+    <name>streaming_video_sqcif_max_height</name>
+    <type>integer</type>
+    <description>Max (suggested) height for SQCIF videos</description>
+  </capability>
+  <capability>
+    <name>streaming_video_max_bit_rate</name>
+    <type>integer</type>
+    <description>Max bit rate for video+audio</description>
+  </capability>
+  <capability>
+    <name>streaming_video_max_video_bit_rate</name>
+    <type>integer</type>
+    <description>Max bit rate for video</description>
+  </capability>
+  <capability>
+    <name>streaming_video_min_video_bit_rate</name>
+    <type>integer</type>
+    <description>Minimum bit rate for video</description>
+  </capability>
+  <capability>
+    <name>streaming_video_max_audio_bit_rate</name>
+    <type>integer</type>
+    <description>Max bit rate for audio</description>
+  </capability>
+  <capability>
+    <name>streaming_video_max_frame_rate</name>
+    <type>integer</type>
+    <description>Max frame rate</description>
+  </capability>
+  <capability>
+    <name>streaming_video_size_limit</name>
+    <type>integer</type>
+    <description>Max size in bytes for the clip</description>
+  </capability>
+  <capability>
+    <name>streaming_video_vcodec_h263_0</name>
+    <type>true/false</type>
+    <description>true if the device supports H.263 type 0 encoded videos</description>
+  </capability>
+  <capability>
+    <name>streaming_video_vcodec_h263_3</name>
+    <type>true/false</type>
+    <description>true if the device supports H.263 type 3 encoded videos</description>
+  </capability>
+  <capability>
+    <name>streaming_video_vcodec_mpeg4</name>
+    <type>true/false</type>
+    <description>true if the device supports MPEG 4 encoded videos</description>
+  </capability>
+  <capability>
+    <name>streaming_video_acodec_amr</name>
+    <type>true/false</type>
+    <description>true if the phone supports AMR</description>
+  </capability>
+  <capability>
+    <name>streaming_video_acodec_awb</name>
+    <type>true/false</type>
+    <description>true if the phone supports AWB</description>
+  </capability>
+  <capability>
+    <name>streaming_video_acodec_aac</name>
+    <type>true/false</type>
+    <description>true if the phone supports AAC</description>
+  </capability>
+  <capability>
+    <name>streaming_video_acodec_aac_ltp</name>
+    <type>true/false</type>
+    <description>true if the phone supports AAC LTP</description>
+  </capability>
+  <capability>
+    <name>wap_push_support</name>
+    <type>true/false</type>
+    <description>true if the phone support WAP Push messages</description>
+  </capability>
+  <capability>
+    <name>connectionless_service_indication</name>
+    <type>true/false</type>
+    <description>true if the phone supports it</description>
+  </capability>
+  <capability>
+    <name>connectionless_service_load</name>
+    <type>true/false</type>
+    <description>true if the phone supports it</description>
+  </capability>
+  <capability>
+    <name>connectionless_cache_operation</name>
+    <type>true/false</type>
+    <description>true if the phone supports it</description>
+  </capability>
+  <capability>
+    <name>connectionoriented_unconfirmed_service_indication</name>
+    <type>true/false</type>
+    <description>Whether unconfirmed service indications are supported, when connection-oriented push is used</description>
+  </capability>
+  <capability>
+    <name>connectionoriented_unconfirmed_service_load</name>
+    <type>true/false</type>
+    <description>Whether unconfirmed service load operations are supported, when connection-oriented push is used</description>
+  </capability>
+  <capability>
+    <name>connectionoriented_unconfirmed_cache_operation</name>
+    <type>true/false</type>
+    <description>Whether unconfirmed cache operations are supported, when connection-oriented push is used</description>
+  </capability>
+  <capability>
+    <name>connectionoriented_confirmed_service_indication</name>
+    <type>true/false</type>
+    <description>Whether confirmed service indications are supported, when connection-oriented push is used</description>
+  </capability>
+  <capability>
+    <name>connectionoriented_confirmed_service_load</name>
+    <type>true/false</type>
+    <description>Whether confirmed service load operations are supported, when connection-oriented push is used</description>
+  </capability>
+  <capability>
+    <name>connectionoriented_confirmed_cache_operation</name>
+    <type>true/false</type>
+    <description>Whether confirmed cache operations are supported, when connection-oriented push is used</description>
+  </capability>
+  <capability>
+    <name>utf8_support</name>
+    <type>true/false</type>
+    <description>Whether the UTF-8 character set is supported</description>
+  </capability>
+  <capability>
+    <name>ascii_support</name>
+    <type>true/false</type>
+    <description>Whether the ASCII character set is supported</description>
+  </capability>
+  <capability>
+    <name>iso8859_support</name>
+    <type>true/false</type>
+    <description>Whether the ISO-8559 character set is supported</description>
+  </capability>
+  <capability>
+    <name>expiration_date</name>
+    <type>true/false</type>
+    <description>Whether an expiry date can be set for the resource</description>
+  </capability>
+  <capability>
+    <name>receiver</name>
+    <type>true/false</type>
+    <description>May receive MMS messages</description>
+  </capability>
+  <capability>
+    <name>sender</name>
+    <type>true/false</type>
+    <description>May send MMS messages</description>
+  </capability>
+  <capability>
+    <name>mms_max_height</name>
+    <type>integer</type>
+    <description>Maximum height for an image</description>
+  </capability>
+  <capability>
+    <name>mms_max_size</name>
+    <type>integer</type>
+    <description>Maximum size in bytes for an MMS message</description>
+  </capability>
+  <capability>
+    <name>mms_max_width</name>
+    <type>integer</type>
+    <description>Maximum width for an image</description>
+  </capability>
+  <capability>
+    <name>built_in_recorder</name>
+    <type>true/false</type>
+    <description>The device features a built-in audio recorder</description>
+  </capability>
+  <capability>
+    <name>built_in_camera</name>
+    <type>true/false</type>
+    <description>The device features a built-in camera</description>
+  </capability>
+  <capability>
+    <name>mms_jpeg_baseline</name>
+    <type>true/false</type>
+    <description>Baseline JPG images support</description>
+  </capability>
+  <capability>
+    <name>mms_jpeg_progressive</name>
+    <type>true/false</type>
+    <description>Progressive JPG images support</description>
+  </capability>
+  <capability>
+    <name>mms_gif_static</name>
+    <type>true/false</type>
+    <description>Static GIF (87a) support</description>
+  </capability>
+  <capability>
+    <name>mms_gif_animated</name>
+    <type>true/false</type>
+    <description>Animated GIF (89a) support</description>
+  </capability>
+  <capability>
+    <name>mms_png</name>
+    <type>true/false</type>
+    <description>PNG support</description>
+  </capability>
+  <capability>
+    <name>mms_bmp</name>
+    <type>true/false</type>
+    <description>BMP support</description>
+  </capability>
+  <capability>
+    <name>mms_wbmp</name>
+    <type>true/false</type>
+    <description>WBMP support</description>
+  </capability>
+  <capability>
+    <name>mms_amr</name>
+    <type>true/false</type>
+    <description>AMR support</description>
+  </capability>
+  <capability>
+    <name>mms_wav</name>
+    <type>true/false</type>
+    <description>WAV support</description>
+  </capability>
+  <capability>
+    <name>mms_midi_monophonic</name>
+    <type>true/false</type>
+    <description>Monophonic MIDI support</description>
+  </capability>
+  <capability>
+    <name>mms_midi_polyphonic</name>
+    <type>true/false</type>
+    <description>Polyphonic MIDI support</description>
+  </capability>
+  <capability>
+    <name>mms_midi_polyphonic_voices</name>
+    <type>integer</type>
+    <description>If polyphonic MIDI is supported, the number of available voices</description>
+  </capability>
+  <capability>
+    <name>mms_spmidi</name>
+    <type>true/false</type>
+    <description>SPMIDI support</description>
+  </capability>
+  <capability>
+    <name>mms_mmf</name>
+    <type>true/false</type>
+    <description>MMF support</description>
+  </capability>
+  <capability>
+    <name>mms_mp3</name>
+    <type>true/false</type>
+    <description>MP3 support</description>
+  </capability>
+  <capability>
+    <name>mms_evrc</name>
+    <type>true/false</type>
+	 <description>EVRC support</description>
+  </capability>
+  <capability>
+    <name>mms_qcelp</name>
+    <type>true/false</type>
+    <description>QCELP support</description>
+  </capability>
+  <capability>
+    <name>mms_ota_bitmap</name>
+    <type>true/false</type>
+    <description>OTA Bitmap support</description>
+  </capability>
+  <capability>
+    <name>mms_nokia_wallpaper</name>
+    <type>true/false</type>
+    <description>Nokia wallpaper support</description>
+  </capability>
+  <capability>
+    <name>mms_nokia_operatorlogo</name>
+    <type>true/false</type>
+    <description>Nokia operator logo support</description>
+  </capability>
+  <capability>
+    <name>mms_nokia_3dscreensaver</name>
+    <type>true/false</type>
+    <description>Nokia 3D screensaver support</description>
+  </capability>
+  <capability>
+    <name>mms_nokia_ringingtone</name>
+    <type>true/false</type>
+    <description>Nokia ringingtone support</description>
+  </capability>
+  <capability>
+    <name>mms_rmf</name>
+    <type>true/false</type>
+    <description>RMF support</description>
+  </capability>
+  <capability>
+	  <name>mms_xmf</name>
+    <type>true/false</type>
+    <description>XMF support</description>
+  </capability>
+  <capability>
+    <name>mms_symbian_install</name>
+    <type>true/false</type>
+    <description>Symbian install files support (May receive Symbian install files inside an MMS)</description>
+  </capability>
+  <capability>
+    <name>mms_jar</name>
+    <type>true/false</type>
+    <description>JAR support</description>
+  </capability>
+  <capability>
+    <name>mms_jad</name>
+    <type>true/false</type>
+    <description>JAD support</description>
+  </capability>
+  <capability>
+    <name>mms_vcard</name>
+    <type>true/false</type>
+    <description>Vcard support</description>
+  </capability>
+  <capability>
+	  <name>mms_vcalendar</name>
+    <type>true/false</type>
+	 <description>Vcalendar support</description>
+  </capability>
+  <capability>
+    <name>mms_wml</name>
+    <type>true/false</type>
+    <description>The message may contain wml</description>
+  </capability>
+  <capability>
+    <name>mms_wbxml</name>
+    <type>true/false</type>
+    <description>The message may contain wbxml</description>
+  </capability>
+  <capability>
+    <name>mms_wmlc</name>
+    <type>true/false</type>
+    <description>The message may contain wmlc</description>
+  </capability>
+  <capability>
+    <name>mms_video</name>
+    <type>true/false</type>
+    <description>The message may contain a video clip</description>
+  </capability>
+  <capability>
+    <name>mms_mp4</name>
+    <type>true/false</type>
+    <description>The message may contain an MP4 video</description>
+  </capability>
+  <capability>
+    <name>mms_3gpp</name>
+    <type>true/false</type>
+    <description>The message may contain a 3GPP video</description>
+  </capability>
+  <capability>
+    <name>mms_3gpp2</name>
+    <type>true/false</type>
+    <description>The message may contain a 3GPP2 (CDMA phones) video</description>
+  </capability>
+  <capability>
+    <name>mms_max_frame_rate</name>
+    <type>integer</type>
+    <description>The max frame rate for the video</description>
+  </capability>
+  <capability>
+    <name>nokiaring</name>
+    <type>true/false</type>
+    <description>true if the phone supports nokiarings</description>
+  </capability>
+  <capability>
+    <name>picturemessage</name>
+    <type>true/false</type>
+    <description>true if the phone supports Nokia picture messages</description>
+  </capability>
+  <capability>
+    <name>operatorlogo</name>
+    <type>true/false</type>
+    <description>true if the phone supports Nokia operator logo's (72x14 pixel)</description>
+  </capability>
+  <capability>
+    <name>largeoperatorlogo</name>
+    <type>true/false</type>
+    <description>true if the phone supports Nokia large operator logo's (72x28 pixel)</description>
+  </capability>
+  <capability>
+    <name>callericon</name>
+    <type>true/false</type>
+    <description>true if the phone supports Nokia caller icons</description>
+  </capability>
+  <capability>
+    <name>nokiavcard</name>
+    <type>true/false</type>
+    <description>true if the phone supports Nokia vcards</description>
+  </capability>
+  <capability>
+    <name>nokiavcal</name>
+    <type>true/false</type>
+    <description>true if the phone supports Nokia vcals</description>
+  </capability>
+  <capability>
+    <name>sckl_ringtone</name>
+    <type>true/false</type>
+    <description>true if the phone supports SCKL ringtones</description>
+  </capability>
+  <capability>
+    <name>sckl_operatorlogo</name>
+    <type>true/false</type>
+    <description>true if the phone supports SCKL operator logos</description>
+  </capability>
+  <capability>
+    <name>sckl_groupgraphic</name>
+    <type>true/false</type>
+    <description>true if the phone supports SCKL group graphics</description>
+  </capability>
+  <capability>
+    <name>sckl_vcard</name>
+    <type>true/false</type>
+    <description>true if the phone supports SCKL vcards</description>
+  </capability>
+  <capability>
+    <name>sckl_vcalendar</name>
+    <type>true/false</type>
+    <description>true if the phone supports SCKL vcals</description>
+  </capability>
+  <capability>
+    <name>text_imelody</name>
+    <type>true/false</type>
+    <description>true if the phone supports textual iMelody</description>
+  </capability>
+  <capability>
+    <name>ems</name>
+    <type>true/false</type>
+    <description>true if the phone supports EMS messages</description>
+  </capability>
+  <capability>
+    <name>ems_variablesizedpictures</name>
+    <type>true/false</type>
+    <description>true if the phone supports EMS messages</description>
+  </capability>
+  <capability>
+    <name>ems_imelody</name>
+    <type>true/false</type>
+    <description>true if the phone supports iMelody over EMS messages</description>
+  </capability>
+  <capability>
+    <name>ems_odi</name>
+    <type>true/false</type>
+    <description>true if the phone supports EMS ODI (Object Distribution Indicator)</description>
+  </capability>
+  <capability>
+    <name>ems_upi</name>
+    <type>true/false</type>
+    <description>true if the phone supports EMS UPI (User Prompt Indicator)</description>
+  </capability>
+  <capability>
+    <name>ems_version</name>
+    <type>integer</type>
+    <description>EMS version</description>
+  </capability>
+  <capability>
+    <name>siemens_ota</name>
+    <type>true/false</type>
+    <description>true if the phone supports Siemens OTA</description>
+  </capability>
+  <capability>
+    <name>siemens_logo_width</name>
+    <type>integer</type>
+    <description>Logo width (default is 101)</description>
+  </capability>
+  <capability>
+    <name>siemens_logo_height</name>
+    <type>integer</type>
+    <description>Logo height (default is 29)</description>
+  </capability>
+  <capability>
+    <name>siemens_screensaver_width</name>
+    <type>integer</type>
+    <description>Screensaver width (default is 101)</description>
+  </capability>
+  <capability>
+    <name>siemens_screensaver_height</name>
+    <type>integer</type>
+    <description>Screensaver height (default is 50)</description>
+  </capability>
+  <capability>
+    <name>gprtf</name>
+    <type>true/false</type>
+    <description>true if the phone supports Motorola proprietary ringtones (GPRTF)</description>
+  </capability>
+  <capability>
+    <name>sagem_v1</name>
+    <type>true/false</type>
+    <description>true if the phone supports Sagem proprietary ringtones spec 1.0</description>
+  </capability>
+  <capability>
+    <name>sagem_v2</name>
+    <type>true/false</type>
+    <description>true if the phone supports Sagem proprietary ringtones spec 2.0</description>
+  </capability>
+  <capability>
+    <name>panasonic</name>
+    <type>true/false</type>
+    <description>true if the phone supports Panasonic proprietary ringtones</description>
+  </capability>
+  <capability>
+    <name>j2me_midp_1_0</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to MIDP 1.0 specifications</description>
+  </capability>
+  <capability>
+    <name>j2me_cldc_1_0</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to CLDC 1.0 specifications</description>
+  </capability>
+  <capability>
+    <name>j2me_midp_2_0</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to MIDP 2.0</description>
+  </capability>
+  <capability>
+    <name>j2me_cldc_1_1</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to CLDC 2.0 specifications</description>
+  </capability>
+  <capability>
+    <name>doja_1_0</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to DoJa 1.0 specifications</description>
+  </capability>
+  <capability>
+    <name>doja_1_5</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to DoJa 1.5 specifications</description>
+  </capability>
+  <capability>
+    <name>doja_2_0</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to DoJa 2.0 specifications</description>
+  </capability>
+  <capability>
+    <name>doja_2_1</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to DoJa 2.1 specifications</description>
+  </capability>
+  <capability>
+    <name>doja_2_2</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to DoJa 2.2 specifications</description>
+  </capability>
+  <capability>
+    <name>doja_3_0</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to DoJa 3.0 specifications</description>
+  </capability>
+  <capability>
+    <name>doja_3_5</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to DoJa 3.5 specifications</description>
+  </capability>
+  <capability>
+    <name>doja_4_0</name>
+    <type>true/false</type>
+    <description>true if the phone is compliant to DoJa 4.0 specifications</description>
+  </capability>
+  <capability>
+    <name>j2me_jtwi</name>
+    <type>true/false</type>
+    <description>JTWI support</description>
+  </capability>
+  <capability>
+    <name>j2me_mmapi_1_0</name>
+    <type>true/false</type>
+    <description>MMAPI 1.0 support</description>
+  </capability>
+  <capability>
+    <name>j2me_mmapi_1_1</name>
+    <type>true/false</type>
+    <description>MMAPI 1.1 support</description>
+  </capability>
+  <capability>
+    <name>j2me_wmapi_1_0</name>
+    <type>true/false</type>
+    <description>WMAPI 1.0 support</description>
+  </capability>
+  <capability>
+    <name>j2me_wmapi_1_1</name>
+    <type>true/false</type>
+    <description>WMAPI 1.1 support</description>
+  </capability>
+  <capability>
+    <name>j2me_wmapi_2_0</name>
+    <type>true/false</type>
+    <description>WMAPI 2.0 support</description>
+  </capability>
+  <capability>
+    <name>j2me_btapi</name>
+    <type>true/false</type>
+    <description>BlueTooth API support</description>
+  </capability>
+  <capability>
+    <name>j2me_3dapi</name>
+    <type>true/false</type>
+    <description>3D API support</description>
+  </capability>
+  <capability>
+    <name>j2me_loctapi</name>
+    <type>true/false</type>
+    <description>Localization API support</description>
+  </capability>
+  <capability>
+    <name>j2me_nokia_ui</name>
+    <type>true/false</type>
+    <description>Nokia UI support</description>
+  </capability>
+  <capability>
+    <name>j2me_motorola_lwt</name>
+    <type>true/false</type>
+    <description>Motorola LWT support</description>
+  </capability>
+  <capability>
+    <name>j2me_siemens_color_game</name>
+    <type>true/false</type>
+    <description>Siemens Color Game extension support</description>
+  </capability>
+  <capability>
+    <name>j2me_siemens_extension</name>
+    <type>true/false</type>
+    <description>Siemens extension support</description>
+  </capability>
+  <capability>
+    <name>j2me_heap_size</name>
+    <type>integer</type>
+    <description>Memory limit in bytes of the memory during runtime</description>
+  </capability>
+  <capability>
+    <name>j2me_storage_size</name>
+    <type>integer</type>
+    <description>The physical memory limit</description>
+  </capability>
+  <capability>
+    <name>j2me_max_jar_size</name>
+    <type>integer</type>
+    <description>Limit in bytes of a midlet downloaded over-the-air</description>
+  </capability>
+  <capability>
+    <name>j2me_max_record_store_size</name>
+    <type>integer</type>
+    <description>Limit in bytes of a record store</description>
+  </capability>
+  <capability>
+    <name>j2me_screen_width</name>
+    <type>integer</type>
+    <description>Screen width in pixels</description>
+  </capability>
+  <capability>
+    <name>j2me_screen_height</name>
+    <type>integer</type>
+    <description>Screen height in pixels</description>
+  </capability>
+  <capability>
+    <name>j2me_canvas_width</name>
+    <type>integer</type>
+    <description>Canvas width in pixels</description>
+  </capability>
+  <capability>
+    <name>j2me_canvas_height</name>
+    <type>integer</type>
+    <description>Canvas height in pixels</description>
+  </capability>
+  <capability>
+    <name>j2me_bits_per_pixel</name>
+    <type>integer</type>
+    <description>Bits per pixels - tells you the colors supported</description>
+  </capability>
+  <capability>
+    <name>j2me_audio_capture_enabled</name>
+    <type>true/false</type>
+    <description>The device may capture audio clips while in a midlet</description>
+  </capability>
+  <capability>
+    <name>j2me_video_capture_enabled</name>
+    <type>true/false</type>
+    <description>The device may capture video clips while in a midlet</description>
+  </capability>
+  <capability>
+    <name>j2me_photo_capture_enabled</name>
+    <type>true/false</type>
+    <description>The device may capture images clips while in a midlet</description>
+  </capability>
+  <capability>
+    <name>j2me_capture_image_formats</name>
+    <type>string</type>
+    <description>If j2me_photo_capture_enabled is true, this will tell you the image format supported</description>
+  </capability>
+  <capability>
+    <name>j2me_http</name>
+    <type>true/false</type>
+    <description>The device may start HTTP sessions</description>
+  </capability>
+  <capability>
+    <name>j2me_https</name>
+    <type>true/false</type>
+    <description>The device may start HTTPS sessions</description>
+  </capability>
+  <capability>
+    <name>j2me_socket</name>
+    <type>true/false</type>
+    <description>The device may open a socket</description>
+  </capability>
+  <capability>
+    <name>j2me_udp</name>
+    <type>true/false</type>
+    <description>The device may start UDP sessions</description>
+  </capability>
+  <capability>
+    <name>j2me_serial</name>
+    <type>true/false</type>
+    <description>The device may start serial connections</description>
+  </capability>
+  <capability>
+    <name>j2me_gif</name>
+    <type>true/false</type>
+    <description>true if it supports gif images</description>
+  </capability>
+  <capability>
+    <name>j2me_gif89a</name>
+    <type>true/false</type>
+    <description>true if it supports gif 89a (animated) images</description>
+  </capability>
+  <capability>
+    <name>j2me_jpg</name>
+    <type>true/false</type>
+    <description>true if it supports jpg images</description>
+  </capability>
+  <capability>
+    <name>j2me_png</name>
+    <type>true/false</type>
+    <description>true if it supports png images</description>
+  </capability>
+  <capability>
+    <name>j2me_bmp</name>
+    <type>true/false</type>
+    <description>true if it supports bmp images</description>
+  </capability>
+  <capability>
+    <name>j2me_bmp3</name>
+    <type>true/false</type>
+    <description>true if it supports bmp3 images</description>
+  </capability>
+  <capability>
+    <name>j2me_wbmp</name>
+    <type>true/false</type>
+    <description>true if it supports wbmp images</description>
+  </capability>
+  <capability>
+    <name>j2me_midi</name>
+    <type>true/false</type>
+    <description>true if it supports midi files</description>
+  </capability>
+  <capability>
+    <name>j2me_wav</name>
+    <type>true/false</type>
+    <description>true if it supports wav files</description>
+  </capability>
+  <capability>
+    <name>j2me_amr</name>
+    <type>true/false</type>
+    <description>true if it supports amr files</description>
+  </capability>
+  <capability>
+    <name>j2me_mp3</name>
+    <type>true/false</type>
+    <description>true if it supports mp3 files</description>
+  </capability>
+  <capability>
+    <name>j2me_mp4</name>
+    <type>true/false</type>
+    <description>true if it supports mp4 audiofiles</description>
+  </capability>
+  <capability>
+    <name>j2me_imelody</name>
+    <type>true/false</type>
+    <description>true if it supports imelody files</description>
+  </capability>
+  <capability>
+    <name>j2me_rmf</name>
+    <type>true/false</type>
+    <description>true if it supports rmf files</description>
+  </capability>
+  <capability>
+    <name>j2me_au</name>
+    <type>true/false</type>
+    <description>true if it supports au files</description>
+  </capability>
+  <capability>
+    <name>j2me_aac</name>
+    <type>true/false</type>
+    <description>true if it supports aac files</description>
+  </capability>
+  <capability>
+    <name>j2me_realaudio</name>
+    <type>true/false</type>
+    <description>true if it supports realaudio files</description>
+  </capability>
+  <capability>
+    <name>j2me_xmf</name>
+    <type>true/false</type>
+    <description>true if it supports xmf files</description>
+  </capability>
+  <capability>
+    <name>j2me_wma</name>
+    <type>true/false</type>
+    <description>true if it supports wma files</description>
+  </capability>
+  <capability>
+    <name>j2me_3gpp</name>
+    <type>true/false</type>
+    <description>true if it supports 3gpp files</description>
+  </capability>
+  <capability>
+    <name>j2me_h263</name>
+    <type>true/false</type>
+    <description>true if it supports h263 files</description>
+  </capability>
+  <capability>
+    <name>j2me_svgt</name>
+    <type>true/false</type>
+    <description>true if it supports svgt files</description>
+  </capability>
+  <capability>
+    <name>j2me_mpeg4</name>
+    <type>true/false</type>
+    <description>true if it supports mpeg4 audio/video files</description>
+  </capability>
+  <capability>
+    <name>j2me_realvideo</name>
+    <type>true/false</type>
+    <description>true if it supports realvideo files</description>
+  </capability>
+  <capability>
+    <name>j2me_real8</name>
+    <type>true/false</type>
+    <description>true if it supports real8 files</description>
+  </capability>
+  <capability>
+    <name>j2me_realmedia</name>
+    <type>true/false</type>
+    <description>true if it supports realmedia files</description>
+  </capability>
+  <capability>
+    <name>j2me_left_softkey_code</name>
+    <type>integer</type>
+    <description>The number refers to the value which is returned by an event handler method in the j2me APIs, so its an internal number (which is implementation dependant). When the left softkey is pressed, this will be the value returned by the even handler (often a negative number).</description>
+  </capability>
+  <capability>
+    <name>j2me_right_softkey_code</name>
+    <type>integer</type>
+    <description>The number refers to the value which is returned by an event handler method in the j2me APIs, so its an internal number (which is implementation dependant). When the right softkey is pressed, this will be the value returned by the even handler (often a negative number).</description>
+  </capability>
+  <capability>
+    <name>j2me_middle_softkey_code</name>
+    <type>integer</type>
+    <description>The number refers to the value which is returned by an event handler method in the j2me APIs, so its an internal number (which is implementation dependant). When the middle softkey is pressed, this will be the value returned by the even handler (often a negative number).</description>
+  </capability>
+  <capability>
+    <name>j2me_select_key_code</name>
+    <type>integer</type>
+    <description>The number refers to the value which is returned by an event handler method in the j2me APIs, so its an internal number (which is implementation dependant). When the 'select' softkey is pressed, this will be the value returned by the even handler (often a negative number).</description>
+  </capability>
+  <capability>
+    <name>j2me_return_key_code</name>
+    <type>integer</type>
+    <description>The number refers to the value which is returned by an event handler method in the j2me APIs, so its an internal number (which is implementation dependant). When the 'return' softkey is pressed, this will be the value returned by the even handler (often a negative number).</description>
+  </capability>
+  <capability>
+    <name>j2me_clear_key_code</name>
+    <type>integer</type>
+    <description>The number refers to the value which is returned by an event handler method in the j2me APIs, so its an internal number (which is implementation dependant). When the 'clear' key is pressed, this will be the value returned by the even handler (often a negative number).</description>
+  </capability>
+  <capability>
+    <name>j2me_datefield_no_accepts_null_date</name>
+    <type>true/false</type>
+    <description>datefields do not accept empty values (this is a bug)</description>
+  </capability>
+  <capability>
+    <name>j2me_datefield_broken</name>
+    <type>true/false</type>
+    <description>datefields do not work (this is a bug)</description>
+  </capability>
+  <capability>
+    <name>wav</name>
+    <type>true/false</type>
+    <description>Supports the .wav (Waveform) sound format</description>
+  </capability>
+  <capability>
+    <name>mmf</name>
+    <type>true/false</type>
+    <description>Supports the MMF (a Yamaha format) version is understood by the number of voices</description>
+  </capability>
+  <capability>
+    <name>smf</name>
+    <type>true/false</type>
+    <description>Supports the smf (Standard MIDI File) sound format</description>
+  </capability>
+  <capability>
+    <name>mld</name>
+    <type>true/false</type>
+    <description>An iMode sound format</description>
+  </capability>
+  <capability>
+    <name>midi_monophonic</name>
+    <type>true/false</type>
+    <description>Supports the midi (Musical Instrument Digital Interface) monophonic sound format </description>
+  </capability>
+  <capability>
+    <name>midi_polyphonic</name>
+    <type>true/false</type>
+    <description>Supports the midi (Musical Instrument Digital Interface) polyphonic sound format </description>
+  </capability>
+  <capability>
+    <name>sp_midi</name>
+    <type>true/false</type>
+    <description>Supports the Scalable Polyphony MIDI sound format</description>
+  </capability>
+  <capability>
+    <name>rmf</name>
+    <type>true/false</type>
+    <description>Supports the rmf sound format (Beatnik format)</description>
+  </capability>
+  <capability>
+    <name>xmf</name>
+    <type>true/false</type>
+    <description>Supports the XMF sound format (Beatnik format)</description>
+  </capability>
+  <capability>
+    <name>compactmidi</name>
+    <type>true/false</type>
+    <description>Supports the Compact MIDI sound format (a Faith Inc. format)</description>
+  </capability>
+  <capability>
+    <name>digiplug</name>
+    <type>true/false</type>
+    <description>A compact polyphonic sound format developed by the Digiplug company</description>
+  </capability>
+  <capability>
+    <name>nokia_ringtone</name>
+    <type>true/false</type>
+    <description>Supports the Nokia ringing tone sound format</description>
+  </capability>
+  <capability>
+    <name>imelody</name>
+    <type>true/false</type>
+    <description>A standard file format for melodies, also adopted as the ringtone format by the 4 companies developing the EMS standard</description>
+  </capability>
+  <capability>
+    <name>au</name>
+    <type>true/false</type>
+    <description>Also called the uLaw, NeXT, or Sun Audio format</description>
+  </capability>
+  <capability>
+    <name>amr</name>
+    <type>true/false</type>
+    <description>AMR standard sound format</description>
+  </capability>
+  <capability>
+    <name>awb</name>
+    <type>true/false</type>
+    <description>AMR wide band standard sound format</description>
+  </capability>
+  <capability>
+    <name>aac</name>
+    <type>true/false</type>
+    <description>AAC standard sound format</description>
+  </capability>
+  <capability>
+    <name>mp3</name>
+    <type>true/false</type>
+    <description>Supports the mp3 sound format</description>
+  </capability>
+  <capability>
+    <name>qcelp</name>
+    <type>true/false</type>
+    <description>Supports the Qualcomm Code Excited Linear Predictive waveform format</description>
+  </capability>
+  <capability>
+    <name>evrc</name>
+    <type>true/false</type>
+    <description>Supports the Enhanced Variable Rate Codec waveform format</description>
+  </capability>
+  <capability>
+    <name>voices</name>
+    <type>integer</type>
+    <description>Maximum number of notes the device can play at the same time</description>
+  </capability>
+</wurfl_capability_descriptions>

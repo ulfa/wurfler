@@ -13,5 +13,7 @@
 	<li><a href="/device/{{id}}">{{model}}</a></li>
 	{% endfor %}
 	</ul>	
+	<button type="button">Delete</button>
     </body>
+    <footer>© 2011 Ulf Angermann</footer>
 </html>

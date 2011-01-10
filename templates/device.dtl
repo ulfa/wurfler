@@ -31,5 +31,6 @@
 		<li>{{ id }}</li>
 		{% endfor %}
 		</ul>
+		<button type="button">Delete</button>
     </body>
 </html>

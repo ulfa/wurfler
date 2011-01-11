@@ -92,6 +92,8 @@ get_devices(Capabilities, Timestamp) ->
 get_devices_by_model(Model_Name) ->
 	wurfler:get_devices_by_model(Model_Name).
 
+save_caps_devices([], Devices) ->
+	ok;
 save_caps_devices(Caps, Devices) ->
 	wurfler_cache:save_caps_devices(Caps, Devices).
 

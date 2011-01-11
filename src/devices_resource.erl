@@ -85,7 +85,7 @@ get_capabilities(Body) ->
 get_devices([], _Timestamp) ->
 	xml_factory:create_devices([]);
 get_devices(Capabilities, []) ->
-	wurfler:searchByCapabilities(Capabilities, "01.01.1970");
+	wurfler:searchByCapabilities(Capabilities, ?DEFAULT_TIMESTAMP);
 get_devices(Capabilities, Timestamp) ->
 	wurfler:searchByCapabilities(Capabilities, Timestamp).
 

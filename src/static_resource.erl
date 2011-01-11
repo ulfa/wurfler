@@ -8,6 +8,8 @@
  
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -include_lib("kernel/include/file.hrl").
+-include_lib("eunit/include/eunit.hrl").
+
 -record(context, {docroot,fullpath,fileinfo}).
  
 init(DocRoot) -> 
@@ -42,8 +44,6 @@ provide_content(ReqData, Context) ->
   {ok, Value} = file:read_file(Context#context.fullpath),
   {Value, ReqData, Context}.
 % ------------------ PRIVATE ------------------------
- 
- 
 get_full_path(DocRoot, Path) ->
    case mochiweb_util:safe_relative_path(Path) of
      undefined -> undefined;
@@ -56,3 +56,6 @@ get_full_path(DocRoot, Path) ->
           FullPath
       end
     end.
+%% --------------------------------------------------------------------
+%%% Test functions
+%% --------------------------------------------------------------------

@@ -84,7 +84,7 @@ init([]) ->
 handle_call({read_caps_devices, Caps}, _From, State) ->
 	Caps_Devices=wurfler_db:read_capabilities_devices(Caps),
     {reply, Caps_Devices, State};
-handle_call({read_caps_devices, Caps}, _From, State) ->
+handle_call({clear_caps_devices, Caps}, _From, State) ->
 	Result = wurfler_db:clear_capabilities_devices(),
     {reply, Result, State}.
 

@@ -119,7 +119,7 @@ handle_call({get_devices_by_name, Model_Name}, _From, _State) ->
 	{reply, Result, new_state()};
 handle_call({check_device, Capabilities, DeviceKey}, _From, _State) ->
 	Result = check_device(Capabilities, DeviceKey, new_state()),
-	{reply, Result#state.devices, new_state()};
+	{reply, Result, new_state()};
 handle_call({version}, _From, State) ->
     {reply, "0.1", State}.
 %% --------------------------------------------------------------------
@@ -179,8 +179,12 @@ search_by_capabilities(Capabilities, Timestamp, State) ->
 	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
 check_device(Capabilities, DeviceKey, State) ->
-	List_Of_Funs=create_funs_from_list(Capabilities),
-	get_devices_for_caps(List_Of_Funs, DeviceKey, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
+	List_Of_Funs = create_funs_from_list(Capabilities),
+	get_devices_for_caps(List_Of_Funs, DeviceKey, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}),
+	case State#state.devices of
+		[{devices,[],[]}] -> [];
+		Devices -> {Capabilities, Devices}
+	end.
 
 get_all_brands() ->
 	{ok, wurfler_db:get_all_brands()}.

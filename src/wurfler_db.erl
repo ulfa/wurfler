@@ -99,8 +99,8 @@ find_record_by_ua(devicesTbl, Ua) ->
 get_all_keys(capabilities_devices) ->
 	mnesia:dirty_all_keys(capabilities_devices);
 get_all_keys(devicesTbl) ->
-	get_all_keys(devicesTbl, "01.01.1970").
-get_all_keys(devicesTbl, "01.01.1970") ->
+	get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP).
+get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl) ])) end);
 get_all_keys(devicesTbl, Timestamp) ->
 	T=wurfler_date_util:parse_to_datetime(Timestamp),

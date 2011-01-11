@@ -33,7 +33,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0]).
 -export([start/0]).
--export([create_device/1, update_device/1]).
+-export([create_device/1, update_device/1, delete_device/1]).
 
 %% ====================================================================
 %% External functions
@@ -42,6 +42,8 @@ create_device(Device) ->
 	gen_server:cast(?MODULE, {create_device, Device}).
 update_device(Device) ->
 	gen_server:cast(?MODULE, {update_device, Device}).
+delete_device(Device) ->
+	gen_server:cast(?MODULE, {delete_device, Device}).
 %% --------------------------------------------------------------------
 %% record definitions
 %% --------------------------------------------------------------------
@@ -79,7 +81,7 @@ init([]) ->
 %%          {stop, Reason, Reply, State}   | (terminate/2 is called)
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_call(Request, From, State) ->
+handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
 
@@ -93,11 +95,18 @@ handle_call(Request, From, State) ->
 handle_cast({create_device, Device}, State) ->
 	error_logger:info_msg("create device : ~p~n", [Device]),
 	#device{id=Id} = read_device(Device),
-	Result = [wurfler:check_device(Capabilities, [Id]) || Capabilities <- wurfler_db:get_all_keys(capabilities_devices)],
-	error_logger:info_msg("treffer : ~p~n", [Result]),
+	case [wurfler:check_device(Capabilities, [Id]) || Capabilities <- wurfler_db:get_all_keys(capabilities_devices)] of
+		[] -> error_logger:info_msg("nothing to do for device : ~p~n", [Device]);
+		Result -> error_logger:info_msg("must update cache for device : ~p~n", [Device]),
+				  request_for_capablities(Result)
+	end,
     {noreply, State};
 handle_cast({update_device, Device}, State) ->
 	error_logger:info_msg("update device : ~p~n", [Device]),
+	D = read_device(Device),
+    {noreply, State};
+handle_cast({delete_device, Device}, State) ->
+	error_logger:info_msg("delete device : ~p~n", [Device]),
 	D = read_device(Device),
     {noreply, State}.
 %% --------------------------------------------------------------------
@@ -107,7 +116,7 @@ handle_cast({update_device, Device}, State) ->
 %%          {noreply, State, Timeout} |
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_info(Info, State) ->
+handle_info(_Info, State) ->
     {noreply, State}.
 
 %% --------------------------------------------------------------------
@@ -115,7 +124,7 @@ handle_info(Info, State) ->
 %% Description: Shutdown the server
 %% Returns: any (ignored by gen_server)
 %% --------------------------------------------------------------------
-terminate(Reason, State) ->
+terminate(_Reason, _State) ->
     ok.
 
 %% --------------------------------------------------------------------
@@ -123,16 +132,26 @@ terminate(Reason, State) ->
 %% Purpose: Convert process state when code is changed
 %% Returns: {ok, NewState}
 %% --------------------------------------------------------------------
-code_change(OldVsn, State, Extra) ->
+code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+request_for_capablities([]) ->
+	ok;
+request_for_capablities([{SetOfCaps, _Devices}|Caps]) ->
+	Devices = wurfler:searchByCapabilities(SetOfCaps, ?DEFAULT_TIMESTAMP),
+	wurfler_cache:save_caps_devices(SetOfCaps, Devices),
+	write_change_set(Caps, Devices),
+	request_for_capablities(Caps).
+write_change_set([], _Devices) ->
+	error_logger:info_msg("ERROR"),
+	ok;
+write_change_set(Caps, Devices) ->
+	error_logger:info_msg("writing caps and devices : ~p~n~p~n", [Caps,Devices]).
 read_device(#device{id=Id}) ->
 	wurfler:searchByDeviceName(Id).	
-getAllKeys() ->
-	wurfler_db:get_all_keys(capabilities_devices).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

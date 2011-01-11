@@ -174,6 +174,7 @@ search_by_ua(UserAgent, _State)->
 	end.
 
 search_by_capabilities(Capabilities, Timestamp, State) ->
+	io:format("1... ~p~n", [Capabilities]),
 	List_Of_Funs=create_funs_from_list(Capabilities),
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
 	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).

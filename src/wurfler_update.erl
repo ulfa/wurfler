@@ -143,7 +143,7 @@ request_for_capablities([]) ->
 request_for_capablities([{SetOfCaps, _Devices}|Caps]) ->
 	Devices = wurfler:searchByCapabilities(SetOfCaps, ?DEFAULT_TIMESTAMP),
 	wurfler_cache:save_caps_devices(SetOfCaps, Devices),
-	write_change_set(Caps, Devices),
+	write_change_set(SetOfCaps, Devices),
 	request_for_capablities(Caps).
 write_change_set([], _Devices) ->
 	error_logger:info_msg("ERROR"),

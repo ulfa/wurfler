@@ -95,7 +95,7 @@ handle_call(_Request, _From, State) ->
 handle_cast({create_device, Device}, State) ->
 	error_logger:info_msg("create device : ~p~n", [Device]),
 	#device{id=Id} = read_device(Device),
-	case [wurfler:check_device(Capabilities, [Id]) || Capabilities <- wurfler_db:get_all_keys(capabilities_devices)] of
+	case lists:flatten([wurfler:check_device(Capabilities, [Id]) || Capabilities <- wurfler_db:get_all_keys(capabilities_devices)]) of
 		[] -> error_logger:info_msg("nothing to do for device : ~p~n", [Device]);
 		Result -> error_logger:info_msg("must update cache for device : ~p~n", [Device]),
 				  request_for_capablities(Result)
@@ -140,7 +140,8 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 request_for_capablities([]) ->
 	ok;
-request_for_capablities([{SetOfCaps, _Devices}|Caps]) ->
+request_for_capablities([{SetOfCaps, Devices1}|Caps]) ->
+	io:format("2... ~p~n", [Devices1]),
 	Devices = wurfler:searchByCapabilities(SetOfCaps, ?DEFAULT_TIMESTAMP),
 	wurfler_cache:save_caps_devices(SetOfCaps, Devices),
 	write_change_set(SetOfCaps, Devices),

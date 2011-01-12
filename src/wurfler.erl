@@ -174,7 +174,6 @@ search_by_ua(UserAgent, _State)->
 	end.
 
 search_by_capabilities(Capabilities, Timestamp, State) ->
-	io:format("1... ~p~n", [Capabilities]),
 	List_Of_Funs=create_funs_from_list(Capabilities),
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
 	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
@@ -182,7 +181,9 @@ search_by_capabilities(Capabilities, Timestamp, State) ->
 check_device(Capabilities, DeviceKey, State) ->
 	List_Of_Funs = create_funs_from_list(Capabilities),
 	get_devices_for_caps(List_Of_Funs, DeviceKey, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}),
+	io:format("1a...: ~p~n", [State#state.devices]),
 	case State#state.devices of
+		[] -> [];
 		[{devices,[],[]}] -> [];
 		Devices -> {Capabilities, Devices}
 	end.
@@ -294,6 +295,7 @@ get_devices_for_caps(_List_Of_Funs, [], State) ->
 	State#state{devices = xml_factory:create_devices(State#state.devices)};
 
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
+	
 	Device = search_by_device_id(Key),
 	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State),
 	case run_funs_against_list(List_Of_Funs, Caps, {nok}) of

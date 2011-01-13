@@ -36,7 +36,7 @@
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
 -export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/2]).
 -compile([export_all]).
--define(TIMEOUT, infinity).
+-define(TIMEOUT, 50000).
 %% ====================================================================
 %% Record definition
 %% ====================================================================

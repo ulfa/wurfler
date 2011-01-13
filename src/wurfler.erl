@@ -180,9 +180,8 @@ search_by_capabilities(Capabilities, Timestamp, State) ->
 
 check_device(Capabilities, DeviceKey, State) ->
 	List_Of_Funs = create_funs_from_list(Capabilities),
-	get_devices_for_caps(List_Of_Funs, DeviceKey, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}),
-	io:format("1a...: ~p~n", [State#state.devices]),
-	case State#state.devices of
+	State1=get_devices_for_caps(List_Of_Funs, DeviceKey, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}),
+	case State1#state.devices of
 		[] -> [];
 		[{devices,[],[]}] -> [];
 		Devices -> {Capabilities, Devices}
@@ -295,14 +294,15 @@ get_devices_for_caps(_List_Of_Funs, [], State) ->
 	State#state{devices = xml_factory:create_devices(State#state.devices)};
 
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
-	
-	Device = search_by_device_id(Key),
+	Device = search_by_device_id(Key),	
 	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State),
 	case run_funs_against_list(List_Of_Funs, Caps, {nok}) of
   		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, add_device_to_devices(?CONTAINS, Device, State));
 		{nok} -> get_devices_for_caps(List_Of_Funs, Keys, State)
 	end.
 
+add_device_to_devices(_Fun, Device, #state{devices=[]}=State) ->
+	State#state{devices=[xml_factory:create_device(Device)|State#state.devices]};
 add_device_to_devices(Fun, Device, #state{devices=Devices}=State) ->
  	case lists:any(Fun, Devices) of 
 		false -> State#state{devices=[xml_factory:create_device(Device)|State#state.devices]};
@@ -349,6 +349,7 @@ extract_one_capabilty(Generic, {Name, {_Value,_Operator}}) ->
 %% --------------------------------------------------------------------
 search_by_ua_test() ->
 	search_by_ua("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like Mac OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7", new_state()).
+
 add_device_to_devices_test() ->
 	Devices=[xml_factory:create_device(#device{id="1", brand_name="brand_1", model_name="model_1"}), 
 			 xml_factory:create_device(#device{id="2", brand_name="brand_2", model_name="model_2"})],

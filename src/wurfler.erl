@@ -37,6 +37,11 @@
 -export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/2]).
 -compile([export_all]).
 -define(TIMEOUT, 50000).
+-define(CONTAINS, fun({device, [{model_name, Model_Name},_], []}) ->					   					   
+					if Device#device.model_name == Model_Name -> true;
+					    true -> false
+					end
+			   	  end).
 %% ====================================================================
 %% Record definition
 %% ====================================================================

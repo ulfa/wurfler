@@ -141,9 +141,9 @@ delete_brand(Brand_name) ->
 	mnesia:activity(transaction, fun() ->
 		case find_devices_by_brand(devicesTbl, Brand_name) of
 			[] -> [];
-			Devices -> [mnesia:delete(devicesTbl, Device#device.id, write)|| Device <- Devices],
-					   mnesia:delete(brand_index, Brand_name, write)
-		end
+			Devices -> [mnesia:delete(devicesTbl, Device#device.id, write)|| Device <- Devices]
+		end,
+		 mnesia:delete(brand_index, Brand_name, write)
 	end).
 	
 remove_device_from_brand(#device{id=Id, brand_name=Brand_name}) ->

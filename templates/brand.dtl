@@ -13,7 +13,9 @@
 	<li><a href="/device/{{id}}">{{model}}</a></li>
 	{% endfor %}
 	</ul>	
-	<button type="button">Delete</button>
+	<form action="/brand/{{brand}}" method="post">
+		<button type="submit" id="delete-brand" name="brand" value="{{brand}}">Delete</button>
+	</form>		
     </body>
     <footer>© 2011 Ulf Angermann</footer>
 </html>

@@ -46,7 +46,7 @@ content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}], ReqData, Context}.
 
 allowed_methods(ReqData, Context) ->
-    {['GET'], ReqData, Context}.
+    {['GET','DELETE', 'POST'], ReqData, Context}.
 
 to_html(ReqData, #context{brand=Brand}=Context) ->
      {ok, Content} = brand_dtl:render(record_to_tuple(brand, Brand)),	 
@@ -61,9 +61,24 @@ resource_exists(ReqData, Context) ->
 		[] -> {false, ReqData, Context#context{brand=[]}};
 		Brand -> {true, ReqData, Context#context{brand=Brand}}
 	end.
+
+delete_resource(ReqData, Context)->
+	delete_brand(wrq:path_info(brand, ReqData)),
+	{true, ReqData, Context#context{brand=[]}}.
+
+delete_completed(ReqData, Context) ->
+	{true, ReqData, Context}.
+
+post_is_create(ReqData, Context) ->
+	{false, ReqData, Context}.
+
+process_post(ReqData, Context) -> 
+	delete_resource(ReqData, Context).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+delete_brand(Brand_name) ->
+	wurfler_db:delete_brand(Brand_name).
 get_brand(Brand_Name) ->
 	wurfler:get_brand(Brand_Name).
 record_to_tuple(brand, [Brand]) ->

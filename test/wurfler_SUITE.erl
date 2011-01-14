@@ -65,7 +65,8 @@ groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_
 			 {brand_get_requests, [parallel], [get_brand_by_brand_name, get_all_brands, get_brand_by_brand_name_to_html]},
 			 {brand_get_requests_html, [parallel], [get_brand_by_brand_name_to_html]},
 			 {model_get_requests, [parallel], [get_devices_by_model_name, get_devices_without_model_name]},
-			 {model_get_requests_html, [parallel], [get_devices_by_model_name_html, get_devices_without_model_name_html]}
+			 {model_get_requests_html, [parallel], [get_devices_by_model_name_html, get_devices_without_model_name_html]},
+			 {device_delete, [sequence] , [delete_device_by_id]}
 			].
 
 %%--------------------------------------------------------------------
@@ -82,7 +83,8 @@ groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_
 %%--------------------------------------------------------------------
 all() -> [{group, device_get_requests}, {group, device_get_requests_html}, {group, devices_post_requests},
 		  {group, brand_get_requests}, {group, brand_get_requests_html},{group, model_get_requests},
-		  {group, model_get_requests_html}
+		  {group, model_get_requests_html},
+		  {group, device_delete}
 		 ].
 
 %%--------------------------------------------------------------------
@@ -196,7 +198,8 @@ post_cap_query(_Config) ->
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),
-	1856=erlang:length(Devices).
+	io:format("Anzahl : ~p~n", [erlang:length(Devices)]),
+	1864=erlang:length(Devices).
 
 post_cap_query_no_caps(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
@@ -208,14 +211,14 @@ post_cap_query_with_timestamp(_Config) ->
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),
-	1856=erlang:length(Devices).
+	1864=erlang:length(Devices).
 
 post_cap_query_device_os_version(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>01.01.2010</timestamp><capabilities><capability name=\"device_os\" value=\"iPhone OS\" operator=\"=\"/><capability name=\"device_os_version\" value=\"0.0\" operator=\">\"/></capabilities></query>",
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),	
-	5= erlang:length(Devices).
+	4= erlang:length(Devices).
 	
 %% Tests for the brand service
 get_brand_by_brand_name(_Config) ->
@@ -235,3 +238,6 @@ get_devices_without_model_name_html(_Config) ->
 	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/model", ?HTML_CONTENT_TYPE, get).
 get_devices_without_model_name(_Config) ->
 	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/model", ?XML_CONTENT_TYPE, get).
+
+delete_device_by_id(_Config) ->
+	ibrowse:send_req("http://localhost:8000/device/ahong_d13_ver1", ?XML_CONTENT_TYPE, delete).

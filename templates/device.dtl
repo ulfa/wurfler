@@ -18,7 +18,7 @@
 		<ul>
 			<li><label for="{{id}}">Id : </label>{{id}}</li>  
 			<li><label for="{{brand_name}}">Brand name :</label>{{brand_name}}</li>
-			<li><label for="{{model_name}}">Model name :</label>{{brand_name}}</li>
+			<li><label for="{{model_name}}">Model name :</label>{{model_name}}</li>
 			<li><label for="{{user_agent}}">User Agent :</label>{{user_agent}}</li>
 			<li><label for="{{actual_device_root}}">Actual device :</label>{{actual_device_root}}</li>
 			<li><label for="{{fall_back}}">Fallback :</label>{{fall_back}}</li>
@@ -31,6 +31,9 @@
 		<li>{{ id }}</li>
 		{% endfor %}
 		</ul>
-		<button type="button">Delete</button>
+			<form action="http://localhost:8000/device/{{id}}">
+				<input type="submit" value="delete"/>
+			</form>
+		
     </body>
 </html>

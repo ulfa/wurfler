@@ -34,9 +34,9 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
--export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/2]).
+-export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/2, delete_device/1, delete_brand/1]).
 -compile([export_all]).
--define(TIMEOUT, 50000).
+-define(TIMEOUT, infinity).
 -define(CONTAINS, fun({device, [{model_name, Model_Name},_], []}) ->					   					   
 					if Device#device.model_name == Model_Name -> true;
 					    true -> false
@@ -67,8 +67,13 @@ get_devices_by_model(Model_Name) ->
 	gen_server:call(?MODULE, {get_devices_by_name, Model_Name}, ?TIMEOUT).
 getVersion() ->
 	gen_server:call(?MODULE, {version}).
-check_device(Capabilities, DeviceKey) ->
-	gen_server:call(?MODULE, {check_device, Capabilities, DeviceKey}, ?TIMEOUT).
+check_device(Capabilities, Id) ->
+	gen_server:call(?MODULE, {check_device, Capabilities, Id}, ?TIMEOUT).
+delete_device(Id) ->
+	gen_server:call(?MODULE, {delete_device, Id}, ?TIMEOUT).
+delete_brand(Brand) ->
+	gen_server:call(?MODULE, {delete_brand, Brand}, ?TIMEOUT).
+
 %% ====================================================================
 %% Server functions
 %% ====================================================================
@@ -122,9 +127,16 @@ handle_call({get_brand, Brand_Name}, _From, State) ->
 handle_call({get_devices_by_name, Model_Name}, _From, _State) ->
 	{ok, Result} = getDeviceByModelName(Model_Name),
 	{reply, Result, new_state()};
-handle_call({check_device, Capabilities, DeviceKey}, _From, _State) ->
-	Result = check_device(Capabilities, DeviceKey, new_state()),
+handle_call({check_device, Capabilities, Id}, _From, _State) ->
+	Result = check_device(Capabilities, Id, new_state()),
 	{reply, Result, new_state()};
+handle_call({delete_device, Id}, _From, State) ->
+	Result = deleteDevice(Id),
+	{reply, Result, State};
+handle_call({delete_brand, Brand}, _From, State) ->
+	Result = deleteBrand(Brand),
+	{reply, Result, State};
+
 handle_call({version}, _From, State) ->
     {reply, "0.1", State}.
 %% --------------------------------------------------------------------
@@ -349,6 +361,10 @@ extract_one_capabilty(Generic, {Name, {_Value,_Operator}}) ->
  		false -> [];
 		Cap -> Cap
 	end.
+deleteBrand(Brand_name) ->
+	wurfler_db:delete_brand(Brand_name).
+deleteDevice(Id) ->
+	wurfler_db:delete_device(devicesTbl, Id).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

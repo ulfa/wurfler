@@ -27,7 +27,7 @@
 %%
 %% Exported Functions
 %%
--export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2]).
+-export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2, delete_resource/2, delete_completed/2, allowed_methods/2]).
 %% -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -record(context, {device}).
@@ -41,7 +41,7 @@ content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.
 
 allowed_methods(ReqData, Context) ->
-    {['GET'], ReqData, Context}.
+    {['GET', 'DELETE'], ReqData, Context}.
 
 to_html(ReqData, #context{device=Device}=Context) ->
      {ok, Content} = device_dtl:render(record_to_tuple(device, Device)),
@@ -58,11 +58,21 @@ resource_exists(ReqData, Context) ->
 		Device -> {true, ReqData, Context#context{device=Device}}
 	end.
 
+delete_resource(ReqData, Context)->
+	case delete_device(wrq:path_info(device, ReqData)) of
+		[] -> {false, ReqData, Context#context{device=[]}};
+		ok -> {true, ReqData, Context}
+	end.
+
+delete_completed(ReqData, Context) ->
+	{true, ReqData, Context}.
 %%
 %% Local Functions
 %%
+delete_device(Id) ->
+	wurfler_db:delete_device(devicesTbl, Id).
 get_device(undefined, ReqData) ->
-error_logger:info_msg("UA ~p~n", [wrq:get_req_header("User-Agent", ReqData)]),
+	error_logger:info_msg("UA ~p~n", [wrq:get_req_header("User-Agent", ReqData)]),
 	wurfler:searchByUA(wrq:get_req_header("User-Agent", ReqData));
 get_device(Value, _ReqData) ->
 	wurfler:searchByDeviceName(Value).
@@ -77,7 +87,6 @@ record_to_tuple(device, Record) ->
 record_to_tuple(group, Record) ->	
 	Capabilities = record_to_tuple(capabilities, Record#group.capabilites, []),
 	Data = lists:nthtail(1,tuple_to_list(Record#group{capabilites=Capabilities})),
-%% 	lists:zip(Keys, Data);
 	{lists:nth(1, Data), lists:nth(2, Data)};
 record_to_tuple(capability, Record)->									  
 	Keys = record_info(fields, capability),

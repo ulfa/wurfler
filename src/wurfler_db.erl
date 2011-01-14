@@ -31,8 +31,9 @@
 %% --------------------------------------------------------------------
 -export([start/0,create_db/0, save_device/2, find_record_by_id/2, find_record_by_ua/2, find_groups_by_id/2]).
 -export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2, get_all_brands/0]).
--export([delete_record/2, get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1, get_capablities_devices/1]).
--export([clear_capabilities_devices/0]).
+-export([get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1, get_capablities_devices/1]).
+-export([clear_capabilities_devices/0, find_devices_by_brand/2]).
+-export([delete_device/2, delete_brand/1]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -44,7 +45,8 @@ create_db() ->
 		_ -> error_logger:info_msg("schema created ~n")
 	end,
 	application:start(mnesia),
-	mnesia:create_table(devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
+	mnesia:create_table(devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},
+									{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(j2meTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(symbianTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
@@ -75,37 +77,35 @@ save_brand_index(Brand_Name, {Id, Model_Name}) ->
 			[Record] -> mnesia:write(brand_index, Record#brand_index{models=[{Id, Model_Name}|Record#brand_index.models]}, write)
 		end
 	end).
+save_brand_index(Brand_index) ->
+	mnesia:activity(transaction, fun() -> mnesia:write(brand_index, Brand_index, write) end).
 save_capabilities_devices(Caps_Devices) ->
 	mnesia:activity(transaction, fun() -> mnesia:write(capabilities_devices, Caps_Devices, write) end).
 %% --------------------------------------------------------------------
 %% finder functions
 %% --------------------------------------------------------------------
-delete_record(Id, Brand_Name) ->
-	mnesia:activity(transaction, fun() -> 
-										 mnesia:delete(devicesTbl, Id, write),
-										 mnesia:delete(brand_index, Brand_Name, write)
-								 end).
 find_record_by_id(devicesTbl, Id) ->
 	mnesia:dirty_read(devicesTbl, Id).
 find_groups_by_id(devicesTbl, Id) ->
-	[Device] = mnesia:dirty_read(devicesTbl, Id), 
+	[Device] = find_record_by_id(devicesTbl, Id), 
 	{Device#device.fall_back, Device#device.groups}.
 find_capabilities_by_id(devicesTbl, Id) ->
-	[Device] = mnesia:dirty_read(devicesTbl, Id),
+	[Device] = find_record_by_id(devicesTbl, Id),
 	Caps = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
 	{Device#device.fall_back, Caps}.
 find_record_by_ua(devicesTbl, Ua) ->
-	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua ])) end).
+	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua])) end).
 get_all_keys(capabilities_devices) ->
 	mnesia:dirty_all_keys(capabilities_devices);
+
 get_all_keys(devicesTbl) ->
 	get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP).
 get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP) ->
-	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl) ])) end);
+ 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl) ])) end);
 get_all_keys(devicesTbl, Timestamp) ->
 	T=wurfler_date_util:parse_to_datetime(Timestamp),
 	mnesia:activity(sync_dirty, fun() -> 
-								qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.lastmodified > T ])) 
+								qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.lastmodified > T])) 
 								end).
 get_all_brands()->
 	mnesia:activity(sync_dirty, fun() -> 
@@ -113,8 +113,10 @@ get_all_brands()->
 								end).
 get_brand(Brand_Name) ->
 	mnesia:dirty_read(brand_index, Brand_Name).
+find_devices_by_brand(devicesTbl, Brand_name) ->
+	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.brand_name == Brand_name])) end).
 get_devices_by_model_name(devicesTbl, Model_Name) ->
-		mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.model_name == Model_Name ])) end).
+		mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.model_name == Model_Name])) end).
 get_capablities_devices(Capapbilities) ->
 	mnesia:dirty_read(Capapbilities).
 %% --------------------------------------------------------------------
@@ -122,6 +124,32 @@ get_capablities_devices(Capapbilities) ->
 %% --------------------------------------------------------------------
 clear_capabilities_devices() ->
 	mnesia:activity(transaction, fun() -> mnesia:clear_table(capabilities_devices) end).
+%% --------------------------------------------------------------------
+%%% delete functions
+%% --------------------------------------------------------------------
+delete_device(devicesTbl, "generic") ->
+	error_logger:info_msg("can't delete the generic device");
+delete_device(devicesTbl, Id) ->
+	mnesia:activity(transaction, fun() ->
+		case find_record_by_id(devicesTbl, Id) of
+			[] -> [];
+			[Device] -> remove_device_from_brand(Device),
+						mnesia:delete(devicesTbl, Device#device.id, write)			
+		end
+	end).
+delete_brand(Brand_name) ->
+	mnesia:activity(transaction, fun() ->
+		case find_devices_by_brand(devicesTbl, Brand_name) of
+			[] -> [];
+			Devices -> [mnesia:delete(devicesTbl, Device#device.id, write)|| Device <- Devices],
+					   mnesia:delete(brand_index, Brand_name, write)
+		end
+	end).
+	
+remove_device_from_brand(#device{id=Id, brand_name=Brand_name}) ->
+	[Brand_index] = get_brand(Brand_name),
+	Models = lists:keydelete(Id, 1, Brand_index#brand_index.models),
+	save_brand_index(Brand_index#brand_index{models=Models}).	
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

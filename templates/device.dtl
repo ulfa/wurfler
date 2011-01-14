@@ -31,8 +31,8 @@
 		<li>{{ id }}</li>
 		{% endfor %}
 		</ul>
-			<form action="http://localhost:8000/device/{{id}}">
-				<input type="submit" value="delete"/>
+			<form action="/device/{{id}}" method="post">
+				<button type="submit" id="delete-id" name="device" value="{{id}}">Delete</button>
 			</form>
 		
     </body>

@@ -27,21 +27,24 @@
 %%
 %% Exported Functions
 %%
--export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2, delete_resource/2, delete_completed/2, allowed_methods/2]).
+-export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2, 
+		 delete_resource/2, delete_completed/2, allowed_methods/2]).
+-export([post_is_create/2, process_post/2]).
 %% -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -record(context, {device}).
 %%
 %% API Functions
 %%
-init([]) -> 
-	{ok, #context{device=[]}}.
+init(_Config) -> 
+	{{trace, "/tmp"}, #context{device=[]}}.
+	%%{ok, #context{device=[]}}.
 
 content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.
 
 allowed_methods(ReqData, Context) ->
-    {['GET', 'DELETE'], ReqData, Context}.
+    {['GET', 'DELETE', 'POST'], ReqData, Context}.
 
 to_html(ReqData, #context{device=Device}=Context) ->
      {ok, Content} = device_dtl:render(record_to_tuple(device, Device)),
@@ -57,6 +60,12 @@ resource_exists(ReqData, Context) ->
 		[] -> {false, ReqData, Context#context{device=[]}};
 		Device -> {true, ReqData, Context#context{device=Device}}
 	end.
+
+post_is_create(ReqData, Context) ->
+	{false, ReqData, Context}.
+
+process_post(ReqData, Context) -> 
+	delete_resource(ReqData, Context).
 
 delete_resource(ReqData, Context)->
 	case delete_device(wrq:path_info(device, ReqData)) of

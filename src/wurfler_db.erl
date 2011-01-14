@@ -149,7 +149,10 @@ delete_brand(Brand_name) ->
 remove_device_from_brand(#device{id=Id, brand_name=Brand_name}) ->
 	[Brand_index] = get_brand(Brand_name),
 	Models = lists:keydelete(Id, 1, Brand_index#brand_index.models),
-	save_brand_index(Brand_index#brand_index{models=Models}).	
+	case Models of
+		[] -> mnesia:delete(brand_index, Brand_name, write); 
+		_ ->save_brand_index(Brand_index#brand_index{models=Models})
+	end.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

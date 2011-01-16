@@ -64,8 +64,12 @@ resource_exists(ReqData, Context) ->
 post_is_create(ReqData, Context) ->
 	{false, ReqData, Context}.
 
-process_post(ReqData, Context) -> 
-	delete_resource(ReqData, Context).
+process_post(ReqData, Context) ->
+	LOC = "http://" ++ wrq:get_req_header("host", ReqData) ++ "/brands",
+	io:format("1... ~p~n", [LOC]),
+    Req=wrq:set_resp_header("Location", LOC, ReqData),
+	Req1=wrq:do_redirect(true, Req),
+	delete_resource(Req1, Context).
 
 delete_resource(ReqData, Context)->
 	case delete_device(wrq:path_info(device, ReqData)) of

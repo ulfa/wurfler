@@ -62,7 +62,7 @@ resource_exists(ReqData, Context) ->
 		Brand -> {true, ReqData, Context#context{brand=Brand}}
 	end.
 
-delete_resource(ReqData, Context)->
+delete_resource(ReqData, Context)->	
 	delete_brand(wrq:path_info(brand, ReqData)),
 	{true, ReqData, Context#context{brand=[]}}.
 
@@ -73,10 +73,15 @@ post_is_create(ReqData, Context) ->
 	{false, ReqData, Context}.
 
 process_post(ReqData, Context) -> 
-	delete_resource(ReqData, Context).
+	ReqData1 = redirect("/brands", ReqData),
+	delete_resource(ReqData1, Context).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+redirect(Target, ReqData) ->
+	Location = "http://" ++ wrq:get_req_header(?HOST, ReqData) ++ Target,
+    Req=wrq:set_resp_header(?LOCATION, Location, ReqData),
+	wrq:do_redirect(true, Req).
 delete_brand(Brand_name) ->
 	wurfler_db:delete_brand(Brand_name).
 get_brand(Brand_Name) ->

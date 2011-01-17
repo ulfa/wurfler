@@ -37,8 +37,8 @@
 %% API Functions
 %%
 init(_Config) -> 
-	{{trace, "/tmp"}, #context{device=[]}}.
-	%%{ok, #context{device=[]}}.
+%% 	{{trace, "/tmp"}, #context{device=[]}}.
+	{ok, #context{device=[]}}.
 
 content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.

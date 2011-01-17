@@ -11,6 +11,7 @@
              wurfler_update,
              wurfler_deps,
              xml_factory,
+             about_resource,
              static_resource,
              device_resource,
              devices_resource,
@@ -25,7 +26,8 @@
 			device_dtl,
 			devices_dtl,
 			brands_dtl,
-			brand_dtl
+			brand_dtl,
+			base_dtl
             ]},
   {registered, [wurflerservice]},
   {applications, [

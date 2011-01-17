@@ -1,9 +1,7 @@
-<html>
-    <head>
-        <title>Wurfler</title>
-    </head>
-    <body>
+{% extends "base.dtl" %}
+
+{% block title %}About{% endblock %}
+    {% block content %}    
         <h1>Wurfler</h1>
         <p>Something about the wurfler project</p>
-    </body>
-</html>
+	{% endblock %}

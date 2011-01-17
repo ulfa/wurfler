@@ -65,11 +65,8 @@ post_is_create(ReqData, Context) ->
 	{false, ReqData, Context}.
 
 process_post(ReqData, Context) ->
-	LOC = "http://" ++ wrq:get_req_header("host", ReqData) ++ "/brands",
-	io:format("1... ~p~n", [LOC]),
-    Req=wrq:set_resp_header("Location", LOC, ReqData),
-	Req1=wrq:do_redirect(true, Req),
-	delete_resource(Req1, Context).
+	ReqData1 = redirect("/brands", ReqData),
+	delete_resource(ReqData1, Context).
 
 delete_resource(ReqData, Context)->
 	case delete_device(wrq:path_info(device, ReqData)) of
@@ -82,6 +79,11 @@ delete_completed(ReqData, Context) ->
 %%
 %% Local Functions
 %%
+redirect(Target, ReqData) ->
+	Location = "http://" ++ wrq:get_req_header(?HOST, ReqData) ++ Target,
+    Req=wrq:set_resp_header(?LOCATION, Location, ReqData),
+	wrq:do_redirect(true, Req).
+	
 delete_device(Id) ->
 	wurfler_db:delete_device(devicesTbl, Id).
 get_device(undefined, ReqData) ->

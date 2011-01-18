@@ -147,6 +147,9 @@ Before running the following line you have to modify the cover.spec and test.spe
 Inside these files you have to specify your own absolute path. Later i will build
 a script which will do the work for you.
 In the cover.spec you also have to specify the name of your node. 
+Note: If ct_run is not in the PATH you have to create the link. 
+In /usr/local/bin :
+sudo ln -s ../lib/erlang/bin/ct_run ct_run
 
 Then you can run : 
 

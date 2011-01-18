@@ -97,24 +97,26 @@ handle_call({clear_caps_devices, _Caps}, _From, State) ->
 %% --------------------------------------------------------------------
 handle_cast({save_caps_devices, Caps, Devices, []}, State) ->
 	case wurfler_db:get_capablities_devices(Caps) of
-		[] -> CD = create_capabilities_devices(Caps, Devices, [], wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
+		[] -> CD = create_capabilities_devices(Caps, Devices, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
 		Caps_Devices -> case Caps_Devices#capabilities_devices.key of
-							[] -> CD = create_capabilities_devices(Caps, Devices, [], 
-																	Caps_Devices#capabilities_devices.created, 
-																	wurfler_date_util:get_uc_time());
-							_  -> CD = create_capabilities_devices(Caps, Devices, Caps_Devices#capabilities_devices.key,
-																   Caps_Devices#capabilities_devices.created, wurfler_date_util:get_uc_time()) 
+							[] -> CD = create_capabilities_devices(Caps, Devices, Caps_Devices#capabilities_devices.created, wurfler_date_util:get_uc_time());
+							_  -> CD = create_capabilities_devices(Caps, Devices, Caps_Devices#capabilities_devices.key,Caps_Devices#capabilities_devices.created, 
+																   wurfler_date_util:get_uc_time()) 
 						end
 	end,
 	save_capabilities_devices(CD),
     {noreply, State};
 
-handle_cast({save_caps_devices, Caps, Devices, Key}, State) ->
+handle_cast({save_caps_devices, Capabilities, Devices, Key}, State) ->
 	case wurfler_db:find_capabilities_device_by_key(Key) of
-		[] -> wurfler_db:save_capabilities_devices(#capabilities_devices{capabilities=Caps, devices=Devices, key=Key, 
-																		 created=wurfler_date_util:get_uc_time(), lastmodified=wurfler_date_util:get_uc_time()});
-		_ -> wurfler_db:save_capabilities_devices(#capabilities_devices{capabilities=Caps, devices=Devices, lastmodified=wurfler_date_util:get_uc_time()})
-	end,						
+ 		[] -> CD=create_capabilities_devices(Capabilities, Devices, Key, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
+		Caps_Devices -> case Key =:= Caps_Devices#capabilities_devices.key of
+							 true -> CD = create_capabilities_devices(Capabilities, Devices, wurfler_date_util:get_uc_time());
+							 false -> error_logger:warning_msg("The key : ~p for Capabilities : ~p are different! ~n", [Key, Caps_Devices#capabilities_devices.capabilities]),
+									  CD = create_capabilities_devices(Capabilities, Devices,  wurfler_date_util:get_uc_time())
+						end
+	end,			
+	wurfler_db:save_capabilities_devices(CD),				
     {noreply, State}.
 
 %% --------------------------------------------------------------------
@@ -150,6 +152,11 @@ save_capabilities_devices(Caps_devices) ->
 	wurfler_db:save_capabilities_devices(Caps_devices).
 create_capabilities_devices(Capabilities, Devices, Key, Created, Lastmodified) ->
 	#capabilities_devices{capabilities=Capabilities, devices=Devices, key=Key, created=Created, lastmodified=Lastmodified}.
+create_capabilities_devices(Capabilities, Devices, Created, Lastmodified) ->
+	#capabilities_devices{capabilities=Capabilities, devices=Devices, created=Created, lastmodified=Lastmodified}.
+create_capabilities_devices(Capabilities, Devices, Lastmodified) ->
+	#capabilities_devices{capabilities=Capabilities, devices=Devices, lastmodified=Lastmodified}.
+
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>{% block title %}Wurfler{% endblock %}</title>
+		<meta name="author" content="Ulf Angermann" />
+	</head>
+	<body>
+    	<header>
+			<figure>
+				<a href="http://www.erlang.org" title="Erlang"><img src="/images/erlang.jpg" alt="powered by Erlang" /></a>
+			</figure>
+			<hgroup>
+				<h1>Wurfler</h1>
+				<h3>Find all the information you want to know from wurfler</h3>
+			</hgroup>
+		</header>
+		{% block content %}{% endblock %}
+	</body>
+	<footer>@2011 Ulf Angermann</footer>
+</html>    

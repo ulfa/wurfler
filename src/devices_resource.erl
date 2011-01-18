@@ -69,14 +69,18 @@ resource_exists(ReqData, Context) ->
 process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
 	Caps = get_capabilities(Body),
+	Key = get_key(Body),
 	Timestamp = get_timestamp(Body),
 	Devices = get_devices(Caps, Timestamp),
-	save_caps_devices(Caps, Devices),
+	save_caps_devices(Caps, Devices, Key),
 	D = xml_factory:to_xml(Devices),
 	{true, wrq:append_to_response_body(D, ReqData), Context}.
 %%
 %% Local Functions
 %%
+get_key(Body) ->
+	Xml = xml_factory:parse(Body),
+	xml_factory:get_attribute("/query/@key", Xml).
 get_capabilities(Body) ->
 	Xml = xml_factory:parse(Body),
 	Caps = xmerl_xpath:string ("/query/capabilities/capability", Xml),
@@ -92,10 +96,10 @@ get_devices(Capabilities, Timestamp) ->
 get_devices_by_model(Model_Name) ->
 	wurfler:get_devices_by_model(Model_Name).
 
-save_caps_devices([], Devices) ->
+save_caps_devices([], _Devices, _Key) ->
 	ok;
-save_caps_devices(Caps, Devices) ->
-	wurfler_cache:save_caps_devices(Caps, Devices).
+save_caps_devices(Caps, Devices, Key) ->
+	wurfler_cache:save_caps_devices(Caps, Devices, Key).
 
 get_timestamp(Body) ->
 	Xml = xml_factory:parse(Body),
@@ -109,8 +113,11 @@ create_cap(Cap) ->
 %% --------------------------------------------------------------------
 %% Test functions
 %% --------------------------------------------------------------------
+get_key_test() ->
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query key=\"1111\">\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
+	?assertEqual("1111", get_key(Xml_Bin)).
 get_capabilities_test() ->
-	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
+	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query key=\"1111\">\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	?assertEqual([{"j2me_cldc_1_1",{"true",'=='}},{"j2me_midp_1_1",{"true",'=='}}],  get_capabilities(Xml_Bin)).
 get_timestamp_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>19.12.2010</timestamp><capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,

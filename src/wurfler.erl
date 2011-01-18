@@ -230,7 +230,9 @@ get_all_capabilities("root", #state{capabilities=Caps}) ->
 get_all_capabilities("generic", #state{capabilities=Caps}) ->
    	{ok, #state{capabilities=Caps}};
 get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
-	{Fall_back, Capabilities} = wurfler_db:find_capabilities_by_id(devicesTbl, DeviceName),	
+	io:format("1... ~p~n", [DeviceName]),
+	{Fall_back, Capabilities} = wurfler_db:find_capabilities_by_id(devicesTbl, DeviceName),
+	io:format("2... ~p~n", [Fall_back]),
 	get_all_capabilities(Fall_back, #state{capabilities=overwrite(Caps, Capabilities)}).
 
 get_generic_capabilities() ->

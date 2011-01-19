@@ -96,8 +96,9 @@ handle_call({clear_caps_devices, _Caps}, _From, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_cast({save_caps_devices, Caps, Devices, []}, State) ->
+	io:format("1..~n"),
 	case wurfler_db:get_capablities_devices(Caps) of
-		[] -> CD = create_capabilities_devices(Caps, Devices, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
+		[] -> CD = create_capabilities_devices([], Caps, Devices, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
 		Caps_Devices -> case Caps_Devices#capabilities_devices.key of
 							[] -> CD = create_capabilities_devices(Caps, Devices, Caps_Devices#capabilities_devices.created, wurfler_date_util:get_uc_time());
 							_  -> CD = create_capabilities_devices(Caps, Devices, Caps_Devices#capabilities_devices.key,Caps_Devices#capabilities_devices.created, 
@@ -108,12 +109,13 @@ handle_cast({save_caps_devices, Caps, Devices, []}, State) ->
     {noreply, State};
 
 handle_cast({save_caps_devices, Capabilities, Devices, Key}, State) ->
+	io:format("2..~p~n", [Key]),
 	case wurfler_db:find_capabilities_device_by_key(Key) of
- 		[] -> CD = create_capabilities_devices(Capabilities, Devices, Key, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
+ 		[] -> CD = create_capabilities_devices([], Capabilities, Devices, Key, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
 		[Caps_Devices] -> case Key =:= Caps_Devices#capabilities_devices.key of
-							 true -> CD = create_capabilities_devices(Capabilities, Devices, wurfler_date_util:get_uc_time());
+							 true -> CD = create_capabilities_devices(Caps_Devices, Capabilities, Devices, wurfler_date_util:get_uc_time());
 							 false -> error_logger:warning_msg("The key : ~p for Capabilities :  are different! ~n", [Key]),
-									  CD = create_capabilities_devices(Capabilities, Devices,  wurfler_date_util:get_uc_time())
+									  CD = create_capabilities_devices(Caps_Devices, Capabilities, Devices,  wurfler_date_util:get_uc_time())
 						end
 	end,			
 	save_capabilities_devices(CD),				
@@ -150,12 +152,13 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 save_capabilities_devices(Caps_devices) when is_record(Caps_devices, capabilities_devices)->
 	wurfler_db:save_capabilities_devices(Caps_devices).
-create_capabilities_devices(Capabilities, Devices, Key, Created, Lastmodified) ->
+
+create_capabilities_devices(_Caps_Devices, Capabilities, Devices, Key, Created, Lastmodified) ->
 	#capabilities_devices{capabilities=Capabilities, devices=Devices, key=Key, created=Created, lastmodified=Lastmodified}.
-create_capabilities_devices(Capabilities, Devices, Created, Lastmodified) ->
-	#capabilities_devices{capabilities=Capabilities, devices=Devices, created=Created, lastmodified=Lastmodified}.
-create_capabilities_devices(Capabilities, Devices, Lastmodified) ->
-	#capabilities_devices{capabilities=Capabilities, devices=Devices, lastmodified=Lastmodified}.
+create_capabilities_devices(Caps_Devices, Capabilities, Devices, Created, Lastmodified) ->
+	Caps_Devices#capabilities_devices{capabilities=Capabilities, devices=Devices, created=Created, lastmodified=Lastmodified}.
+create_capabilities_devices(Caps_Devices, Capabilities, Devices, Lastmodified) ->
+	Caps_Devices#capabilities_devices{capabilities=Capabilities, devices=Devices, lastmodified=Lastmodified}.
 
 %% --------------------------------------------------------------------
 %%% Test functions

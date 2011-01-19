@@ -189,7 +189,7 @@ WMLProgramming mailing list
       <capability name="normalScreens" value="false"/>
       <capability name="largeScreens" value="false"/>
       <capability name="xlargeScreens" value="false"/>
-      <capability name="anyDensity" value="false"/>
+      <capability name="anyDensity" value="true"/>
       <capability name="lowDensity" value="false"/>
       <capability name="mediumDensity" value="false"/>
       <capability name="highDensity" value="false"/>

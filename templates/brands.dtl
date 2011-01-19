@@ -1,13 +1,10 @@
-<html>
-    <head>
-        <title>Brands</title>
-    </head>
-    <body>
-    	<h1>Brands</h1>
+{% extends "base.dtl" %}
+
+{% block title %}Brands{% endblock %}
+{% block content %}        	
 		<ul>
 		{% for brand, models in brands %}
 		<li><a href="/brand/{{brand|urlencode}}">{{brand}}</a>({{models|length}})</li>
 		{% endfor %}
 		</ul>
-    </body>
-</html>
+{% endblock %}

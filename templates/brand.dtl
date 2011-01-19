@@ -1,9 +1,8 @@
-<html>
-    <head>
-        <title>Brand details</title>
-    </head>
-    <body>
-	<h1>Brand</h1>
+{% extends "base.dtl" %}
+
+{% block title %}Brand{% endblock %}
+{% block content %}        	
+
 	Brand name : {{brand}}
 	
 	
@@ -16,6 +15,4 @@
 	<form action="/brand/{{brand}}" method="post">
 		<button type="submit" id="delete-brand" name="brand" value="{{brand}}">Delete</button>
 	</form>		
-    </body>
-    <footer>© 2011 Ulf Angermann</footer>
-</html>
+{% endblock %}

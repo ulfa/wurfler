@@ -109,14 +109,14 @@ handle_cast({save_caps_devices, Caps, Devices, []}, State) ->
 
 handle_cast({save_caps_devices, Capabilities, Devices, Key}, State) ->
 	case wurfler_db:find_capabilities_device_by_key(Key) of
- 		[] -> CD=create_capabilities_devices(Capabilities, Devices, Key, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
-		Caps_Devices -> case Key =:= Caps_Devices#capabilities_devices.key of
+ 		[] -> CD = create_capabilities_devices(Capabilities, Devices, Key, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
+		[Caps_Devices] -> case Key =:= Caps_Devices#capabilities_devices.key of
 							 true -> CD = create_capabilities_devices(Capabilities, Devices, wurfler_date_util:get_uc_time());
-							 false -> error_logger:warning_msg("The key : ~p for Capabilities : ~p are different! ~n", [Key, Caps_Devices#capabilities_devices.capabilities]),
+							 false -> error_logger:warning_msg("The key : ~p for Capabilities :  are different! ~n", [Key]),
 									  CD = create_capabilities_devices(Capabilities, Devices,  wurfler_date_util:get_uc_time())
 						end
 	end,			
-	wurfler_db:save_capabilities_devices(CD),				
+	save_capabilities_devices(CD),				
     {noreply, State}.
 
 %% --------------------------------------------------------------------
@@ -148,7 +148,7 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
-save_capabilities_devices(Caps_devices) ->
+save_capabilities_devices(Caps_devices) when is_record(Caps_devices, capabilities_devices)->
 	wurfler_db:save_capabilities_devices(Caps_devices).
 create_capabilities_devices(Capabilities, Devices, Key, Created, Lastmodified) ->
 	#capabilities_devices{capabilities=Capabilities, devices=Devices, key=Key, created=Created, lastmodified=Lastmodified}.

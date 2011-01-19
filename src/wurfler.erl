@@ -34,7 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
--export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/2, delete_device/1, delete_brand/1]).
+-export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/3, delete_device/1, delete_brand/1]).
 -compile([export_all]).
 -define(TIMEOUT, infinity).
 -define(CONTAINS, fun({device, [{model_name, Model_Name},_], []}) ->					   					   
@@ -67,8 +67,8 @@ get_devices_by_model(Model_Name) ->
 	gen_server:call(?MODULE, {get_devices_by_name, Model_Name}, ?TIMEOUT).
 getVersion() ->
 	gen_server:call(?MODULE, {version}).
-check_device(Capabilities, Id) ->
-	gen_server:call(?MODULE, {check_device, Capabilities, Id}, ?TIMEOUT).
+check_device(Capabilities, Key, Id) ->
+	gen_server:call(?MODULE, {check_device, Capabilities, Key, Id}, ?TIMEOUT).
 delete_device(Id) ->
 	gen_server:call(?MODULE, {delete_device, Id}, ?TIMEOUT).
 delete_brand(Brand) ->
@@ -127,8 +127,8 @@ handle_call({get_brand, Brand_Name}, _From, State) ->
 handle_call({get_devices_by_name, Model_Name}, _From, _State) ->
 	{ok, Result} = getDeviceByModelName(Model_Name),
 	{reply, Result, new_state()};
-handle_call({check_device, Capabilities, Id}, _From, _State) ->
-	Result = check_device(Capabilities, Id, new_state()),
+handle_call({check_device, Capabilities, Key, Id}, _From, _State) ->
+	Result = check_device(Capabilities, Key, Id, new_state()),
 	{reply, Result, new_state()};
 handle_call({delete_device, Id}, _From, State) ->
 	Result = deleteDevice(Id),
@@ -195,13 +195,13 @@ search_by_capabilities(Capabilities, Timestamp, State) ->
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
 	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
-check_device(Capabilities, DeviceKey, State) ->
+check_device(Capabilities, DeviceId, Key, State) ->
 	List_Of_Funs = create_funs_from_list(Capabilities),
-	State1=get_devices_for_caps(List_Of_Funs, DeviceKey, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}),
+	State1=get_devices_for_caps(List_Of_Funs, DeviceId, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}),
 	case State1#state.devices of
 		[] -> [];
 		[{devices,[],[]}] -> [];
-		Devices -> {Capabilities, Devices}
+		Devices -> {Capabilities, Key, Devices}
 	end.
 
 get_all_brands() ->

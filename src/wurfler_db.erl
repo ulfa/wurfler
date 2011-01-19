@@ -34,6 +34,7 @@
 -export([get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1, get_capablities_devices/1]).
 -export([clear_capabilities_devices/0, find_devices_by_brand/2, find_capabilities_device_by_key/1]).
 -export([delete_device/2, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
+-export([get_all_cap_key/1]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -98,9 +99,9 @@ find_capabilities_by_id(devicesTbl, Id) ->
 
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua])) end).
-get_all_keys(capabilities_devices) ->
-	mnesia:dirty_all_keys(capabilities_devices);
 
+get_all_cap_key(capabilities_devices) ->
+	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([{P#capabilities_devices.capabilities, P#capabilities_devices.key} || P <- mnesia:table(capabilities_devices)])) end).
 get_all_keys(devicesTbl) ->
 	get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP).
 get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP) ->

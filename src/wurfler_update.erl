@@ -94,8 +94,8 @@ handle_call(_Request, _From, State) ->
 %% --------------------------------------------------------------------
 handle_cast({create_device, Device}, State) ->
 	error_logger:info_msg("create device : ~p~n", [Device]),
-	#device{id=Id} = read_device(Device),
-	case lists:flatten([wurfler:check_device(Capabilities, [Id]) || Capabilities <- wurfler_db:get_all_keys(capabilities_devices)]) of
+	#device{id = Id} = read_device(Device),
+	case lists:flatten([wurfler:check_device(Capabilities, [Id]) || {Capabilities, Key} <- wurfler_db:get_all_cap_key(capabilities_devices)]) of
 		[] -> error_logger:info_msg("nothing to do for device : ~p~n", [Device]);
 		Result -> error_logger:info_msg("must update cache for device : ~p~n", [Device]),
 				  request_for_capablities(Result)
@@ -140,19 +140,19 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 request_for_capablities([]) ->
 	ok;
-request_for_capablities([{SetOfCaps, Devices1}|Caps]) ->
-	io:format("2... ~p~n", [Devices1]),
+request_for_capablities([{SetOfCaps, Key, Devices}|Caps]) ->
+	io:format("2... ~p~n", [Devices]),
 	Devices = wurfler:searchByCapabilities(SetOfCaps, ?DEFAULT_TIMESTAMP),
-	wurfler_cache:save_caps_devices(SetOfCaps, Devices),
-	save_change_set(SetOfCaps, Devices),
+	wurfler_cache:save_caps_devices(SetOfCaps, Key, Devices),
+	save_change_set(SetOfCaps, Key, Devices),
 	request_for_capablities(Caps).
-save_change_set([], _Devices) ->
-	error_logger:info_msg("ERROR"),
-	ok;
-save_change_set(Caps, Devices) ->
-	error_logger:info_msg("writing caps and devices : ~p~n~p~n", [Caps,Devices]).
 read_device(#device{id=Id}) ->
 	wurfler:searchByDeviceName(Id).	
+save_change_set([], _Key, _Devices) ->
+	error_logger:error_msg("ERROR"),
+	ok;
+save_change_set(Caps, Key, Devices) ->
+	error_logger:info_msg("writing caps and devices : ~p~n~p~n~p~n", [Caps,Key,Devices]).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

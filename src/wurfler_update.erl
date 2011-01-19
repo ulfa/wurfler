@@ -103,11 +103,11 @@ handle_cast({create_device, Device}, State) ->
     {noreply, State};
 handle_cast({update_device, Device}, State) ->
 	error_logger:info_msg("update device : ~p~n", [Device]),
-	D = read_device(Device),
+	read_device(Device),
     {noreply, State};
 handle_cast({delete_device, Device}, State) ->
 	error_logger:info_msg("delete device : ~p~n", [Device]),
-	D = read_device(Device),
+	read_device(Device),
     {noreply, State}.
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
@@ -144,12 +144,12 @@ request_for_capablities([{SetOfCaps, Devices1}|Caps]) ->
 	io:format("2... ~p~n", [Devices1]),
 	Devices = wurfler:searchByCapabilities(SetOfCaps, ?DEFAULT_TIMESTAMP),
 	wurfler_cache:save_caps_devices(SetOfCaps, Devices),
-	write_change_set(SetOfCaps, Devices),
+	save_change_set(SetOfCaps, Devices),
 	request_for_capablities(Caps).
-write_change_set([], _Devices) ->
+save_change_set([], _Devices) ->
 	error_logger:info_msg("ERROR"),
 	ok;
-write_change_set(Caps, Devices) ->
+save_change_set(Caps, Devices) ->
 	error_logger:info_msg("writing caps and devices : ~p~n~p~n", [Caps,Devices]).
 read_device(#device{id=Id}) ->
 	wurfler:searchByDeviceName(Id).	

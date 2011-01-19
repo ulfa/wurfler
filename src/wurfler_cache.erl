@@ -96,7 +96,6 @@ handle_call({clear_caps_devices, _Caps}, _From, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_cast({save_caps_devices, Caps, Devices, []}, State) ->
-	io:format("1..~n"),
 	case wurfler_db:get_capablities_devices(Caps) of
 		[] -> CD = create_capabilities_devices([], Caps, Devices, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
 		Caps_Devices -> case Caps_Devices#capabilities_devices.key of
@@ -109,7 +108,6 @@ handle_cast({save_caps_devices, Caps, Devices, []}, State) ->
     {noreply, State};
 
 handle_cast({save_caps_devices, Capabilities, Devices, Key}, State) ->
-	io:format("2..~p~n", [Key]),
 	case wurfler_db:find_capabilities_device_by_key(Key) of
  		[] -> CD = create_capabilities_devices([], Capabilities, Devices, Key, wurfler_date_util:get_uc_time(), wurfler_date_util:get_uc_time());
 		[Caps_Devices] -> case Key =:= Caps_Devices#capabilities_devices.key of

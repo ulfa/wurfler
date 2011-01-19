@@ -33,7 +33,7 @@
 -export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2, get_all_brands/0]).
 -export([get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1, get_capablities_devices/1]).
 -export([clear_capabilities_devices/0, find_devices_by_brand/2, find_capabilities_device_by_key/1]).
--export([delete_device/2, delete_brand/1]).
+-export([delete_device/2, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -47,14 +47,11 @@ create_db() ->
 	application:start(mnesia),
 	mnesia:create_table(devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},
 									{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	mnesia:create_table(j2meTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	mnesia:create_table(symbianTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	mnesia:create_table(blackberryTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	mnesia:create_table(androidTbl,[{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(brand_index,[{disc_copies, [node()]}, {attributes, record_info(fields, brand_index)}]),
+	mnesia:create_table(changed_caps_devices,[{record_name, capabilities_devices}, {disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
 	mnesia:create_table(capabilities_devices,[{disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
 	mnesia:create_table(capability_description,[{disc_copies, [node()]}, {attributes, record_info(fields, capability_description)}]),
-	mnesia:wait_for_tables([devicesTbl, j2meTbl, symbianTbl, blackberryTbl, androidTbl, brand_index, capabilities_devices, capability_description], 100000),
+	mnesia:wait_for_tables([devicesTbl, brand_index, capabilities_devices, changed_caps_devices, capability_description], 100000),
 	application:stop(mnesia).
 %% --------------------------------------------------------------------
 %% save functions
@@ -81,6 +78,8 @@ save_brand_index(Brand_index) ->
 	mnesia:activity(transaction, fun() -> mnesia:write(brand_index, Brand_index, write) end).
 save_capabilities_devices(Caps_Devices) ->
 	mnesia:activity(transaction, fun() -> mnesia:write(capabilities_devices, Caps_Devices, write) end).
+save_changed_caps_devices(Caps_Devices) ->
+	mnesia:activity(transaction, fun() -> mnesia:write(changed_caps_devices, Caps_Devices, write) end).
 %% --------------------------------------------------------------------
 %% finder functions
 %% --------------------------------------------------------------------
@@ -125,6 +124,11 @@ get_capablities_devices(Capapbilities) ->
 	mnesia:dirty_read(Capapbilities).
 find_capabilities_device_by_key(Key) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(capabilities_devices), P#capabilities_devices.key =:= Key])) end).
+find_changed_caps_devices(Timestamp) ->
+	T = wurfler_date_util:parse_to_datetime(Timestamp),
+	mnesia:activity(sync_dirty, fun() -> 
+								qlc:e(qlc:q([P || P <- mnesia:table(changed_caps_devices), P#capabilities_devices.lastmodified > T])) 
+								end).
 %% --------------------------------------------------------------------
 %%% Other functions
 %% --------------------------------------------------------------------

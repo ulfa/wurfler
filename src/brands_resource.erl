@@ -67,7 +67,6 @@ resource_exists(ReqData, Context) ->
 %% --------------------------------------------------------------------
 get_brands()->
 	wurfler:get_brands().
-
 record_to_tuple(brands, [], Acc) ->
 	[{brands, lists:keysort(1,Acc)}];
 record_to_tuple(brands, [Record|Records], Acc) ->

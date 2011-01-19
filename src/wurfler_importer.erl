@@ -191,7 +191,7 @@ process_attribute(device, Attribute)->
 		{xmlAttribute,id,_,_,_,_,_,_,Id,_} -> {id, Id};
 		{xmlAttribute,user_agent,_,_,_,_,_,_,User_agent,_} -> {user_agent, User_agent};
 		{xmlAttribute,fall_back,_,_,_,_,_,_,Fall_back,_} -> {fall_back, Fall_back};
-		{xmlAttribute,actual_device_root,_,_,_,_,_,_,Fall_back,_} -> {actual_device_root, Fall_back}
+		{xmlAttribute,actual_device_root,_,_,_,_,_,_,Actual_Device_Root,_} -> {actual_device_root, Actual_Device_Root}
 	end;
 process_attribute(capability, Attribute)->
 	case Attribute of

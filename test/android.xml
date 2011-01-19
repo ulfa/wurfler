@@ -42,6 +42,7 @@ Thank you
 WMLProgramming mailing list 
 ]]></statement>
   </version>
+<devices>
   <device id="generic" user_agent="" fall_back="root">
     <group id="product_info">
       <capability name="mobile_browser" value=""/>
@@ -189,6 +190,10 @@ WMLProgramming mailing list
       <capability name="largeScreens" value="false"/>
       <capability name="xlargeScreens" value="false"/>
       <capability name="anyDensity" value="false"/>
+      <capability name="lowDensity" value="false"/>
+      <capability name="mediumDensity" value="false"/>
+      <capability name="highDensity" value="false"/>
+      <capability name="extraHighDensity" value="false"/>
     </group>
     <group id="image_format">
       <capability name="greyscale" value="false"/>
@@ -604,7 +609,7 @@ WMLProgramming mailing list
       <capability name="handheldfriendly" value="false"/>
     </group>
 	<group id="android">
-		<capability name="android.software.live_wallpaper" value="false"/>
+		<capability name="android.software.live_wallpaper" value="true"/>
 		<capability name="android.software.sip" value="false"/>
 		<capability name="android.software.sip.voip" value="false"/>
 		<capability name="android.hardware.audio.low_latency" value="false"/>
@@ -856,198 +861,14 @@ WMLProgramming mailing list
     </group>
   </device>
 
-  <device id="motorola_morrison_ver1" user_agent="Mozilla/5.0 (Linux; U; Android 1.5; en-us; morrison) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2" fall_back="generic_android_ver1_5" actual_device_root="true">
+  <device id="htc_desire_a8181_ver1" user_agent="Mozilla/5.0 (Linux; U; Android 2.1-update1; en-gb; Desire_A8181 Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17" fall_back="generic_android_ver2_1" actual_device_root="true">
     <group id="product_info">
-      <capability name="model_name" value="Morrison"/>
-      <capability name="brand_name" value="Motorola"/>
-    </group>
-  </device>
-  <device id="htc_a6277_ver1" user_agent="Mozilla/5.0 (Linux; U; Android 1.5; en-us; A6277 Build/CUPCAKE) AppleWebKit/528.5+ (KHTML, like Gecko) Version/3.1.2 Mobile Safari/525.20.1" fall_back="generic_android_ver1_5" actual_device_root="true">
-    <group id="product_info">
-      <capability name="uaprof" value="http://device.sprintpcs.com/HTC/APA6277KT/1006512.rdf"/>
-      <capability name="model_name" value="6277"/>
+      <capability name="uaprof" value="http://www.htcmms.com.tw/Android/Common/Bravo/HTC_Desire_A8181.xml"/>
+      <capability name="model_name" value="Desire"/>
+      <capability name="uaprof2" value="http://www.htcmms.com.tw/Android/Telstra/Desire/ua-profile.xml"/>
       <capability name="brand_name" value="HTC"/>
-      <capability name="release_date" value="2009_august"/>
-    </group>
-    <group id="wml_ui">
-      <capability name="table_support" value="true"/>
-    </group>
-    <group id="display">
-      <capability name="columns" value="25"/>
-      <capability name="rows" value="21"/>
-      <capability name="max_image_width" value="300"/>
-      <capability name="resolution_width" value="320"/>
-      <capability name="resolution_height" value="480"/>
-    </group>
-    <group id="image_format">
-      <capability name="jpg" value="true"/>
-      <capability name="gif" value="true"/>
-      <capability name="wbmp" value="true"/>
-      <capability name="png" value="true"/>
-      <capability name="colors" value="65536"/>
-    </group>
-    <group id="storage">
-      <capability name="max_deck_size" value="0"/>
-    </group>
-    <group id="wap_push">
-      <capability name="wap_push_support" value="true"/>
-    </group>
-    <group id="sound_format">
-      <capability name="aac" value="true"/>
-      <capability name="mp3" value="true"/>
-      <capability name="amr" value="true"/>
-      <capability name="midi_monophonic" value="true"/>
-      <capability name="imelody" value="true"/>
-    </group>
-    <group id="object_download">
-      <capability name="directdownload_support" value="true"/>
-      <capability name="oma_support" value="true"/>
-    </group>
-  </device>
-  <device id="samsung_gt_i7500_ver1" user_agent="Mozilla/5.0 (Linux; U; Android 1.5; GT-I7500) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2" fall_back="generic_android_ver1_5" actual_device_root="true">
-    <group id="product_info">
-      <capability name="uaprof" value="http://wap.samsungmobile.com/uaprof/GT-i7500.xml"/>
-      <capability name="model_name" value="GT i7500"/>
-      <capability name="brand_name" value="Samsung"/>
-      <capability name="marketing_name" value="Galaxy"/>
-      <capability name="release_date" value="2009_august"/>
-    </group>
-    <group id="wml_ui">
-      <capability name="table_support" value="true"/>
-    </group>
-    <group id="display">
-      <capability name="physical_screen_height" value="65"/>
-      <capability name="columns" value="25"/>
-      <capability name="physical_screen_width" value="49"/>
-      <capability name="rows" value="21"/>
-      <capability name="max_image_width" value="300"/>
-      <capability name="resolution_width" value="320"/>
-      <capability name="resolution_height" value="480"/>
-    </group>
-    <group id="image_format">
-      <capability name="jpg" value="true"/>
-      <capability name="gif" value="true"/>
-      <capability name="png" value="true"/>
-      <capability name="colors" value="65536"/>
-    </group>
-    <group id="wap_push">
-      <capability name="wap_push_support" value="true"/>
-    </group>
-    <group id="mms">
-      <capability name="mms_png" value="true"/>
-      <capability name="mms_max_size" value="307200"/>
-      <capability name="mms_max_width" value="640"/>
-      <capability name="mms_spmidi" value="true"/>
-      <capability name="mms_max_height" value="480"/>
-      <capability name="mms_gif_static" value="true"/>
-      <capability name="mms_wav" value="true"/>
-      <capability name="mms_vcard" value="true"/>
-      <capability name="mms_midi_monophonic" value="true"/>
-      <capability name="mms_bmp" value="true"/>
-      <capability name="mms_amr" value="true"/>
-      <capability name="mms_jpeg_baseline" value="true"/>
-    </group>
-    <group id="sound_format">
-      <capability name="aac" value="true"/>
-      <capability name="mp3" value="true"/>
-      <capability name="amr" value="true"/>
-      <capability name="midi_monophonic" value="true"/>
-      <capability name="imelody" value="true"/>
-    </group>
-    <group id="object_download">
-      <capability name="directdownload_support" value="true"/>
-    </group>
-  </device>
-  <device id="htc_hero_ver1" user_agent="Mozilla/5.0 (Linux; U; Android 1.5; en-us; hero) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2" fall_back="generic_android_ver1_5" actual_device_root="true">
-    <group id="product_info">
-      <capability name="has_qwerty_keyboard" value="false"/>
-      <capability name="uaprof" value="http://www.htcmms.com.tw/Android/TMO/Hero/ua-profile.xml"/>
-      <capability name="model_name" value="Hero"/>
-      <capability name="brand_name" value="HTC"/>
-      <capability name="release_date" value="2009_september"/>
-    </group>
-    <group id="wml_ui">
-      <capability name="table_support" value="true"/>
-    </group>
-    <group id="display">
-      <capability name="physical_screen_height" value="67"/>
-      <capability name="columns" value="25"/>
-      <capability name="physical_screen_width" value="44"/>
-      <capability name="rows" value="21"/>
-      <capability name="max_image_width" value="300"/>
-      <capability name="resolution_width" value="320"/>
-      <capability name="resolution_height" value="480"/>
-      <capability name="max_image_height" value="460"/>
-    </group>
-    <group id="image_format">
-      <capability name="jpg" value="true"/>
-      <capability name="gif" value="true"/>
-      <capability name="png" value="true"/>
-      <capability name="colors" value="65536"/>
-    </group>
-    <group id="wap_push">
-      <capability name="wap_push_support" value="true"/>
-    </group>
-    <group id="mms">
-      <capability name="mms_png" value="true"/>
-      <capability name="mms_max_size" value="307200"/>
-      <capability name="mms_max_width" value="640"/>
-      <capability name="mms_max_height" value="480"/>
-      <capability name="mms_gif_static" value="true"/>
-      <capability name="mms_midi_monophonic" value="true"/>
-      <capability name="mms_wbmp" value="true"/>
-      <capability name="mms_amr" value="true"/>
-      <capability name="mms_jpeg_baseline" value="true"/>
-    </group>
-    <group id="sound_format">
-      <capability name="aac" value="true"/>
-      <capability name="mp3" value="true"/>
-      <capability name="amr" value="true"/>
-      <capability name="midi_monophonic" value="true"/>
-      <capability name="imelody" value="true"/>
-    </group>
-    <group id="bearer">
-      <capability name="max_data_rate" value="1800"/>
-    </group>
-    <group id="j2me">
-      <capability name="j2me_midp_2_0" value="false"/>
-      <capability name="j2me_cldc_1_0" value="false"/>
-      <capability name="j2me_cldc_1_1" value="false"/>
-      <capability name="j2me_midp_1_0" value="false"/>
-    </group>
-    <group id="streaming">
-      <capability name="streaming_vcodec_h264_bp" value="1.2"/>
-      <capability name="streaming_vcodec_mpeg4_sp" value="2"/>
-    </group>
-    <group id="object_download">
-      <capability name="directdownload_support" value="true"/>
-      <capability name="wallpaper_max_height" value="480"/>
-      <capability name="wallpaper_max_width" value="320"/>
-      <capability name="wallpaper_preferred_width" value="320"/>
-      <capability name="wallpaper_preferred_height" value="480"/>
-      <capability name="oma_support" value="true"/>
-    </group>
-    <group id="xhtml_ui">
-      <capability name="xhtml_can_embed_video" value="plain"/>
-    </group>
-    <group id="drm">
-      <capability name="oma_v_1_0_separate_delivery" value="true"/>
-    </group>
-  </device>
-  <device id="verizon_droid2_ver1" user_agent="Mozilla/5.0 (Linux; U; Android 2.2; en-us; DROID2 Build/VZW) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2" fall_back="generic_android_ver2_2" actual_device_root="true">
-    <group id="product_info">
-      <capability name="model_name" value="Droid2"/>
-      <capability name="brand_name" value="Verizon"/>
-    </group>
-  </device>
-  <device id="samsung_gt_p1000_ver1" user_agent="Mozilla/5.0 (Linux; U; Android 2.2; es-es; GT-P1000 Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1" fall_back="generic_android_ver2_2" actual_device_root="true">
-    <group id="product_info">
-      <capability name="is_tablet" value="true"/>
-      <capability name="uaprof" value="http://wap.samsungmobile.com/uaprof/GT-P1000.xml"/>
-      <capability name="model_name" value="GT-P1000"/>
-      <capability name="brand_name" value="Samsung"/>
-      <capability name="marketing_name" value="Galaxy Tab"/>
-      <capability name="release_date" value="2010_september"/>
+      <capability name="marketing_name" value="Desire"/>
+      <capability name="release_date" value="2010_april"/>
     </group>
     <group id="wml_ui">
       <capability name="table_support" value="true"/>
@@ -1055,22 +876,20 @@ WMLProgramming mailing list
     <group id="display">
       <capability name="columns" value="25"/>
       <capability name="dual_orientation" value="true"/>
-      <capability name="max_image_width" value="400"/>
+      <capability name="max_image_width" value="320"/>
       <capability name="rows" value="21"/>
-      <capability name="resolution_width" value="600"/>
-      <capability name="resolution_height" value="1024"/>
+      <capability name="resolution_width" value="480"/>
+      <capability name="resolution_height" value="800"/>
+      <capability name="max_image_height" value="760"/>
+      <capability name="normalScreens" value="true"/>
+      <capability name="highDensity" value="true"/>
     </group>
     <group id="image_format">
       <capability name="jpg" value="true"/>
       <capability name="gif" value="true"/>
-      <capability name="wbmp" value="true"/>
+      <capability name="bmp" value="true"/>
       <capability name="png" value="true"/>
-      <capability name="colors" value="16777216"/>
-    </group>
-    <group id="streaming">
-      <capability name="streaming_vcodec_h263_0" value="30"/>
-      <capability name="streaming_vcodec_h264_bp" value="1.2"/>
-      <capability name="streaming_vcodec_mpeg4_sp" value="2"/>
+      <capability name="colors" value="65536"/>
     </group>
     <group id="wap_push">
       <capability name="wap_push_support" value="true"/>
@@ -1078,27 +897,95 @@ WMLProgramming mailing list
     <group id="mms">
       <capability name="mms_png" value="true"/>
       <capability name="mms_max_size" value="307200"/>
-      <capability name="mms_max_width" value="2048"/>
-      <capability name="mms_max_height" value="1536"/>
+      <capability name="mms_max_width" value="480"/>
+      <capability name="mms_max_height" value="800"/>
       <capability name="mms_gif_static" value="true"/>
-      <capability name="mms_vcard" value="true"/>
       <capability name="mms_midi_monophonic" value="true"/>
       <capability name="mms_wbmp" value="true"/>
       <capability name="mms_amr" value="true"/>
       <capability name="mms_jpeg_baseline" value="true"/>
     </group>
     <group id="sound_format">
-      <capability name="sp_midi" value="true"/>
+      <capability name="wav" value="true"/>
+      <capability name="aac" value="true"/>
       <capability name="mp3" value="true"/>
       <capability name="amr" value="true"/>
       <capability name="midi_monophonic" value="true"/>
       <capability name="imelody" value="true"/>
     </group>
     <group id="bearer">
-      <capability name="max_data_rate" value="3600"/>
+      <capability name="max_data_rate" value="7200"/>
     </group>
-    <group id="flash_lite">
-      <capability name="full_flash_support" value="true"/>
+    <group id="object_download">
+      <capability name="directdownload_support" value="true"/>
+      <capability name="oma_support" value="true"/>
+    </group>
+	<group id="android">
+		<capability name="android.software.live_wallpaper" value="false"/>
+	</group>
+  </device>
+  <device id="htc_desire_a8181_ver1_sub2_2" user_agent="Mozilla/5.0 (Linux; U; Android 2.2; de-de; Desire_A8181 Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1" fall_back="htc_desire_a8181_ver1">
+    <group id="product_info">
+	  <capability name="model_name" value="Desire_2.2"/>
+      <capability name="uaprof2" value=""/>
+      <capability name="device_os_version" value="2.2"/>
+      <capability name="release_date" value="2010_september"/>
+    </group>
+  </device>
+  <device id="htc_desire_ver1" user_agent="Mozilla/5.0 (Linux; U; Android 2.1-update1; en-gb; HTC Desire Build/ERE27) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2" fall_back="htc_desire_a8181_ver1">
+    <group id="product_info">
+      <capability name="uaprof" value="http://www.htcmms.com.tw/Android/Common/Bravo/HTC_Desire.xml"/>
+      <capability name="model_name" value="Desire_2.1"/>
+      <capability name="device_os_version" value="2.1"/>
+      <capability name="uaprof2" value=""/>
+      <capability name="brand_name" value="HTC"/>
+      <capability name="marketing_name" value=""/>
+      <capability name="release_date" value="2010_march"/>
+    </group>
+  </device> 
+  <device id="htc_desire_ver1_subadr6275" user_agent="Mozilla/5.0 (Linux; U; Android 2.1-update1; en-us; USCCADR6275US Carrier ID 45 Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17" fall_back="htc_desire_ver1"/>
+  <device id="samsung_gt_i9000_ver1" user_agent="Mozilla/5.0 (Linux; U; Android 2.1-update1; zh-tw; GT-I9000 Build/ECLAIR) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2" fall_back="generic_android_ver2_1" actual_device_root="true">
+    <group id="product_info">
+      <capability name="has_qwerty_keyboard" value="false"/>
+      <capability name="uaprof" value="http://wap.samsungmobile.com/uaprof/GT-i9000.xml"/>
+      <capability name="model_name" value="GT-I9000"/>
+      <capability name="brand_name" value="Samsung"/>
+      <capability name="marketing_name" value="Galaxy S"/>
+      <capability name="release_date" value="2010_march"/>
+    </group>
+    <group id="display">
+      <capability name="dual_orientation" value="true"/>
+      <capability name="max_image_width" value="320"/>
+      <capability name="resolution_width" value="480"/>
+      <capability name="resolution_height" value="800"/>
+      <capability name="max_image_height" value="480"/>
+      <capability name="highDensity" value="true"/>
+      <capability name="normalScreens" value="true"/>
+    </group>
+    <group id="bearer">
+      <capability name="max_data_rate" value="7200"/>
+    </group>
+    <group id="image_format">
+      <capability name="colors" value="16777216"/>
+    </group>
+    <group id="streaming">
+      <capability name="streaming_vcodec_h264_bp" value="1.2"/>
+    </group>
+  </device>
+  <device id="samsung_gt_i9000_ver1_sub22" user_agent="Mozilla/5.0 (Linux; U; Android 2.2; es-es; GT-I9000 Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1" fall_back="samsung_gt_i9000_ver1">
+    <group id="product_info">
+	  <capability name="model_name" value="GT-I9000_2.2"/>
+      <capability name="device_os_version" value="2.2"/>
+    </group>
+  </device>
+  <device id="samsung_gt_i9000_ver1_subt" user_agent="Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17" fall_back="samsung_gt_i9000_ver1">
+    <group id="product_info">
+      <capability name="is_tablet" value="true"/>
+      <capability name="uaprof" value="http://wap.samsungmobile.com/uaprof/GT-i9000T.xml"/>
+      <capability name="model_name" value="GT I9000T_2.1"/>
+      <capability name="brand_name" value="Samsung"/>
+      <capability name="device_os_version" value="2.1"/>
+      <capability name="marketing_name" value="Galaxy S"/>
     </group>
   </device>
 </devices>

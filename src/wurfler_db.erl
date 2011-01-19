@@ -101,11 +101,11 @@ get_all_keys(capabilities_devices) ->
 get_all_keys(devicesTbl) ->
 	get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP).
 get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP) ->
- 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl) ])) end);
+ 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root /= "true" ])) end);
 get_all_keys(devicesTbl, Timestamp) ->
-	T=wurfler_date_util:parse_to_datetime(Timestamp),
+	T = wurfler_date_util:parse_to_datetime(Timestamp),
 	mnesia:activity(sync_dirty, fun() -> 
-								qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.lastmodified > T])) 
+								qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.lastmodified > T,  P#device.actual_device_root /= "true"])) 
 								end).
 get_all_brands()->
 	mnesia:activity(sync_dirty, fun() -> 

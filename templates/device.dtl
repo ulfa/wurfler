@@ -1,19 +1,7 @@
-<html>
-    <head>
-        <title>Handset details</title>
-    </head>
-    <body>
-    	<header>
-			<figure>
-				<a href="http://www.erlang.org" title="Erlang"><img src="/images/erlang.jpg" alt="powered by Erlang" /></a>
-			</figure>
-			<hgroup>
-				<h1>Wurfler</h1>
-				<h3>Find all the information you want to know from wurfler</h3>
-			</hgroup>
-		</header>    
-		
-    	<h1>Device</h1>
+<{% extends "base.dtl" %}
+
+{% block title %}Device{% endblock %}
+    	{% block content %}
     	<img src="/device_image/{{id}}.gif"/>
 		<ul>
 			<li><label for="{{id}}">Id : </label>{{id}}</li>  
@@ -25,6 +13,7 @@
 			<li><label for="{{created}}">Created :</label>{{created|date:"r"}}</li>
 			<li><label for="{{lastmodified}}">Last modified :</label>{{lastmodified|date:"r"}}</li>
 		</ul>
+		
 		<h1>Groups</h1>
 		<ul>
 		{% for id, caps in groups %}
@@ -34,5 +23,5 @@
 		<form action="/device/{{id}}" method="post">
 			<button type="submit" id="delete-id" name="device" value="{{id}}">Delete</button>
 		</form>		
-    </body>
-</html>
+    
+{% endblock %}

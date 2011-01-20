@@ -195,9 +195,9 @@ search_by_capabilities(Capabilities, Timestamp, State) ->
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
 	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
-check_device(Capabilities, DeviceId, Key, State) ->
+check_device(Capabilities, Key, DeviceId, State) ->
 	List_Of_Funs = create_funs_from_list(Capabilities),
-	State1=get_devices_for_caps(List_Of_Funs, DeviceId, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}),
+	State1 = get_devices_for_caps(List_Of_Funs, [DeviceId], State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}),
 	case State1#state.devices of
 		[] -> [];
 		[{devices,[],[]}] -> [];

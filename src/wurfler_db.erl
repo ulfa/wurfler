@@ -58,13 +58,7 @@ create_db() ->
 %% save functions
 %% --------------------------------------------------------------------
 save_device(devicesTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(devicesTbl, Device, write) end);
-save_device(j2meTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(j2meTbl, Device, write) end);
-save_device(symbianTbl, Device)-> 
-	mnesia:activity(transaction, fun() -> mnesia:write(symbianTbl, Device, write) end);
-save_device(blackberryTbl, Device)->
-	mnesia:activity(transaction, fun() -> mnesia:write(blackberryTbl, Device, write) end).
+	mnesia:activity(transaction, fun() -> mnesia:write(devicesTbl, Device, write) end).
 
 save_brand_index([], {Id, Model_Name}) ->
 	error_logger:error_msg("can't save the data, because of a missing brand_name for model : ~p and Id : ~p~n", [Model_Name, Id]);

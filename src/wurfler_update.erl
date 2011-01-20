@@ -94,20 +94,17 @@ handle_call(_Request, _From, State) ->
 %% --------------------------------------------------------------------
 handle_cast({create_device, Device}, State) ->
 	error_logger:info_msg("create device : ~p~n", [Device]),
-	#device{id = Id} = read_device(Device),
-	case lists:flatten([wurfler:check_device(Capabilities, [Id]) || {Capabilities, Key} <- wurfler_db:get_all_cap_key(capabilities_devices)]) of
-		[] -> error_logger:info_msg("nothing to do for device : ~p~n", [Device]);
-		Result -> error_logger:info_msg("must update cache for device : ~p~n", [Device]),
-				  request_for_capablities(Result)
-	end,
+	process_device(Device),
     {noreply, State};
+handle_cast({update_device, #device{id="generic"}}, State) ->
+	error_logger:info_msg("there is no action after updating the generic device ~n"),
+	{noreply, State};
 handle_cast({update_device, Device}, State) ->
 	error_logger:info_msg("update device : ~p~n", [Device]),
-	read_device(Device),
+	process_device(Device),
     {noreply, State};
 handle_cast({delete_device, Device}, State) ->
-	error_logger:info_msg("delete device : ~p~n", [Device]),
-	read_device(Device),
+	error_logger:info_msg("delete device is not implemented: ~p~n", [Device]),
     {noreply, State}.
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
@@ -138,24 +135,33 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+process_device(Device) ->
+	case read_device(Device) of
+		[] -> error_logger:error_msg("can't find device with id : ~p~n", [Device]);
+		#device{id = Id} -> case lists:flatten([wurfler:check_device(Capabilities, Key, Id) || {Capabilities, Key} <- wurfler_db:get_all_cap_key(capabilities_devices)]) of
+								[] -> error_logger:info_msg("nothing to do for device : ~p~n", [Device]);
+								Result -> error_logger:info_msg("must update cache for device : ~p~n", [Device]),
+				  						  request_for_capablities(Result)
+							end
+	end.			
+
 request_for_capablities([]) ->
 	ok;
 request_for_capablities([{SetOfCaps, Key, Devices}|Caps]) ->
-	io:format("2... ~p~n", [Devices]),
 	Devices = wurfler:searchByCapabilities(SetOfCaps, ?DEFAULT_TIMESTAMP),
-	wurfler_cache:save_caps_devices(SetOfCaps, Key, Devices),
+	wurfler_cache:save_caps_devices(SetOfCaps, Devices, Key),
 	save_change_set(SetOfCaps, Key, Devices),
 	request_for_capablities(Caps).
-read_device(#device{id=Id}) ->
+read_device(#device{ id = Id}) ->
 	wurfler:searchByDeviceName(Id).	
 save_change_set([], _Key, _Devices) ->
 	error_logger:error_msg("ERROR"),
 	ok;
 save_change_set(Caps, Key, Devices) ->
-	error_logger:info_msg("writing caps and devices : ~p~n~p~n~p~n", [Caps,Key,Devices]).
+	wurfler_db:save_changed_caps_devices(#capabilities_devices{capabilities=Caps, key=Key, devices=Devices}).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
 insert_new_device_test() ->
-	D = #device{id="apple_iphone_ver1"},
+	D = #device{id="nokia_generic_series20"},
 	handle_cast({create_device, D}, #state{}).

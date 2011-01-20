@@ -131,7 +131,7 @@ import(Filename, State) ->
 	Wurfl_Patch = xml_factory:parse_file(Filename),	
 	case xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch) of
 		[] -> error_logger:info_msg("no devices found! ~n"); 
-		Devices ->	 process_devices(Devices, State)
+		Devices -> process_devices(Devices, State)
 	end,
 	error_logger:info_msg("finished importing wurfl patch~n").
 
@@ -147,8 +147,9 @@ process_device(DeviceXml, _State) ->
 			  wurfler_importer:check_devices([Device#device.id]),
 			  wurfler_importer:create_brand_index([Device#device.id]),
 			  wurfler_update:create_device(Device);
-		[DeviceDB] ->  D = merge_device(DeviceXml, DeviceDB),
+		[DeviceDB] -> D = merge_device(DeviceXml, DeviceDB),
 					   wurfler_importer:store_device(D),
+					   wurfler_importer:create_brand_index([D#device.id]),
 					   wurfler_update:update_device(D)
 	end.
 

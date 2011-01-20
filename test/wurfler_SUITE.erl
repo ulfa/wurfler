@@ -199,7 +199,7 @@ post_cap_query(_Config) ->
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),
 	io:format("Anzahl : ~p~n", [erlang:length(Devices)]),
-	1864=erlang:length(Devices).
+	1028=erlang:length(Devices).
 
 post_cap_query_no_caps(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
@@ -211,7 +211,7 @@ post_cap_query_with_timestamp(_Config) ->
 	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
 	Xml = xml_factory:parse(D),
 	Devices = xmerl_xpath:string("//devices/device", Xml),
-	1864=erlang:length(Devices).
+	1028=erlang:length(Devices).
 
 post_cap_query_device_os_version(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query key=\"1111\"><timestamp>01.01.2010</timestamp><capabilities><capability name=\"device_os\" value=\"iPhone OS\" operator=\"=\"/><capability name=\"device_os_version\" value=\"0.0\" operator=\">\"/></capabilities></query>",

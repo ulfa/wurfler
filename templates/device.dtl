@@ -1,8 +1,22 @@
-<{% extends "base.dtl" %}
+{% extends "base.dtl" %}
 
 {% block title %}Device{% endblock %}
-    	{% block content %}
-    	<img src="/device_image/{{id}}.gif"/>
+{% block navigation %}
+<nav>
+		<ul>
+			{% for id, caps in groups %}
+				<li>{{ id }}</li>
+				<ul>
+				{% for cap in caps %}
+				{{cap}}
+				{% endfor %}
+				</ul>
+			{% endfor %}
+		</ul>
+<nav>
+{% endblock %}
+{% block content %}
+	<img src="/device_image/{{id}}.gif"/>
 		<ul>
 			<li><label for="{{id}}">Id : </label>{{id}}</li>  
 			<li><label for="{{brand_name}}">Brand name :</label>{{brand_name}}</li>
@@ -13,15 +27,7 @@
 			<li><label for="{{created}}">Created :</label>{{created|date:"r"}}</li>
 			<li><label for="{{lastmodified}}">Last modified :</label>{{lastmodified|date:"r"}}</li>
 		</ul>
-		
-		<h1>Groups</h1>
-		<ul>
-		{% for id, caps in groups %}
-		<li>{{ id }}</li>
-		{% endfor %}
-		</ul>
 		<form action="/device/{{id}}" method="post">
 			<button type="submit" id="delete-id" name="device" value="{{id}}">Delete</button>
 		</form>		
-    
 {% endblock %}

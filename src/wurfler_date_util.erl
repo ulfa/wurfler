@@ -28,7 +28,7 @@
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
--export([get_uc_time/0, parse_to_datetime/1]).
+-export([get_uc_time/0, parse_to_datetime/1,parse_to_datetime/2]).
 %% --------------------------------------------------------------------
 %% record definitions
 %% --------------------------------------------------------------------
@@ -38,6 +38,10 @@ get_uc_time() ->
 parse_to_datetime(DateString) ->
 	Parse = fun (Start, Length) -> {I, _} = string:to_integer(string:substr(DateString, Start, Length)), I end,
 	{{Parse(7, 4), Parse(4, 2), Parse(1, 2)}, {0, 0, 0}}.
+parse_to_datetime(without_dot, DateString) ->
+	Parse = fun (Start, Length) -> {I, _} = string:to_integer(string:substr(DateString, Start, Length)), I end,
+	{{Parse(5, 4), Parse(3, 2), Parse(1, 2)}, {0, 0, 0}}.
+	
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -47,3 +51,5 @@ parse_to_datetime(DateString) ->
 %% --------------------------------------------------------------------
 parse_to_datetime_test() ->
 	?assertEqual({{2010, 12, 19}, {00,00,00}},parse_to_datetime("19.12.2010")).
+parse_to_datetime_without_dot_test() ->
+	?assertEqual({{2010, 12, 19}, {00,00,00}},parse_to_datetime(without_dot,"19122010")).

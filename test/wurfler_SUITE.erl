@@ -66,7 +66,8 @@ groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_
 			 {brand_get_requests_html, [parallel], [get_brand_by_brand_name_to_html]},
 			 {model_get_requests, [parallel], [get_devices_by_model_name, get_devices_without_model_name]},
 			 {model_get_requests_html, [parallel], [get_devices_by_model_name_html, get_devices_without_model_name_html]},
-			 {device_delete, [sequence] , [delete_device_by_id]}
+			 {device_delete, [sequence] , [delete_device_by_id]},
+			 {changes_resource, [sequence] , [find_changes]}
 			].
 
 %%--------------------------------------------------------------------
@@ -84,7 +85,8 @@ groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_
 all() -> [{group, device_get_requests}, {group, device_get_requests_html}, {group, devices_post_requests},
 		  {group, brand_get_requests}, {group, brand_get_requests_html},{group, model_get_requests},
 		  {group, model_get_requests_html},
-		  {group, device_delete}
+		  {group, device_delete},
+		  {group, changes_resource}
 		 ].
 
 %%--------------------------------------------------------------------
@@ -241,3 +243,7 @@ get_devices_without_model_name(_Config) ->
 
 delete_device_by_id(_Config) ->
 	ibrowse:send_req("http://localhost:8000/device/ahong_d13_ver1", ?XML_CONTENT_TYPE, delete).
+
+find_changes(_Config) ->
+		{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/changes/01012010", ?XML_CONTENT_TYPE, get),
+		io:format("1.. ~p~n", [D]).

@@ -17,6 +17,7 @@
              devices_resource,
 	     brand_resource,
 	     brands_resource,
+	     changes_resource,
              wurfler_db,             
              wurfler_file_poller,
 	wurfler_patch,

@@ -34,6 +34,7 @@
 -export([start_link/0]).
 -export([start/0]).
 -export([create_device/1, update_device/1, delete_device/1]).
+-export([find_changes/1]).
 
 %% ====================================================================
 %% External functions
@@ -44,6 +45,8 @@ update_device(Device) ->
 	gen_server:cast(?MODULE, {update_device, Device}).
 delete_device(Device) ->
 	gen_server:cast(?MODULE, {delete_device, Device}).
+find_changes(Timestamp) ->
+	gen_server:call(?MODULE, {find_changes, Timestamp}).
 %% --------------------------------------------------------------------
 %% record definitions
 %% --------------------------------------------------------------------
@@ -81,9 +84,9 @@ init([]) ->
 %%          {stop, Reason, Reply, State}   | (terminate/2 is called)
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_call(_Request, _From, State) ->
-    Reply = ok,
-    {reply, Reply, State}.
+handle_call({find_changes, Timestamp}, _From, State) ->
+    Result = wurfler_db:find_changed_caps_devices(Timestamp),
+    {reply, Result, State}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
@@ -144,7 +147,6 @@ process_device(Device) ->
 				  						  request_for_capablities(Result)
 							end
 	end.			
-
 request_for_capablities([]) ->
 	ok;
 request_for_capablities([{SetOfCaps, Key, Devices}|Caps]) ->
@@ -165,3 +167,6 @@ save_change_set(Caps, Key, Devices) ->
 insert_new_device_test() ->
 	D = #device{id="nokia_generic_series20"},
 	handle_cast({create_device, D}, #state{}).
+find_changes_test() ->
+	find_changes("01011970").
+	

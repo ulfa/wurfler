@@ -53,7 +53,6 @@ to_html(ReqData, #context{device=Device}=Context) ->
 to_xml(ReqData, #context{device = Device} = Context) ->
     D = xml_factory:to_xml([xml_factory:create_xml(device, Device)]),
     {D, ReqData, Context}.
-
  
 resource_exists(ReqData, Context) ->
 	case get_device(wrq:path_info(device, ReqData), ReqData) of

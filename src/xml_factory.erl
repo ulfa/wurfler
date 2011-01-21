@@ -51,7 +51,19 @@ create_xml(group, #group{id = Id, capabilites = Capabilites}) ->
 create_xml(capability, Capability) ->
     {capability, [{name, Capability#capability.name}, {value, Capability#capability.value}], []};
 create_xml(brand, #brand_index{brand_name=Brand_Name, models=Models}) ->
-	{brand , [{name, Brand_Name}], create_models(Models, [])}.
+	{brand , [{name, Brand_Name}], create_models(Models, [])};
+
+create_xml(capabilities_devices, #capabilities_devices{capabilities=Caps, devices=Devices, key=Key}) ->
+	create_xml(querie, Caps, Key, []).
+
+create_xml(querie, [], Key, Acc) ->
+	[{'query', [key, Key], Acc}];
+create_xml(querie, [Cap|Caps], Key, Acc) ->
+	create_xml(querie, Caps, Key, [create_attributes(Caps)| Acc]).
+	
+
+create_attributes(Cap) ->
+	[{name, element(1,Cap)}, {value, erlang:element(1,erlang:element(2,Cap))}, {operator, erlang:element(2,erlang:element(2,Cap))}].
 create_models([], Acc) ->
 	Acc;
 create_models([{Id, Model_Name}|Models], Acc) ->
@@ -62,6 +74,7 @@ create_device(#device{brand_name=Brand_name, model_name=Model_name}) ->
 	{'device', [{model_name,Model_name}, {brand_name,Brand_name}], []}.
 create_devices(Devices)->
 	[{'devices', [], Devices}].
+
 
 
 

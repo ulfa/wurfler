@@ -120,7 +120,7 @@ get_capablities_devices(Capapbilities) ->
 find_capabilities_device_by_key(Key) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(capabilities_devices), P#capabilities_devices.key =:= Key])) end).
 find_changed_caps_devices(Timestamp) ->
-	T = wurfler_date_util:parse_to_datetime(Timestamp),
+	T = wurfler_date_util:parse_to_datetime(without_dot,Timestamp),
 	mnesia:activity(sync_dirty, fun() -> 
 								qlc:e(qlc:q([P || P <- mnesia:table(changed_caps_devices), P#capabilities_devices.lastmodified > T])) 
 								end).

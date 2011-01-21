@@ -45,7 +45,7 @@ content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.
 
 allowed_methods(ReqData, Context) ->
-    {['GET', 'DELETE', 'POST'], ReqData, Context}.
+    {['GET'], ReqData, Context}.
 
 to_html(ReqData, Context) ->
      {ok, Content} = about_dtl:render([]),

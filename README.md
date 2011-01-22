@@ -7,12 +7,43 @@ Wurfler is not only a wrapper around wurfl, so you can query the data by user ag
 
 ## Feature which are implemented and working
 
+### Search
 
-## serching for something
+This section describes the search capabilities of the server. The following REST 
+interfaces gives you the possibility to query the wurfl file by :
+
+get device by id
+get device by user agent
+
+get brand by name
+get all brands 
+
+get devices by capabilities
+
+get the list of new/changed devices since a given timestamp
+
 ### import of devices
-### export of devices
+
+the initial upload of a wurfl file
+
+the partial upload of devices handled by a wurfl_patch file._
+
 ### notifictian of changed devices
 
+Every time you add or change existing devices, wurfler will notice these changes and
+will do the following things for you.
+
+## Feature which will be implemented in the near future
+
+The features which are listed below will be implemented in the future
+
+### export of devices
+Wurfler will be able to export the existing data in a wurfl file. That means, that someone can 
+easily change the data and than she can export the list for using elsewhere
+
+### export of deleted devices
+Wurfler will be able to export deleted devices. Every time someone deletes a device, wurfler
+will create a wurlf_patch file for this device. 
 
 
 ## Installation

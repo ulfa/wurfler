@@ -136,9 +136,8 @@ handle_call({delete_device, Id}, _From, State) ->
 handle_call({delete_brand, Brand}, _From, State) ->
 	Result = deleteBrand(Brand),
 	{reply, Result, State};
-
 handle_call({version}, _From, State) ->
-    {reply, "0.1", State}.
+    {reply, get_version(), State}.
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages
@@ -174,6 +173,9 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+get_version() ->
+	{ok, Version}=application:get_key(wurflerservice, vsn),
+	Version.
 new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
 

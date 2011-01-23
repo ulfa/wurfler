@@ -4,4 +4,5 @@
     {% block content %}    
         <h1>Wurfler</h1>
         <p>Something about the wurfler project</p>
+        Version {{version}}
 	{% endblock %}

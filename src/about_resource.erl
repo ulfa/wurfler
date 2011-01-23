@@ -48,7 +48,7 @@ allowed_methods(ReqData, Context) ->
     {['GET'], ReqData, Context}.
 
 to_html(ReqData, Context) ->
-     {ok, Content} = about_dtl:render([]),
+     {ok, Content} = about_dtl:render([{version, wurfler:getVersion()}]),
      {Content, ReqData, Context}.
 
 to_xml(ReqData, Context) ->

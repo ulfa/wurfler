@@ -2,16 +2,16 @@
 
 {% block title %}Brand{% endblock %}
 {% block content %}        	
-
-	Brand name : {{brand}}
-	
-	
-	<h2>Models</h2>
+	<h2>Brand name : {{brand}}</h2>
+	<br/>
+	<h4>Models</h4>
+	<br/>
 	<ul id="multicolumns">
 	{% for id, model in models %}
 	<li><a href="/device/{{id}}">{{model}}</a></li>
 	{% endfor %}
 	</ul>	
+	<br/>
 	<form action="/brand/{{brand}}" method="post">
 		<button type="submit" id="delete-brand" name="brand" value="{{brand}}">Delete</button>
 	</form>		

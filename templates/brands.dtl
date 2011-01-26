@@ -2,7 +2,7 @@
 
 {% block title %}Brands{% endblock %}
 {% block content %}        	
-		<ul>
+		<ul id="multicolumns">
 		{% for brand, models in brands %}
 		<li><a href="/brand/{{brand|urlencode}}">{{brand}}</a>({{models|length}})</li>
 		{% endfor %}

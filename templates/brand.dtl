@@ -7,7 +7,7 @@
 	
 	
 	<h2>Models</h2>
-	<ul>
+	<ul id="multicolumns">
 	{% for id, model in models %}
 	<li><a href="/device/{{id}}">{{model}}</a></li>
 	{% endfor %}

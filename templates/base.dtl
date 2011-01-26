@@ -16,6 +16,7 @@
 			</hgroup>
 		</header>		
 		{% block navigation %}{% endblock %}
+		{% block aside %}{% endblock %}
 		{% block content %}{% endblock %}
 	</body>
 	<footer>@2011 Ulf Angermann</footer>

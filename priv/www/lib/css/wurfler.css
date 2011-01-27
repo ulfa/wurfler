@@ -10,7 +10,7 @@ hgroup.left { text-align:left; }
 	-moz-column-rule: 1px solid #ddccb5;
 	-webkit-column-rule: 1px solid #ddccb5;
 	}
-	
+
 /* ** ** Header Styles ** ** */
 h1, h2, h3, h4, h5 {margin:0 0 0.5em; line-height:1.1em;}
 h1 {	font-size:2.52em;} 
@@ -18,4 +18,9 @@ h2 {	font-size:1.952em;}
 h3 {	font-size:1.652em;} 
 h4 {	font-size:1.452em;} 
 h5 {	font-size:1.252em;} 
-h6 {	font-size:1.52em;}	
+h6 {	font-size:1.52em;}
+
+#device {
+	height:72px;
+	width:72px;
+}	

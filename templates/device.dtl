@@ -4,19 +4,14 @@
 {% block navigation %}
 <nav>
 		<ul>
-			{% for id, caps in groups %}
-				<li>{{ id }}</li>
-				<ul>
-				{% for cap in caps %}
-				{{cap}}
-				{% endfor %}
-				</ul>
+			{% for group, caps in groups %}
+				<li><a href="/group/{{id}}/{{group}}">{{group}}</a></li>
 			{% endfor %}
 		</ul>
-<nav>
+</nav>
 {% endblock %}
 {% block content %}
-	<img src="/device_image/{{id}}.gif"/>
+	<img id="device" src="/device_image/{{id}}.gif"/>
 		<ul>
 			<li><label for="{{id}}">Id : </label>{{id}}</li>  
 			<li><label for="{{brand_name}}">Brand name :</label>{{brand_name}}</li>

@@ -23,4 +23,14 @@ h6 {	font-size:1.52em;}
 #device {
 	height:72px;
 	width:72px;
-}	
+}
+
+footer.copyright {
+    font-size: 0.75em;
+    text-align: center;
+}
+
+#navigation {}
+#content {}
+#left_content {}
+

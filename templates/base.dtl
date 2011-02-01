@@ -13,10 +13,16 @@
 				<h1>Wurfler</h1>
 				<h3>Find all the information of a device you need to know</h3>
 			</hgroup>							
-		</header>		
+		</header>
+		<section id="navigation>		
 		{% block navigation %}{% endblock %}
+		</section>
+		<section id="left_content"> 
 		{% block aside %}{% endblock %}
+		</section>
+		<section id="content"> 
 		{% block content %}{% endblock %}
+		</section> 
 	</body>
-	<footer>@2011 Ulf Angermann</footer>
+	<footer class="copyright">@2011 Ulf Angermann</footer>
 </html>    

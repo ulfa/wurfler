@@ -136,7 +136,8 @@ get_value_test_() ->
 	 	fun() -> setup() end,
      	fun(_) -> cleanup([]) end,
 	 	fun(_) ->
-			?_assertEqual(5000, wurfler_config:get_value(only_for_testing))
+			[?_assertEqual(5000, wurfler_config:get_value(only_for_testing)),
+			 ?_assert(undefined =:= wurfler_config:get_value(not_available))]
 	 	end
 	 }.
 

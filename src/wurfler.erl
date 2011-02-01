@@ -366,7 +366,7 @@ extract_one_capabilty(Generic, {Name, {_Value,_Operator}}) ->
 deleteBrand(Brand_name) ->
 	wurfler_db:delete_brand(Brand_name).
 deleteDevice(Id) ->
-	wurfler_db:delete_device(devicesTbl, Id).
+	wurfler_db:delete_device(Id).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

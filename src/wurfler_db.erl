@@ -33,7 +33,7 @@
 -export([find_capabilities_by_id/2,get_all_keys/1,get_all_keys/2, save_brand_index/2, get_all_brands/0]).
 -export([get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1, get_capablities_devices/1]).
 -export([clear_capabilities_devices/0, find_devices_by_brand/2, find_capabilities_device_by_key/1]).
--export([delete_device/2, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
+-export([delete_device/1, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
 -export([get_all_cap_key/1]).
 %% --------------------------------------------------------------------
 %%% Internal functions
@@ -132,9 +132,9 @@ clear_capabilities_devices() ->
 %% --------------------------------------------------------------------
 %%% delete functions
 %% --------------------------------------------------------------------
-delete_device(devicesTbl, "generic") ->
+delete_device("generic") ->
 	error_logger:info_msg("can't delete the generic device");
-delete_device(devicesTbl, Id) ->
+delete_device(Id) ->
 	mnesia:activity(transaction, fun() ->
 		case find_record_by_id(devicesTbl, Id) of
 			[] -> [];
@@ -142,6 +142,7 @@ delete_device(devicesTbl, Id) ->
 						mnesia:delete(devicesTbl, Device#device.id, write)			
 		end
 	end).
+
 delete_brand(Brand_name) ->
 	mnesia:activity(transaction, fun() ->
 		case find_devices_by_brand(devicesTbl, Brand_name) of
@@ -161,17 +162,35 @@ remove_device_from_brand(#device{id=Id, brand_name=Brand_name}) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-find_record_by_id_test() ->
-	?assertMatch([{device, "benq_s668c_ver1", _, _,_,_,_,_}], find_record_by_id(devicesTbl, "benq_s668c_ver1")).
 find_record_by_ua_test() ->
-	?assertMatch([{device, _,"Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610", _,_,_,_}], find_record_by_ua(devicesTbl, "Mozilla/4.1 (compatible; MSIE 5.0; Symbian OS; Nokia 7610")).
+	?_assertMatch([{device, _Id,"Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17", _,_,_,_,_,_,_}], 
+				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")).
 find_group_by_id_test() ->
 	find_groups_by_id(devicesTbl, "generic").
-find_capabilities_by_id_test()->
-	?assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")).
-get_all_keys_test() ->
-	?assertEqual(6337,erlang:length(get_all_keys(devicesTbl, "01.01.1970"))).
 
-get_all_keys_test_with_timestamp_test() ->
-	?assertEqual(6337,erlang:length(get_all_keys(devicesTbl, "01.01.2010"))),
-	?assertEqual(0,erlang:length(get_all_keys(devicesTbl, "01.01.2011"))).
+wurfler_db_test_() ->
+	{setup, 
+	 	fun() -> setup() end,
+	 	fun(_) ->
+			[?_assertEqual(2,erlang:length(get_all_keys(devicesTbl, "01.01.2010"))),
+			 ?_assertEqual(0,erlang:length(get_all_keys(devicesTbl, "01.01.2099"))),
+			 ?_assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")),
+			 ?_assertMatch([{device, "htc_desire_a8181_ver1_sub2_2",_,_,_,_,_,_,_,_}], find_record_by_id(devicesTbl, "htc_desire_a8181_ver1_sub2_2")),
+			 ?_assertMatch([{device, _Id,"Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17", _,_,_,_,_,_,_}], 
+				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17"))
+			 ]
+	 	end
+	 }.
+	
+
+delete_device_test_() ->
+	{setup, 
+	 	fun() -> setup() end,
+	 	fun(_) ->
+			[?_assert(ok =:= delete_device("samsung_gt_i9000_ver1"))]
+	 	end
+	 }.
+
+setup() ->
+	mnesia:load_textfile("data/test.data").
+    

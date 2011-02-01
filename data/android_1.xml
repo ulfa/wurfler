@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<query key="123">
+	<capabilities>
+		<capability name="smallScreens" value="true" operator="="/>
+	</capabilities>
+</query>

@@ -1,0 +1,5 @@
+{logdir, "@PATH@/logs"}.
+{label, "wurfler"}.
+{alias, t1, "@PATH@/test"}.
+{suites, t1, all}.
+%%{cover, "@PATH@/cover.spec"}.

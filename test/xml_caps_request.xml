@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<query>
-	<capabilities>
-		<capability name="j2me_cldc_1_1" value="true" operator="="/>
-		<capability name="j2me_midp_1_0" value="true" operator="="/>
-	</capabilities>
-</query>

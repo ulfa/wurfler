@@ -1,0 +1,4 @@
+			<group id="magical_powers">
+				<capability name="makes_good_coffee" value="false" />
+				<capability name="average_coffee_preparation_time" value="0" />
+			</group>

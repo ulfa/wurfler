@@ -31,10 +31,10 @@
 -define(WURFL_CONFIG, "priv/wurfler.config").
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
--export([start_link/0]).
+-export([start_link/0, start_link/1]).
 -export([start/0]).
--export([get_value/1]).
-
+-export([get_value/1, reload/0]).
+-compile([export_all]).
 -record(state, {config}).
 
 %% ====================================================================
@@ -54,6 +54,9 @@ reload() ->
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
+start_link([Config_File]) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [Config_File], []).
+
 start() ->
 	start_link().
 %% --------------------------------------------------------------------
@@ -65,8 +68,12 @@ start() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-	{ok, [Config]} = file:consult(?WURFL_CONFIG),
-    {ok, #state{config=Config}}.
+ 	{ok, [Config]} = file:consult(?WURFL_CONFIG),
+	{ok, #state{config=Config}};
+
+init([Config_File]) ->
+ 	{ok, [Config]} = file:consult(Config_File),
+	{ok, #state{config=Config}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -79,7 +86,7 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({get_value, Key}, _From, State=#state{config=Config})->
-	Value=proplists:get_value(Key, Config),
+	Value = proplists:get_value(Key, Config),
     {reply,Value, State};
 
 handle_call({reload}, _From, _State)->
@@ -120,6 +127,23 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+ -ifdef(EUNIT).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+get_value_test_() ->
+	{setup, 
+	 	fun() -> setup() end,
+     	fun(_) -> cleanup([]) end,
+	 	fun(_) ->
+			?_assertEqual(5000, wurfler_config:get_value(only_for_testing))
+	 	end
+	 }.
+
+setup() ->
+ 	wurfler_config:start_link(["priv/wurfler.config"]).
+
+cleanup(_) ->
+    ok = wurfler_config:terminate([],[]).
+
+-endif.

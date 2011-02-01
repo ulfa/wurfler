@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wurfl_patch>
+	<devices>
+		<device user_agent="UA "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; de; rv:1.9.2.6) Gecko/20100625 Firefox/3.6.6" fall_back="generic_android_ver1_6" id="myDevice_ver1">
+			<group id="product_info">
+				<capability name="brand_name" value="Android" />
+				<capability name="model_name" value="myDevice" />
+				<capability name="device_os" value="1.6" />
+			</group>
+		</device>
+	</devices>
+</wurfl_patch>

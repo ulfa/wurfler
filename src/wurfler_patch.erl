@@ -222,18 +222,18 @@ get_capability(CapabilitiesDb, Capability_Name) ->
 %%% Test functions
 %% --------------------------------------------------------------------
 merge_group_test() ->
-	GroupXml = xml_factory:parse_file("./test/group_xml"),
+	GroupXml = xml_factory:parse_file("./data/group_xml"),
 	[Group] = xmerl_xpath:string ("/group", GroupXml),
-	{ok, [GroupsDb]} = file:consult("./test/group_db"),
+	{ok, [GroupsDb]} = file:consult("./data/group_db"),
 	G=merge_group(xml, Group, GroupsDb),
 %% 	io:format("G ~p~n", [G]),
 	?assertMatch({group, "magical_powers", _},G),
 	?assertEqual(4, erlang:length(G#group.capabilites)).
 
 merge_groups_test() ->
-	DeviceXml = xml_factory:parse_file("./test/group_patch_xml"),
+	DeviceXml = xml_factory:parse_file("./data/group_patch_xml"),
 	GroupsXml = xmerl_xpath:string ("/device/group", DeviceXml),
-	{ok, [GroupsDb]} = file:consult("./test/group_patch"),
+	{ok, [GroupsDb]} = file:consult("./data/group_patch"),
 	G=merge_groups(GroupsXml, GroupsDb),
 	io:format("G ~p~n ", [G]),
 	?assertEqual(4,erlang:length(G)).
@@ -270,12 +270,12 @@ merge_device_test() ->
 	ok.
 %% 	merge_device(DeviceXml, DeviceDb).
 import_wurflpatch_test()->
-	import("./test/device_patch_xml", #state{}).
+	import("./data/device_patch_xml", #state{}).
 
 get_device_test() ->
-	?assertMatch([{device,"generic",[],undefined,"root",_,_,_}], get_device(devicesTbl, "generic")).
+	?assertMatch([{device,"generic",_,undefined,"root",_,_,_,_,_}], get_device(devicesTbl, "generic")).
 
 process_device_test() ->
-	Wurfl_Patch = xml_factory:parse_file("./test/wurlfpatch.xml"),
+	Wurfl_Patch = xml_factory:parse_file("./data/wurlfpatch.xml"),
 	Devices = xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch).
 

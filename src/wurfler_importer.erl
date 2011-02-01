@@ -320,26 +320,26 @@ check_device(model_name, _Device, _Model_name) ->
 %%% Test functions
 %% --------------------------------------------------------------------
 get_brand_name_from_db_test() ->
-	?assertEqual("RIM", get_brand_name_from_db("blackberry6700_ver1")).
+	?assertEqual("HTC", get_brand_name_from_db("htc_desire_a8181_ver1")).
 process_group_test()->
-	GroupXml = xml_factory:parse_file("./test/group_xml"),
+	GroupXml = xml_factory:parse_file("./data/group_xml"),
 	?assertMatch({group, "magical_powers", _},process_group(GroupXml)).
 get_device_os_test() ->
-	{ok, [Groups]} = file:consult("test/groups"),
+	{ok, [Groups]} = file:consult("data/groups"),
 	?assertEqual("Android",get_device_os(Groups)).
 add_attributes_test() ->
-	{ok, [Device]} = file:consult("test/device"),
+	{ok, [Device]} = file:consult("data/device"),
 	Attributes = [{test, "test"}, {test1, "test2"}],
 	?assertEqual(4, erlang:length(add_attributes(Device, Attributes))).
 get_brand_and_model_test() ->
-	{ok, [Device]} = file:consult("test/device"),
+	{ok, [Device]} = file:consult("data/device"),
 	?assertEqual(2, erlang:length(get_brand_and_model(Device))).
 get_brand_name_test()->
-	{ok, [Device]} = file:consult("test/device"),
+	{ok, [Device]} = file:consult("data/device"),
 	?assertEqual({brand_name,"HTC"}, get_brand_name(Device)).
 get_brand_name_without_test()->
-	{ok, [Device1]} = file:consult("test/groups"),
+	{ok, [Device1]} = file:consult("data/groups"),
 	?assertEqual(2, erlang:length(get_brand_and_model(Device1))).
 get_model_name_test() ->
-	{ok,[Device]} = file:consult("test/device"),
+	{ok,[Device]} = file:consult("data/device"),
 	?assertEqual({model_name, "Legend"}, get_model_name(Device)).

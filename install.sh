@@ -1,7 +1,7 @@
 #!/bin/sh
 
-cat test/test.spec.in | sed -e "s,@PATH@,$PWD," > $PWD/test/test.spec
-cat test/cover.spec.in | sed -e "s,@PATH@,$PWD," > $PWD/test/cover.spec
+cat $PWD/data/test.spec.in | sed -e "s,@PATH@,$PWD," > $PWD/test/test.spec
+cat $PWD/data/cover.spec.in | sed -e "s,@PATH@,$PWD," > $PWD/test/cover.spec
 
 if [ ! -d wurfl ]		# be sure the directory wurfl exists
 then

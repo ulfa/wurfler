@@ -1,7 +1,0 @@
-         [{group,"product_info",
-                 [{capability,"has_qwerty_keyboard","false"},
-                 {capability,"device_os","Android"}]},
-          {group,"display",
-                 [{capability,"resolution_height","480"},
-                  {capability,"max_image_height","360"}]},
-          {group,"bearer",[{capability,"max_data_rate","1800"}]}].

@@ -67,14 +67,24 @@ dif(_, _) -> 1.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% -------------------------------------------------------------------
-levenshtein_test() ->
-	?assertEqual(2, levenshtein("Aloha!", "Alhoa!")).
+levenshtein_test_() ->
+	{setup, 
+	 	fun() -> setup() end,
+	 	fun(_) ->
+			[
+			 ?_assertEqual(2, levenshtein("Aloha!", "Alhoa!")),
+			 ?_assertEqual(39,levenshtein(string:to_lower("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7"),
+				string:to_lower("Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A538a Safari/419.3")))
+			 ]
+	 	end
+	 }.	
 
-levenshtein_UA_test() ->
-	?assertEqual(39,levenshtein(string:to_lower("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7"),
-				string:to_lower("Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A538a Safari/419.3"))).
+setup() ->
+	mnesia:clear_table(devicesTbl),
+	mnesia:clear_table(brand_index),
+	mnesia:load_textfile("data/daten.txt").
 
-levenshtein_DB_test() ->
+levenshtein_DB_test_() ->
 	Keys = wurfler_db:get_all_keys(devicesTbl),
 	get_devices(Keys, []).
 		
@@ -83,7 +93,9 @@ get_devices([], Acc)->
 get_devices([Key|Keys], Acc) ->
 	[#device{user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
 	A="Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7",
-	%%Diff = levenshtein(string:to_lower(UA),string:to_lower(string:substr(A, 1, erlang:length(A)))),
-	Diff = levenshtein(string:to_lower(string:substr(A, 1, erlang:length(A))), string:to_lower(UA)),
+	%%Diff = levenshtein(UA,A), %%28245692 on a core2duo macbookPro
+	%%erlang:spawn(fun() -> wurfler_string_metrics:levenshtein(UA, A) end),%%10121671 on a core2duo macbookPro
+	%%Diff = levenshtein(string:to_lower(string:substr(A, 1, erlang:length(A))), string:to_lower(UA)),
 	%%io:format("~p, ~p, ~p ~n", [Diff, erlang:length(UA), UA]),
 	get_devices(Keys, Acc).
+

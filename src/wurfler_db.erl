@@ -162,9 +162,6 @@ remove_device_from_brand(#device{id=Id, brand_name=Brand_name}) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-find_record_by_ua_test() ->
-	?_assertMatch([{device, _Id,"Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17", _,_,_,_,_,_,_}], 
-				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")).
 find_group_by_id_test() ->
 	find_groups_by_id(devicesTbl, "generic").
 
@@ -177,20 +174,14 @@ wurfler_db_test_() ->
 			 ?_assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")),
 			 ?_assertMatch([{device, "htc_desire_a8181_ver1_sub2_2",_,_,_,_,_,_,_,_}], find_record_by_id(devicesTbl, "htc_desire_a8181_ver1_sub2_2")),
 			 ?_assertMatch([{device, _Id,"Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17", _,_,_,_,_,_,_}], 
-				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17"))
+				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")),
+			 [?_assert(ok =:= delete_device("samsung_gt_i9000_ver1"))]
 			 ]
 	 	end
 	 }.
 	
-
-delete_device_test_() ->
-	{setup, 
-	 	fun() -> setup() end,
-	 	fun(_) ->
-			[?_assert(ok =:= delete_device("samsung_gt_i9000_ver1"))]
-	 	end
-	 }.
-
 setup() ->
+	mnesia:clear_table(devicesTbl),
+	mnesia:clear_table(brand_index),
 	mnesia:load_textfile("data/test.data").
     

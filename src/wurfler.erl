@@ -246,9 +246,10 @@ get_all_ids_to_delete(Id) ->
 get_all_ids_to_delete([], Acc) ->
 	Acc;
 get_all_ids_to_delete([Fall_Back|Fall_Backs], Acc) ->
-	Acc1 = [wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back)|Acc],
-	get_all_ids_to_delete(Fall_Backs, Acc1).
-	
+	case wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back) of
+		[] -> get_all_ids_to_delete(Fall_Backs, Acc);
+		List -> get_all_ids_to_delete(List, [List|Acc])
+	end.
 %%------------------------------------------------------------------------------
 %% Here i can optimize the create_fun stuff.
 %% Perhaps i will use erl_scan and co.

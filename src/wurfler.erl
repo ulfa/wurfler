@@ -238,6 +238,17 @@ get_all_capabilities(DeviceName, #state{capabilities=Caps}) ->
 get_generic_capabilities() ->
 	{_Fall_back, Generic} = wurfler_db:find_capabilities_by_id(devicesTbl, "generic"),
 	Generic.
+
+get_all_ids_to_delete(Id) ->
+	List = wurfler_db:find_id_by_fall_back(devicesTbl, Id),
+	get_all_ids_to_delete(List, []).
+
+get_all_ids_to_delete([], Acc) ->
+	Acc;
+get_all_ids_to_delete([Fall_Back|Fall_Backs], Acc) ->
+	Acc1 = [wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back)|Acc],
+	get_all_ids_to_delete(Fall_Backs, Acc1).
+	
 %%------------------------------------------------------------------------------
 %% Here i can optimize the create_fun stuff.
 %% Perhaps i will use erl_scan and co.

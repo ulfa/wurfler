@@ -34,7 +34,7 @@
 -export([get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1, get_capablities_devices/1]).
 -export([clear_capabilities_devices/0, find_devices_by_brand/2, find_capabilities_device_by_key/1]).
 -export([delete_device/1, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
--export([get_all_cap_key/1, find_record_by_fall_back/2]).
+-export([get_all_cap_key/1, find_id_by_fall_back/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -93,8 +93,8 @@ find_capabilities_by_id(devicesTbl, Id) ->
 
 find_record_by_ua(devicesTbl, Ua) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.user_agent == Ua])) end).
-find_record_by_fall_back(devicesTbl, Fall_Back) ->
-	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P || P <- mnesia:table(devicesTbl), P#device.fall_back == Fall_Back])) end).
+find_id_by_fall_back(devicesTbl, Fall_Back) ->
+	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.fall_back == Fall_Back])) end).
 get_all_cap_key(capabilities_devices) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([{P#capabilities_devices.capabilities, P#capabilities_devices.key} || P <- mnesia:table(capabilities_devices)])) end).
 get_all_keys(devicesTbl) ->
@@ -177,7 +177,8 @@ wurfler_db_test_() ->
 			 ?_assertMatch([{device, _Id,"Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17", _,_,_,_,_,_,_}], 
 				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")),
 			 ?_assert(ok =:= delete_device("samsung_gt_i9000_ver1")),
-			 ?_assertEqual(2, erlang:length(find_record_by_fall_back(devicesTbl, "generic")))
+			 ?_assert([] =:= delete_device("not_known")),
+			 ?_assertEqual(2, erlang:length(find_id_by_fall_back(devicesTbl, "generic")))
 			 ]
 	 	end
 	 }.

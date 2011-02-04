@@ -239,16 +239,17 @@ get_generic_capabilities() ->
 	{_Fall_back, Generic} = wurfler_db:find_capabilities_by_id(devicesTbl, "generic"),
 	Generic.
 
-get_all_ids_to_delete(Id) ->
-	List = wurfler_db:find_id_by_fall_back(devicesTbl, Id),
-	get_all_ids_to_delete(List, []).
+get_all_ids_to_delete(Fall_Back) ->
+	List_of_ids = wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back),
+	[Fall_Back|get_all_ids_to_delete(List_of_ids, [])].
 
 get_all_ids_to_delete([], Acc) ->
 	Acc;
 get_all_ids_to_delete([Fall_Back|Fall_Backs], Acc) ->
 	case wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back) of
-		[] -> get_all_ids_to_delete(Fall_Backs, Acc);
-		List -> get_all_ids_to_delete(List, [List|Acc])
+		[] -> get_all_ids_to_delete(Fall_Backs, [Fall_Back|Acc]);
+		List -> L = lists:map(fun(I)-> wurfler:get_all_ids_to_delete(I) end, List),
+				get_all_ids_to_delete(Fall_Backs, lists:append(L, Acc))
 	end.
 %%------------------------------------------------------------------------------
 %% Here i can optimize the create_fun stuff.
@@ -378,7 +379,9 @@ extract_one_capabilty(Generic, {Name, {_Value,_Operator}}) ->
 deleteBrand(Brand_name) ->
 	wurfler_db:delete_brand(Brand_name).
 deleteDevice(Id) ->
-	wurfler_db:delete_device(Id).
+	List = get_all_ids_to_delete(Id),
+	io:format("List : ~p~n", [List]),
+	[wurfler_db:delete_device(Key) || Key <- List].
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

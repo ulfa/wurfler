@@ -1,6 +1,8 @@
-# actual version
 
-Wurfler is not only a wrapper around wurfl, so you can query the data by user agent agent.
+If you have a device and you want know the capabilities, you use wurfl.xml.
+If you have am application and you want to know on which devices the app runs,
+you will use wurfler. 
+
 
 # arichitecture
 

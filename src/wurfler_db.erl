@@ -136,6 +136,7 @@ clear_capabilities_devices() ->
 delete_device("generic") ->
 	error_logger:info_msg("can't delete the generic device");
 delete_device(Id) ->
+	io:format("delete device : ~p~n", [Id]),
 	mnesia:activity(transaction, fun() ->
 		case find_record_by_id(devicesTbl, Id) of
 			[] -> [];
@@ -154,12 +155,15 @@ delete_brand(Brand_name) ->
 	end).
 	
 remove_device_from_brand(#device{id=Id, brand_name=Brand_name}) ->
-	[Brand_index] = get_brand(Brand_name),
-	Models = lists:keydelete(Id, 1, Brand_index#brand_index.models),
-	case Models of
-		[] -> mnesia:delete(brand_index, Brand_name, write); 
-		_ ->save_brand_index(Brand_index#brand_index{models=Models})
+	case get_brand(Brand_name) of
+		[] -> [];
+		[Brand_index] -> Models = lists:keydelete(Id, 1, Brand_index#brand_index.models),
+						case Models of
+							[] -> mnesia:delete(brand_index, Brand_name, write); 
+							_ -> save_brand_index(Brand_index#brand_index{models=Models})
+						end
 	end.
+
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

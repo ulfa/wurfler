@@ -244,12 +244,18 @@ get_all_ids_to_delete(Fall_Back) ->
 	[Fall_Back|get_all_ids_to_delete(List_of_ids, [])].
 
 get_all_ids_to_delete([], Acc) ->
-	Acc;
+	%%io:format("Acc ~p~n : ",[Acc]),
+	lists:append(Acc);
 get_all_ids_to_delete([Fall_Back|Fall_Backs], Acc) ->
 	case wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back) of
 		[] -> get_all_ids_to_delete(Fall_Backs, [Fall_Back|Acc]);
-		List -> L = lists:map(fun(I)-> wurfler:get_all_ids_to_delete(I) end, List),
-				get_all_ids_to_delete(Fall_Backs, lists:append(L, Acc))
+		List -> L = lists:map(fun(I)-> 
+									 L1 = wurfler:get_all_ids_to_delete(I),
+									 %%io:format("L1 ~p~n : ", [L1]),
+									 L1
+							  end, List),
+				%%io:format("L ~p~n : ", [L]),
+				get_all_ids_to_delete(Fall_Backs, L ++ Acc)
 	end.
 %%------------------------------------------------------------------------------
 %% Here i can optimize the create_fun stuff.
@@ -467,7 +473,7 @@ run_funs_against_list_test()->
  	List_of_para1=[{"handheldfriendly", {"false", '='}},
  	 {"playback_mp4", {"false", '='}},
  	 {"playback_wmv", {"none", '='}}],
- 	?assertEqual({nok},run_funs_against_list(create_funs_from_list(List_of_para1), Caps1,{nok})),
+ 	?assertEqual({ok},run_funs_against_list(create_funs_from_list(List_of_para1), Caps1,{nok})),
 
 	List_of_para2=[{"jpg", {"true", '='}},
 	 {"gif", {"true", '='}},
@@ -480,7 +486,7 @@ search_by_capabilities_test() ->
 	 {"playback_wmv", {"none", '='}}],
 	State = search_by_capabilities(List, "01.01.2011", new_state()),
 	io:format("~p~n", [State#state.devices]),
-	?assertEqual(4448, erlang:length(State#state.devices)).
+	?assertEqual(1, erlang:length(State#state.devices)).
 	
 search_by_capabilities_test_1() ->
 	List=[{"device_os", {"iPhone OS", '='}}],
@@ -488,17 +494,16 @@ search_by_capabilities_test_1() ->
 	Keys = ["apple_generic", "generic_xhtml"], 
 	get_devices_for_caps(List_Of_Funs, Keys, new_state()).
 
-check_device_test() ->
+check_device() ->
 	Caps=[{"handheldfriendly", {"true", '='}},
 	 {"playback_mp4", {"false", '='}},
 	 {"playback_wmv", {"none", '='}}],
-	A=wurfler:check_device(Caps, ["benq_s668c_ver1"]),
-	io:format("2... :  ~p~n", [A]).
+	wurfler:check_device(Caps, [],"htc_desire_a8181_ver1").
 
 overwrite_test() ->
 	Generic = get_generic_capabilities(),
 	C = [#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
-	?assertEqual(497,erlang:length(overwrite(Generic, C))).
+	?assertEqual(533,erlang:length(overwrite(Generic, C))).
 	
 optimization_test() ->
 	Generic = get_generic_capabilities(),
@@ -507,7 +512,21 @@ optimization_test() ->
 	io:format("~p~n", [Result]),
 	?assertEqual(2, erlang:length(Result)).
 	
+wurfler_test_() ->
+	{setup, 
+	 	fun() -> setup() end,
+	 	fun(_) ->
+			[
+			 ?_assert(34 =:= erlang:length(get_all_ids_to_delete("generic_android"))),
+			 ?_assert([] =:= check_device())
+			 ]
+	 	end
+	 }.
 
+setup() ->
+	mnesia:clear_table(devicesTbl),
+	mnesia:clear_table(brand_index),
+	mnesia:load_textfile("data/test.data").
 
 
 

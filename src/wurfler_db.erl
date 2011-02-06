@@ -136,12 +136,13 @@ clear_capabilities_devices() ->
 delete_device("generic") ->
 	error_logger:info_msg("can't delete the generic device");
 delete_device(Id) ->
-	io:format("delete device : ~p~n", [Id]),
 	mnesia:activity(transaction, fun() ->
 		case find_record_by_id(devicesTbl, Id) of
 			[] -> [];
 			[Device] -> remove_device_from_brand(Device),
-						mnesia:delete(devicesTbl, Device#device.id, write)			
+						mnesia:delete(devicesTbl, Device#device.id, write),
+						error_logger:info_msg("deleted device with id : ~p~n", [Device#device.id]),
+						Device#device.id
 		end
 	end).
 
@@ -180,7 +181,7 @@ wurfler_db_test_() ->
 			 ?_assertMatch([{device, "htc_desire_a8181_ver1_sub2_2",_,_,_,_,_,_,_,_}], find_record_by_id(devicesTbl, "htc_desire_a8181_ver1_sub2_2")),
 			 ?_assertMatch([{device, _Id,"Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17", _,_,_,_,_,_,_}], 
 				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")),
-			 ?_assert(ok =:= delete_device("samsung_gt_i9000_ver1")),
+			 ?_assertEqual("samsung_gt_i9000_ver1",delete_device("samsung_gt_i9000_ver1")),
 			 ?_assert([] =:= delete_device("not_known")),
 			 ?_assertEqual(2, erlang:length(find_id_by_fall_back(devicesTbl, "generic")))
 			 ]

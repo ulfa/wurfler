@@ -174,7 +174,7 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 %% --------------------------------------------------------------------
 get_version() ->
-	{ok, Version}=application:get_key(wurflerservice, vsn),
+	{ok, Version} = application:get_key(wurflerservice, vsn),
 	Version.
 new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
@@ -241,22 +241,27 @@ get_generic_capabilities() ->
 
 get_all_ids_to_delete(Fall_Back) ->
 	List_of_ids = wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back),
-	[Fall_Back|get_all_ids_to_delete(List_of_ids, [])].
+	slab([Fall_Back|get_all_ids_to_delete(List_of_ids, [])]).
 
-get_all_ids_to_delete([], Acc) ->
-	%%io:format("Acc ~p~n : ",[Acc]),
-	lists:append(Acc);
+get_all_ids_to_delete([], Acc) -> 
+	Acc;
+
 get_all_ids_to_delete([Fall_Back|Fall_Backs], Acc) ->
+	Acc1 = [Fall_Back|Acc],
 	case wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back) of
-		[] -> get_all_ids_to_delete(Fall_Backs, [Fall_Back|Acc]);
-		List -> L = lists:map(fun(I)-> 
-									 L1 = wurfler:get_all_ids_to_delete(I),
-									 %%io:format("L1 ~p~n : ", [L1]),
-									 L1
-							  end, List),
-				%%io:format("L ~p~n : ", [L]),
-				get_all_ids_to_delete(Fall_Backs, L ++ Acc)
+		[] -> get_all_ids_to_delete(Fall_Backs, Acc1);
+		List -> L = lists:map(fun(I)->  wurfler:get_all_ids_to_delete(I) end, List),
+				get_all_ids_to_delete(Fall_Backs, [L |Acc1])
 	end.
+slab([]) ->
+    [];
+slab([F|R]) when is_list(F) ->
+    case io_lib:char_list(F) of
+        true -> [F|slab(R)];
+        false -> slab(F) ++ slab(R)
+    end;
+slab([F|R]) ->
+    [F|slab(R)].
 %%------------------------------------------------------------------------------
 %% Here i can optimize the create_fun stuff.
 %% Perhaps i will use erl_scan and co.
@@ -386,7 +391,6 @@ deleteBrand(Brand_name) ->
 	wurfler_db:delete_brand(Brand_name).
 deleteDevice(Id) ->
 	List = get_all_ids_to_delete(Id),
-	io:format("List : ~p~n", [List]),
 	[wurfler_db:delete_device(Key) || Key <- List].
 %% --------------------------------------------------------------------
 %%% Test functions
@@ -511,14 +515,16 @@ optimization_test() ->
 	Result = extract_only_need_capabilities(Generic, C),
 	io:format("~p~n", [Result]),
 	?assertEqual(2, erlang:length(Result)).
+
 	
 wurfler_test_() ->
 	{setup, 
 	 	fun() -> setup() end,
 	 	fun(_) ->
 			[
-			 ?_assert(34 =:= erlang:length(get_all_ids_to_delete("generic_android"))),
-			 ?_assert([] =:= check_device())
+			 ?_assertEqual(14,erlang:length(get_all_ids_to_delete("generic_android"))),
+			 ?_assert([] =:= check_device()),
+			 ?_assertEqual(14, erlang:length(deleteDevice("generic_android")))
 			 ]
 	 	end
 	 }.

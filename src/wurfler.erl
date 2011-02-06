@@ -239,19 +239,20 @@ get_generic_capabilities() ->
 	{_Fall_back, Generic} = wurfler_db:find_capabilities_by_id(devicesTbl, "generic"),
 	Generic.
 
-get_all_ids_to_delete(Fall_Back) ->
-	List_of_ids = wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back),
-	slab([Fall_Back|get_all_ids_to_delete(List_of_ids, [])]).
 
-get_all_ids_to_delete([], Acc) -> 
+get_children_plus_parent(Fall_Back) ->
+	List_of_ids = wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back),
+	slab([Fall_Back|get_children(List_of_ids, [])]).
+
+get_children([], Acc) -> 
 	Acc;
 
-get_all_ids_to_delete([Fall_Back|Fall_Backs], Acc) ->
+get_children([Fall_Back|Fall_Backs], Acc) ->
 	Acc1 = [Fall_Back|Acc],
 	case wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back) of
-		[] -> get_all_ids_to_delete(Fall_Backs, Acc1);
-		List -> L = lists:map(fun(I)->  wurfler:get_all_ids_to_delete(I) end, List),
-				get_all_ids_to_delete(Fall_Backs, [L |Acc1])
+		[] -> get_children(Fall_Backs, Acc1);
+		List -> L = lists:map(fun(I)->  wurfler:get_children_plus_parent(I) end, List),
+				get_children(Fall_Backs, [L |Acc1])
 	end.
 slab([]) ->
     [];
@@ -387,10 +388,12 @@ extract_one_capabilty(Generic, {Name, {_Value,_Operator}}) ->
  		false -> [];
 		Cap -> Cap
 	end.
+
 deleteBrand(Brand_name) ->
 	wurfler_db:delete_brand(Brand_name).
+
 deleteDevice(Id) ->
-	List = get_all_ids_to_delete(Id),
+	List = get_children_plus_parent(Id),
 	[wurfler_db:delete_device(Key) || Key <- List].
 %% --------------------------------------------------------------------
 %%% Test functions
@@ -522,7 +525,7 @@ wurfler_test_() ->
 	 	fun() -> setup() end,
 	 	fun(_) ->
 			[
-			 ?_assertEqual(14,erlang:length(get_all_ids_to_delete("generic_android"))),
+			 ?_assertEqual(14,erlang:length(get_children_plus_parent("generic_android"))),		 
 			 ?_assert([] =:= check_device()),
 			 ?_assertEqual(14, erlang:length(deleteDevice("generic_android")))
 			 ]

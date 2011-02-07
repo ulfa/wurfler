@@ -134,15 +134,16 @@ clear_capabilities_devices() ->
 %%% delete functions
 %% --------------------------------------------------------------------
 delete_device("generic") ->
-	error_logger:info_msg("can't delete the generic device");
+	error_logger:info_msg("can't delete the generic device"),
+	[];
 delete_device(Id) ->
 	mnesia:activity(transaction, fun() ->
 		case find_record_by_id(devicesTbl, Id) of
-			[] -> [];
+			[] -> {nok, Id};
 			[Device] -> remove_device_from_brand(Device),
 						mnesia:delete(devicesTbl, Device#device.id, write),
 						error_logger:info_msg("deleted device with id : ~p~n", [Device#device.id]),
-						Device#device.id
+						{ok, Device#device.id}
 		end
 	end).
 
@@ -168,8 +169,8 @@ remove_device_from_brand(#device{id=Id, brand_name=Brand_name}) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-find_group_by_id_test() ->
-	find_groups_by_id(devicesTbl, "generic").
+%%find_group_by_id_test() ->
+%%	find_groups_by_id(devicesTbl, "generic").
 
 wurfler_db_test_() ->
 	{setup, 
@@ -181,8 +182,8 @@ wurfler_db_test_() ->
 			 ?_assertMatch([{device, "htc_desire_a8181_ver1_sub2_2",_,_,_,_,_,_,_,_}], find_record_by_id(devicesTbl, "htc_desire_a8181_ver1_sub2_2")),
 			 ?_assertMatch([{device, _Id,"Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17", _,_,_,_,_,_,_}], 
 				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")),
-			 ?_assertEqual("samsung_gt_i9000_ver1",delete_device("samsung_gt_i9000_ver1")),
-			 ?_assert([] =:= delete_device("not_known")),
+			 ?_assertEqual({ok,"samsung_gt_i9000_ver1"},delete_device("samsung_gt_i9000_ver1")),
+			 ?_assert({nok, "not_known"} =:= delete_device("not_known")),
 			 ?_assertEqual(2, erlang:length(find_id_by_fall_back(devicesTbl, "generic")))
 			 ]
 	 	end

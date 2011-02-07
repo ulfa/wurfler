@@ -68,9 +68,10 @@ process_post(ReqData, Context) ->
 	delete_resource(ReqData1, Context).
 
 delete_resource(ReqData, Context)->
-	case delete_device(wrq:path_info(device, ReqData)) of
-		[] -> {false, ReqData, Context#context{device=[]}};
-		ok -> {true, ReqData, Context}
+	Device = wrq:path_info(device, ReqData),
+	case delete_device(Device) of
+		[{nok, Device}] -> {false, ReqData, Context#context{device=[]}};
+		_ -> {true, ReqData, Context}
 	end.
 
 delete_completed(ReqData, Context) ->

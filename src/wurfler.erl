@@ -241,8 +241,10 @@ get_generic_capabilities() ->
 
 
 get_children_plus_parent(Fall_Back) ->
-	List_of_ids = wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back),
-	slab([Fall_Back|get_children(List_of_ids, [])]).
+	case wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back) of
+		[] -> [];
+		List_of_ids -> slab([Fall_Back|get_children(List_of_ids, [])])
+	end.
 
 get_children([], Acc) -> 
 	Acc;
@@ -393,8 +395,11 @@ deleteBrand(Brand_name) ->
 	wurfler_db:delete_brand(Brand_name).
 
 deleteDevice(Id) ->
-	List = get_children_plus_parent(Id),
-	[wurfler_db:delete_device(Key) || Key <- List].
+	case get_children_plus_parent(Id) of
+		[] -> [{nok, Id}];
+		List -> [wurfler_db:delete_device(Key) || Key <- List]
+	end.
+	
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
@@ -527,6 +532,7 @@ wurfler_test_() ->
 			[
 			 ?_assertEqual(14,erlang:length(get_children_plus_parent("generic_android"))),		 
 			 ?_assert([] =:= check_device()),
+			 ?_assertEqual([{nok, "unknown"}], deleteDevice("unknown")), 
 			 ?_assertEqual(14, erlang:length(deleteDevice("generic_android")))
 			 ]
 	 	end

@@ -242,7 +242,7 @@ get_devices_without_model_name(_Config) ->
 	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/model", ?XML_CONTENT_TYPE, get).
 
 delete_device_by_id(_Config) ->
-	ibrowse:send_req("http://localhost:8000/device/ahong_d13_ver1", ?XML_CONTENT_TYPE, delete).
+	{ok, "204", _C, D}=ibrowse:send_req("http://localhost:8000/device/ahong_d13_ver1", ?XML_CONTENT_TYPE, delete).
 
 find_changes(_Config) ->
 		{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/changes/01012010", ?XML_CONTENT_TYPE, get),

@@ -239,16 +239,14 @@ get_generic_capabilities() ->
 	{_Fall_back, Generic} = wurfler_db:find_capabilities_by_id(devicesTbl, "generic"),
 	Generic.
 
-
 get_children_plus_parent(Fall_Back) ->
 	case wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back) of
-		[] -> [];
-		List_of_ids -> slab([Fall_Back|get_children(List_of_ids, [])])
+		[] -> [Fall_Back];
+		List_of_ids -> flatten([Fall_Back|get_children(List_of_ids, [])])
 	end.
 
 get_children([], Acc) -> 
 	Acc;
-
 get_children([Fall_Back|Fall_Backs], Acc) ->
 	Acc1 = [Fall_Back|Acc],
 	case wurfler_db:find_id_by_fall_back(devicesTbl, Fall_Back) of
@@ -256,15 +254,16 @@ get_children([Fall_Back|Fall_Backs], Acc) ->
 		List -> L = lists:map(fun(I)->  wurfler:get_children_plus_parent(I) end, List),
 				get_children(Fall_Backs, [L |Acc1])
 	end.
-slab([]) ->
+
+flatten([]) ->
     [];
-slab([F|R]) when is_list(F) ->
+flatten([F|R]) when is_list(F) ->
     case io_lib:char_list(F) of
-        true -> [F|slab(R)];
-        false -> slab(F) ++ slab(R)
+        true -> [F|flatten(R)];
+        false -> flatten(F) ++ flatten(R)
     end;
-slab([F|R]) ->
-    [F|slab(R)].
+flatten([F|R]) ->
+    [F|flatten(R)].
 %%------------------------------------------------------------------------------
 %% Here i can optimize the create_fun stuff.
 %% Perhaps i will use erl_scan and co.
@@ -396,7 +395,7 @@ deleteBrand(Brand_name) ->
 
 deleteDevice(Id) ->
 	case get_children_plus_parent(Id) of
-		[] -> [{nok, Id}];
+		[] -> [];
 		List -> [wurfler_db:delete_device(Key) || Key <- List]
 	end.
 	

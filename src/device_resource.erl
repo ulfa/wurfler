@@ -30,7 +30,7 @@
 -export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2, 
 		 delete_resource/2, delete_completed/2, allowed_methods/2]).
 -export([post_is_create/2, process_post/2]).
-%% -compile([export_all]).
+-compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -record(context, {device}).
 %%
@@ -70,8 +70,8 @@ process_post(ReqData, Context) ->
 delete_resource(ReqData, Context)->
 	Device = wrq:path_info(device, ReqData),
 	case delete_device(Device) of
-		[{nok, Device}] -> {false, ReqData, Context#context{device=[]}};
-		_ -> {true, ReqData, Context}
+		[] -> {false, ReqData, Context#context{device=[]}};
+		_ -> {true, ReqData, Context#context{device=[]}}
 	end.
 
 delete_completed(ReqData, Context) ->
@@ -81,11 +81,12 @@ delete_completed(ReqData, Context) ->
 %%
 redirect(Target, ReqData) ->
 	Location = "http://" ++ wrq:get_req_header(?HOST, ReqData) ++ Target,
-    Req=wrq:set_resp_header(?LOCATION, Location, ReqData),
+    Req = wrq:set_resp_header(?LOCATION, Location, ReqData),
 	wrq:do_redirect(true, Req).
 	
 delete_device(Id) ->
-	wurfler_db:delete_device(devicesTbl, Id).
+	wurfler:delete_device(Id).
+
 get_device(undefined, ReqData) ->
 	error_logger:info_msg("UA ~p~n", [wrq:get_req_header("User-Agent", ReqData)]),
 	wurfler:searchByUA(wrq:get_req_header("User-Agent", ReqData));
@@ -131,5 +132,17 @@ record_to_tuple_test() ->
 	io:format("2... : ~p~n" ,[record_to_tuple(device,Device)]). 
 
 	
-
-	
+device_resource_test_() ->
+	{setup, 
+	 	fun() -> setup() end,
+	 	fun(_) ->
+			[
+			 ?_assertEqual([{nok, "unknown"}],delete_device("unknown")),
+			 ?_assertEqual(14,erlang:length(delete_device("generic_android")))		 
+			 ]
+	 	end
+	 }.
+setup() ->
+	mnesia:clear_table(devicesTbl),
+	mnesia:clear_table(brand_index),
+	mnesia:load_textfile("data/test.data").

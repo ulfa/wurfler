@@ -32,6 +32,7 @@
 %% --------------------------------------------------------------------
 %% Internal exports
 %% --------------------------------------------------------------------
+%% @spec ensure_started(App::atom()) -> ok
 ensure_started(App) ->
     case application:start(App) of
         ok ->
@@ -69,6 +70,12 @@ init([]) ->
               	10000,
               	worker,
               	[wurfler]},
+	WurflerSearch={wurfler_search,
+				{wurfler_search, start_link, []},
+              	permanent,
+              	10000,
+              	worker,
+              	[wurfler_search]},	
 	WurflerCache={wurfler_cache,
 				{wurfler_cache, start_link, []},
               	permanent,
@@ -112,6 +119,7 @@ init([]) ->
 		   [
 			WurflerConfig,
 			Wurfler,
+			WurflerSearch,
 			WurflerCache,
 			WurflerFilePoller,
 			WurflerImporter,

@@ -99,8 +99,8 @@ get_devices([Key|Keys], Acc) ->
 	erlang:spawn(fun() -> wurfler_string_metrics:levenshtein(UA, A)  end),
 	%%10121671 on a core2duo macbookPro
 	%%5009021 on my amd box
-	%%Diff = levenshtein(string:to_lower(string:substr(A, 1, erlang:length(A))), string:to_lower(UA)),
-	%%io:format("~p, ~p, ~p ~n", [Diff, erlang:length(UA), UA]),
+	Diff = levenshtein(string:to_lower(string:substr(A, 1, erlang:length(A))), string:to_lower(UA)),
+	io:format("~p, ~p, ~p ~n", [Diff, erlang:length(UA), UA]),
 	get_devices(Keys, Acc).
 
 parmap(UA ,Keys) ->

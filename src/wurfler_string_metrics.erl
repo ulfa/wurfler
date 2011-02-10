@@ -29,6 +29,8 @@
 %% External exports
 %% --------------------------------------------------------------------
 -export([levenshtein/2]).
+-compile([export_all]).
+
 %% --------------------------------------------------------------------
 %% record definitions
 %% --------------------------------------------------------------------
@@ -60,6 +62,9 @@ levenshtein_distlist([TargetHead|TargetTail], [DLH|DLT], SourceChar, NewDistList
 levenshtein_distlist([], _, _, NewDistList, _) ->
 	NewDistList.
 
+invalidate_number(UA) ->
+	re:replace(UA, "AppleWebKit/[0-9]+.[0-9]+.[0-9]+|Version/[0-9]+.[0-9]+.[0-9]+|Mobile/[0-9]+[A-Z][0-9]+|Safari/[0-9]+.[0-9]+", "X", [global, {return, list}]).
+
 % Calculates the difference between two characters or other values
 dif(C, C) -> 0;
 dif(_, _) -> 1.
@@ -67,6 +72,7 @@ dif(_, _) -> 1.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% -------------------------------------------------------------------
+	
 levenshtein_test_() ->
 	{setup, 
 	 	fun() -> setup() end,
@@ -74,7 +80,8 @@ levenshtein_test_() ->
 			[
 			 ?_assertEqual(2, levenshtein("Aloha!", "Alhoa!")),
 			 ?_assertEqual(39,levenshtein(string:to_lower("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7"),
-				string:to_lower("Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A538a Safari/419.3")))
+				string:to_lower("Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A538a Safari/419.3"))),
+			 ?_assertEqual("Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_1 like Mac OS X; en-us) X (KHTML, like Gecko) X X X", invalidate_number("Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_1 like Mac OS X; en-us) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5F90 Safari/525.20"))
 			 ]
 	 	end
 	 }.	
@@ -87,20 +94,22 @@ setup() ->
 levenshtein_DB_test_() ->
 	Keys = wurfler_db:get_all_keys(devicesTbl),
 	A="Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7",
-	parmap(A, Keys).
-	%get_devices(Keys, []).
+	parmap(invalidate_number(A), Keys).
+	%%get_devices(Keys, []).
 		
+	
 get_devices([], Acc)->
 	Acc;
 get_devices([Key|Keys], Acc) ->
 	[#device{user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
 	A="Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7",
 	%%Diff = levenshtein(UA,A), %%28245692 on a core2duo macbookPro
-	erlang:spawn(fun() -> wurfler_string_metrics:levenshtein(UA, A)  end),
+	erlang:spawn(fun() -> wurfler_string_metrics:levenshtein(invalidate_number(UA), invalidate_number(A))  end),
 	%%10121671 on a core2duo macbookPro
 	%%5009021 on my amd box
 	Diff = levenshtein(string:to_lower(string:substr(A, 1, erlang:length(A))), string:to_lower(UA)),
-	io:format("~p, ~p, ~p ~n", [Diff, erlang:length(UA), UA]),
+	io:format("~p, ~p, ~p ~n", [Diff, erlang:length(invalidate_number(UA)), invalidate_number(UA)]),
+	
 	get_devices(Keys, Acc).
 
 parmap(UA ,Keys) ->

@@ -404,7 +404,7 @@ search_by_capabilities_test() ->
 overwrite_test() ->
 	Generic = get_generic_capabilities(),
 	C = [#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
-	?assertEqual(533,erlang:length(overwrite(Generic, C))).
+	?assertEqual(497,erlang:length(overwrite(Generic, C))).
 	
 optimization_test() ->
 	Generic = get_generic_capabilities(),

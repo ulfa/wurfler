@@ -33,7 +33,7 @@
 -compile([export_all]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
--export([searchByUA/1, searchByCapabilities/2, check_device/3]).
+-export([searchByUA/1, searchByCapabilities/2, check_device/3, search_by_device_id/1]).
 -define(TIMEOUT, infinity).
 -define(CONTAINS, fun({device, [{model_name, Model_Name},_], []}) ->					   					   
 					if Device#device.model_name == Model_Name -> true;
@@ -48,6 +48,8 @@ searchByCapabilities(Capabilities, Timestamp) ->
 	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp}, ?TIMEOUT).
 searchByUA(UserAgent)->
 	gen_server:call(?MODULE, {search_by_ua, UserAgent}, ?TIMEOUT).
+searchById(UserAgent)->
+	gen_server:call(?MODULE, {search_by_id, UserAgent}, ?TIMEOUT).
 check_device(Capabilities, Key, Id) ->
 	gen_server:call(?MODULE, {check_device, Capabilities, Key, Id}, ?TIMEOUT).
 
@@ -94,6 +96,9 @@ handle_call({search_by_capabilities, Capabilities, Timestamp}, _From, State) ->
     {reply, Result#state.devices, State};
 handle_call({search_by_ua, User_Agent}, _From, State) ->
 	Result = search_by_ua(User_Agent, State),
+    {reply, Result, State};
+handle_call({search_by_id, Id}, _From, State) ->
+	Result = search_by_device_id(Id),
     {reply, Result, State};
 handle_call({check_device, Capabilities, Key, Id}, _From, _State) ->
 	Result = check_device(Capabilities, Key, Id, new_state()),
@@ -152,11 +157,9 @@ search_by_device_id(DeviceName)->
 	end.
 
 search_by_ua(UserAgent, _State)->
-	case wurfler_db:find_record_by_ua(devicesTbl, UserAgent) of
-		[] -> [];
-		[Device] -> {ok,#state{groups=Groups}} = get_all_groups(Device#device.id, new_state()),
-					Device#device{groups=Groups}
-	end.
+	Keys = wurfler_db:get_all_keys(devicesTbl),
+	{Distance, Id, _Ua} =  wurfler_string_metrics:levenshtein(useragent, Keys, UserAgent),
+	Id.
 
 check_device(Capabilities, Key, DeviceId, State) ->
 	List_Of_Funs = create_funs_from_list(Capabilities),

@@ -28,7 +28,7 @@
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
--export([levenshtein/2]).
+-export([levenshtein/2, levenshtein/3]).
 -compile([export_all]).
 
 %% --------------------------------------------------------------------
@@ -43,6 +43,9 @@
 %% @doc Calculates the Levenshtein distance between two strings
 %% @end
 %%------------------------------------------------------------------------------
+levenshtein(useragent, Keys, UA)->
+	lists:nth(1, pmap(invalidate_number(UA), Keys)).
+
 levenshtein(Samestring, Samestring) -> 0;
 levenshtein(String, []) -> length(String);
 levenshtein([], String) -> length(String);
@@ -90,21 +93,27 @@ setup() ->
 	mnesia:clear_table(devicesTbl),
 	mnesia:clear_table(brand_index),
 	mnesia:load_textfile("data/daten.txt").
+	
 
 levenshtein_DB_test_() ->
 	Keys = wurfler_db:get_all_keys(devicesTbl),
 	A="Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7",
-	parmap(invalidate_number(A), Keys).
+	pmap(invalidate_number(A), Keys).
 	%%get_devices(Keys, []).
-		
+
+levenshtein_1_test_() ->
+	Keys = wurfler_db:get_all_keys(devicesTbl),
+	A="Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7",
+	pmap(invalidate_number(A), Keys).
 	
+
 get_devices([], Acc)->
 	Acc;
 get_devices([Key|Keys], Acc) ->
 	[#device{user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
 	A="Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7",
 	%%Diff = levenshtein(UA,A), %%28245692 on a core2duo macbookPro
-	erlang:spawn(fun() -> wurfler_string_metrics:levenshtein(invalidate_number(UA), invalidate_number(A))  end),
+	erlang:spawn(fun() -> wurfler_string_metrics:levenshtein(UA, A)  end),
 	%%10121671 on a core2duo macbookPro
 	%%5009021 on my amd box
 	Diff = levenshtein(string:to_lower(string:substr(A, 1, erlang:length(A))), string:to_lower(UA)),
@@ -112,13 +121,29 @@ get_devices([Key|Keys], Acc) ->
 	
 	get_devices(Keys, Acc).
 
-parmap(UA ,Keys) ->
-    Parent = self(),
-    [receive 
-		 {Pid, Result} -> Result 
-	 end || Pid <- [spawn(fun() -> Parent ! {self(), wurfler_string_metrics:levenshtein(UA, get_a_ua(Key))} end) || Key <- Keys]
-	].
 
+pmap(UA, Keys) ->
+	Parent = self(),
+	Pids = lists:map(fun(Key) -> 
+							 proc_lib:spawn_link(fun() -> do_it(Parent, UA, Key) end) 
+					 end, Keys),
+	lists:keysort(1,gather(Pids)).
+
+do_it(Parent, UA,  Key) ->
+	{Id, Ua} = get_id_ua(Key),
+	Distance =  wurfler_string_metrics:levenshtein(UA, invalidate_number(Ua)),
+	Parent ! {Distance, Id, Ua}.
+
+gather([Pid|Pids]) ->
+	receive
+		{Distance, Id, Ua} -> [{Distance, Id, Ua}|gather(Pids)]
+	end;
+gather([]) ->
+	[].
+
+get_id_ua(Key) ->
+	[#device{id=Id, user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
+	{Id, UA}.
 get_a_ua(Key) ->
-	[#device{user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
+	[#device{id=Id, user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
 	UA.

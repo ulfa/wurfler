@@ -186,7 +186,8 @@ search_by_device_id(DeviceName)->
 	end.
 
 search_by_ua(UserAgent, _State)->
-	wurfler_search:searchByUA(UserAgent). 
+	Id = wurfler_search:searchByUA(UserAgent),
+	wurfler_search:search_by_device_id(Id).
 
 search_by_capabilities(Capabilities, Timestamp) ->
 	wurfler_search:searchByCapabilities(Capabilities, Timestamp).

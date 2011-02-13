@@ -35,11 +35,6 @@
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, check_device/3, search_by_device_id/1]).
 -define(TIMEOUT, infinity).
--define(CONTAINS, fun({device, [_, {model_name, Model_Name},_], []}) ->					   					   
-					if Device#device.model_name == Model_Name -> true;
-					    true -> false
-					end
-			   	  end).
 
 %% ====================================================================
 %% External functions
@@ -196,13 +191,8 @@ get_generic_capabilities() ->
 	Generic.
 
 
-add_device_to_devices(_Fun, Device, #state{devices=[]}=State) ->
-	State#state{devices=[xml_factory:create_device(Device)|State#state.devices]};
-add_device_to_devices(Fun, Device, #state{devices=Devices}=State) ->
- 	case lists:any(Fun, Devices) of 
-		false -> State#state{devices=[xml_factory:create_device(Device)|State#state.devices]};
-		true -> State
-	end.
+add_device_to_devices(Device, State) ->
+	State#state{devices=[xml_factory:create_device(Device)|State#state.devices]}.
 
 get_devices_for_caps([], _Keys, State) ->
 	State#state{devices = xml_factory:create_devices(State#state.devices)};
@@ -214,7 +204,7 @@ get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),	
 	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State),
 	case run_funs_against_list(List_Of_Funs, Caps, {nok}) of
-  		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, add_device_to_devices(?CONTAINS, Device, State));
+  		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, add_device_to_devices(Device, State));
 		{nok} -> get_devices_for_caps(List_Of_Funs, Keys, State)
 	end.
 

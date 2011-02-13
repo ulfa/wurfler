@@ -35,7 +35,7 @@
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/2, check_device/3, search_by_device_id/1]).
 -define(TIMEOUT, infinity).
--define(CONTAINS, fun({device, [{model_name, Model_Name},_], []}) ->					   					   
+-define(CONTAINS, fun({device, [_, {model_name, Model_Name},_], []}) ->					   					   
 					if Device#device.model_name == Model_Name -> true;
 					    true -> false
 					end

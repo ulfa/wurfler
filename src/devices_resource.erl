@@ -72,7 +72,7 @@ process_post(ReqData, Context) ->
 	Key = get_key(Body),
 	Timestamp = get_timestamp(Body),
 	Devices = get_devices(Caps, Timestamp),
-	save_caps_devices(Caps, Devices, Key),
+	%%save_caps_devices(Caps, Devices, Key),
 	D = xml_factory:to_xml(Devices),
 	{true, wrq:append_to_response_body(D, ReqData), Context}.
 %%

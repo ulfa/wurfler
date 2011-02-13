@@ -21,6 +21,7 @@
 			<li><label for="{{fall_back}}">Fallback :</label>{{fall_back}}</li>
 			<li><label for="{{created}}">Created :</label>{{created|date:"r"}}</li>
 			<li><label for="{{lastmodified}}">Last modified :</label>{{lastmodified|date:"r"}}</li>
+			<li><label for="{{filter}}">filter :</label>{{filter}}</li>
 		</ul>
 		<form action="/device/{{id}}" method="post">
 			<button type="submit" id="delete-id" name="device" value="{{id}}">Delete</button>

@@ -14,7 +14,7 @@
          [{record_name,device},
           {attributes,
               [id,user_agent,actual_device_root,fall_back,brand_name,
-               model_name,groups,created,lastmodified]}]}]}.
+               model_name,groups,created,lastmodified,filter]}]}]}.
 {brand_index,"HTC",[{"htc_desire_a8181_ver1","Desire"}]}.
 {brand_index,"Samsung",[{"samsung_gt_i9000_ver1","GT-I9000"}]}.
 {devicesTbl,"htc_desire_a8181_ver1",
@@ -70,21 +70,24 @@
                      {capability,"oma_support","true"}]},
              {group,"android",
                     [{capability,"android.software.live_wallpaper","false"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"samsung_gt_i9000_ver1_sub22",
             "Mozilla/5.0 (Linux; U; Android 2.2; es-es; GT-I9000 Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
             undefined,"samsung_gt_i9000_ver1",undefined,"GT-I9000_2.2",
             [{group,"product_info",
                     [{capability,"model_name","GT-I9000_2.2"},
                      {capability,"device_os_version","2.2"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"htc_desire_ver1_subadr6275",
             "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-us; USCCADR6275US Carrier ID 45 Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17",
             undefined,"htc_desire_ver1",undefined,undefined,[],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"generic_xhtml","DO_NOT_MATCH_MOZILLA",undefined,"generic",
             undefined,undefined,
             [{group,"markup",
@@ -115,8 +118,9 @@
              {group,"product_info",
                     [{capability,"can_skip_aligned_link_row","true"},
                      {capability,"release_date","2002_july"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"htc_desire_ver1",
             "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-gb; HTC Desire Build/ERE27) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2",
             undefined,"htc_desire_a8181_ver1","HTC","Desire_2.1",
@@ -129,8 +133,9 @@
                      {capability,"brand_name","HTC"},
                      {capability,"marketing_name",[]},
                      {capability,"release_date","2010_march"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"samsung_gt_i9000_ver1_subt",
             "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17",
             undefined,"samsung_gt_i9000_ver1","Samsung","GT I9000T_2.1",
@@ -142,8 +147,9 @@
                      {capability,"brand_name","Samsung"},
                      {capability,"device_os_version","2.1"},
                      {capability,"marketing_name","Galaxy S"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"htc_desire_a8181_ver1_sub2_2",
             "Mozilla/5.0 (Linux; U; Android 2.2; de-de; Desire_A8181 Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
             undefined,"htc_desire_a8181_ver1",undefined,"Desire_2.2",
@@ -152,13 +158,15 @@
                      {capability,"uaprof2",[]},
                      {capability,"device_os_version","2.2"},
                      {capability,"release_date","2010_september"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"generic_android_ver2_1","DO_NOT_MATCH_GENERIC_ANDROID_2_1",
             undefined,"generic_android_ver2",undefined,undefined,
             [{group,"product_info",[{capability,"device_os_version","2.1"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"generic_android_ver1_5","DO_NOT_MATCH_ANDROID_1_5",undefined,
             "generic_android",undefined,"Generic",
             [{group,"product_info",
@@ -168,15 +176,17 @@
                     [{capability,"streaming_vcodec_mpeg4_sp","2"}]},
              {group,"ajax",
                     [{capability,"ajax_preferred_geoloc_api","gears"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"generic_android_ver2_3","DO_NOT_MATCH_ANDROID_2_3",undefined,
             "generic_android_ver2_2",undefined,undefined,
             [{group,"product_info",
                     [{capability,"device_os_version","2.3"},
                      {capability,"release_date","2010_November"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"samsung_gt_i9000_ver1",
             "Mozilla/5.0 (Linux; U; Android 2.1-update1; zh-tw; GT-I9000 Build/ECLAIR) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2",
             "true","generic_android_ver2_1","Samsung","GT-I9000",
@@ -200,8 +210,9 @@
              {group,"image_format",[{capability,"colors","16777216"}]},
              {group,"streaming",
                     [{capability,"streaming_vcodec_h264_bp","1.2"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"generic_android_ver2_2","DO_NOT_MATCH_ANDROID_2_2",undefined,
             "generic_android_ver2_1",undefined,undefined,
             [{group,"product_info",[{capability,"device_os_version","2.2"}]},
@@ -217,8 +228,9 @@
                      {capability,"resolution_width","600"},
                      {capability,"resolution_height","1024"},
                      {capability,"max_image_height","800"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"generic",[],undefined,"root",[],[],
             [{group,"product_info",
                     [{capability,"mobile_browser",[]},
@@ -800,8 +812,9 @@
                      {capability,"android.hardware.touchscreen.multitouch.distinct",
                                  "false"},
                      {capability,"android.hardware.wifi","false"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"generic_android","DO_NOT_MATCH_GENERIC_ANDROID",undefined,
             "generic_xhtml","Android","SDK",
             [{group,"product_info",
@@ -906,22 +919,25 @@
                     [{capability,"directdownload_support","true"},
                      {capability,"oma_support","true"}]},
              {group,"pdf",[{capability,"pdf_support","true"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"generic_android_ver1_6","DO_NOT_MATCH_GENERIC_ANDROID_1_6",
             undefined,"generic_android_ver1_5",undefined,undefined,
             [{group,"product_info",
                     [{capability,"device_os_version","1.6"},
                      {capability,"release_date","2009_july"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"generic_android_ver2","DO_NOT_MATCH_GENERIC_ANDROID_2_0",
             undefined,"generic_android_ver1_6",undefined,undefined,
             [{group,"product_info",
                     [{capability,"device_os_version","2.0"},
                      {capability,"release_date","2009_october"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.
 {devicesTbl,"chtml_generic","DO_NOT_MATCH_GENERIC_HTML",undefined,"generic",
             undefined,undefined,
             [{group,"markup",
@@ -931,5 +947,6 @@
                      {capability,"preferred_markup",
                                  "html_wi_imode_compact_generic"},
                      {capability,"xhtml_support_level","1"}]}],
-            {{2011,1,31},{10,13,37}},
-            {{2011,1,31},{10,13,37}}}.
+            {{2011,2,13},{6,8,38}},
+            {{2011,2,13},{6,8,38}},
+            undefined}.

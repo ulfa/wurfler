@@ -153,8 +153,15 @@ search_by_device_id(DeviceName)->
 
 search_by_ua(UserAgent, _State)->
 	Keys = wurfler_db:get_all_keys(devicesTbl),
-	{Distance, Id, _Ua} =  wurfler_string_metrics:levenshtein(useragent, Keys, UserAgent),
-	Id.
+	{Distance, Id, Ua} =  wurfler_string_metrics:levenshtein(useragent, Keys, UserAgent),
+	error_logger:info_msg("Distance : ~p Prozent : ~p~n", [Distance, calculate(Distance, UserAgent, Ua)]),
+	case calculate(Distance, UserAgent, Ua) > 20 of 
+		true -> [];
+		false -> Id
+	end.
+
+calculate(Distance, UA_1, UA_2) ->
+	Distance * 100 / (erlang:length(UA_1) + erlang:length(UA_2)).
 
 check_device(Capabilities, Key, DeviceId, State) ->
 	List_Of_Funs = create_funs_from_list(Capabilities),

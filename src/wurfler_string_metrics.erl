@@ -72,6 +72,31 @@ invalidate_number(UA) ->
 dif(C, C) -> 0;
 dif(_, _) -> 1.
 
+pmap(UA, Keys) ->
+	Parent = self(),
+	Pids = lists:map(fun(Key) -> 
+						proc_lib:spawn_link(fun() -> do_it(Parent, UA, Key) end) 
+					 end, Keys),
+	lists:keysort(1,gather(Pids)).
+
+do_it(Parent, UA,  Key) ->
+	{Id, Ua} = get_id_ua(Key),
+	Distance = levenshtein(UA, invalidate_number(Ua)),
+	Parent ! {Distance, Id, Ua}.
+
+gather([_Pid|Pids]) ->
+	receive
+		{Distance, Id, Ua} -> [{Distance, Id, Ua}|gather(Pids)]
+	end;
+gather([]) ->
+	[].
+
+get_id_ua(Key) ->
+	[#device{id=Id, user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
+	{Id, UA}.
+get_a_ua(Key) ->
+	[#device{id=Id, user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
+	UA.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% -------------------------------------------------------------------
@@ -120,30 +145,3 @@ get_devices([Key|Keys], Acc) ->
 	io:format("~p, ~p, ~p ~n", [Diff, erlang:length(invalidate_number(UA)), invalidate_number(UA)]),
 	
 	get_devices(Keys, Acc).
-
-
-pmap(UA, Keys) ->
-	Parent = self(),
-	Pids = lists:map(fun(Key) -> 
-							 proc_lib:spawn_link(fun() -> do_it(Parent, UA, Key) end) 
-					 end, Keys),
-	lists:keysort(1,gather(Pids)).
-
-do_it(Parent, UA,  Key) ->
-	{Id, Ua} = get_id_ua(Key),
-	Distance =  wurfler_string_metrics:levenshtein(UA, invalidate_number(Ua)),
-	Parent ! {Distance, Id, Ua}.
-
-gather([Pid|Pids]) ->
-	receive
-		{Distance, Id, Ua} -> [{Distance, Id, Ua}|gather(Pids)]
-	end;
-gather([]) ->
-	[].
-
-get_id_ua(Key) ->
-	[#device{id=Id, user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
-	{Id, UA}.
-get_a_ua(Key) ->
-	[#device{id=Id, user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
-	UA.

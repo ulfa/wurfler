@@ -61,7 +61,7 @@ suite() -> [{timetrap, {seconds, 20}}].
 groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
 			 {device_get_requests_html, [parallel], [get_device_by_id_to_html, get_device_by_ua_to_html, get_device_by_id_404_to_html]},
 			 {devices_post_requests, [parallel], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp,
-												  post_cap_query_device_os_version]},
+												  post_cap_query_device_os_version, post_cap_android]},
 			 {brand_get_requests, [parallel], [get_brand_by_brand_name, get_all_brands, get_brand_by_brand_name_to_html]},
 			 {brand_get_requests_html, [parallel], [get_brand_by_brand_name_to_html]},
 			 {model_get_requests, [parallel], [get_devices_by_model_name, get_devices_without_model_name]},
@@ -247,3 +247,10 @@ delete_device_by_id(_Config) ->
 find_changes(_Config) ->
 		{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/changes/01012010", ?XML_CONTENT_TYPE, get),
 		io:format("1.. ~p~n", [D]).
+
+post_cap_android(_Config) ->
+	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query key=\"1111\"><capabilities><capability name=\"device_os\" value=\"Android\" operator=\"=\"/></capabilities></query>",
+	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
+	Xml = xml_factory:parse(D),
+	Devices = xmerl_xpath:string("//devices/device", Xml),	
+	186 = erlang:length(Devices).	

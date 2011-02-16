@@ -87,8 +87,8 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({search_by_capabilities, Capabilities, Timestamp}, _From, State) ->
-	Result=search_by_capabilities(Capabilities, Timestamp, new_state()),
-    {reply, Result#state.devices, State};
+	Result = search_by_capabilities(Capabilities, Timestamp, new_state()),
+    {reply, Result, State};
 handle_call({search_by_ua, User_Agent}, _From, State) ->
 	Result = search_by_ua(User_Agent, State),
     {reply, Result, State};
@@ -140,10 +140,42 @@ code_change(_OldVsn, State, _Extra) ->
 new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
 
-search_by_capabilities(Capabilities, Timestamp, State) ->
+search_by_capabilities(Capabilities, Timestamp, _State) ->
 	List_Of_Funs=create_funs_from_list(Capabilities),
 	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
-	get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
+	pmap(List_Of_Funs, Capabilities, split_list(Keys, erlang:system_info(schedulers))).
+	%%get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
+
+split_list(List, 2) ->
+	{L1, L2} = lists:split(length(List) div 2, List),
+	[L1, L2];
+split_list(List, 4) ->
+	{L1, L2} = lists:split(length(List) div 2, List),
+	{L3, L4} = lists:split(length(L1) div 2, L1),
+	{L5, L6} = lists:split(length(L2) div 2, L2),
+	[L3,L4,L5,L6].
+%% erlang:system_info(schedulers).
+
+pmap(List_Of_Funs, Capabilities, Keys) ->
+	Parent = self(),
+	Pids = lists:map(fun(Key) -> 
+						proc_lib:spawn_link(fun() -> do_it(Parent, List_Of_Funs, Capabilities, Key) end) 
+					 end, Keys),
+	io:format("PIDS : ~p~n", [Pids]),
+	xml_factory:create_devices(gather(Pids)).
+	
+
+do_it(Parent, List_Of_Funs, Capabilities, Keys) ->
+	Parent ! {get_devices_for_caps(List_Of_Funs, Keys, #state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)})}.
+
+gather([_Pid|Pids]) ->
+	receive
+		{Devices} -> lists:append(Devices,gather(Pids));
+		{[]} -> gather(Pids)
+	end;
+gather([]) ->
+	[].
+
 
 search_by_device_id(DeviceName)->	
 	case wurfler_db:find_record_by_id(devicesTbl, DeviceName) of
@@ -202,10 +234,12 @@ add_device_to_devices(Device, State) ->
 	State#state{devices=[xml_factory:create_device(Device)|State#state.devices]}.
 
 get_devices_for_caps([], _Keys, State) ->
-	State#state{devices = xml_factory:create_devices(State#state.devices)};
+	%%State#state{devices = xml_factory:create_devices(State#state.devices)};
+	State#state.devices;
 
 get_devices_for_caps(_List_Of_Funs, [], State) ->
-	State#state{devices = xml_factory:create_devices(State#state.devices)};
+	%%State#state{devices = xml_factory:create_devices(State#state.devices)};
+	State#state.devices;
 
 get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
 	Device = search_by_device_id(Key),	
@@ -398,8 +432,9 @@ search_by_capabilities_test() ->
 	List=[{"handheldfriendly", {"false", '='}},
 	 {"playback_mp4", {"false", '='}},
 	 {"playback_wmv", {"none", '='}}],
-	State = search_by_capabilities(List, "01.01.2011", new_state()),
-	?assertEqual(1, erlang:length(State#state.devices)).
+	Devices = search_by_capabilities(List, "01.01.2011", new_state()),
+%%  	io:format("Devices : ~p~n", [Devices]),
+	?assertEqual(1, erlang:length(Devices)).
 	
 overwrite_test() ->
 	Generic = get_generic_capabilities(),

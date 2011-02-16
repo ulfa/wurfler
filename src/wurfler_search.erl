@@ -154,7 +154,6 @@ split_list(List, 4) ->
 	{L3, L4} = lists:split(length(L1) div 2, L1),
 	{L5, L6} = lists:split(length(L2) div 2, L2),
 	[L3,L4,L5,L6].
-%% erlang:system_info(schedulers).
 
 pmap(List_Of_Funs, Capabilities, Keys) ->
 	Parent = self(),
@@ -170,8 +169,7 @@ do_it(Parent, List_Of_Funs, Capabilities, Keys) ->
 
 gather([_Pid|Pids]) ->
 	receive
-		{Devices} -> lists:append(Devices,gather(Pids));
-		{[]} -> gather(Pids)
+		{Devices} -> lists:append(Devices,gather(Pids))
 	end;
 gather([]) ->
 	[].

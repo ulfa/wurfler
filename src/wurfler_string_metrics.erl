@@ -77,6 +77,7 @@ pmap(UA, Keys) ->
 	Pids = lists:map(fun(Key) -> 
 						proc_lib:spawn_link(fun() -> do_it(Parent, UA, Key) end) 
 					 end, Keys),
+%% 	io:format("Pids ~p~n", [Pids]),
 	lists:keysort(1,gather(Pids)).
 
 do_it(Parent, UA,  Key) ->
@@ -94,9 +95,6 @@ gather([]) ->
 get_id_ua(Key) ->
 	[#device{id=Id, user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
 	{Id, UA}.
-get_a_ua(Key) ->
-	[#device{id=Id, user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
-	UA.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% -------------------------------------------------------------------
@@ -143,5 +141,4 @@ get_devices([Key|Keys], Acc) ->
 	%%5009021 on my amd box
 	Diff = levenshtein(string:to_lower(string:substr(A, 1, erlang:length(A))), string:to_lower(UA)),
 	io:format("~p, ~p, ~p ~n", [Diff, erlang:length(invalidate_number(UA)), invalidate_number(UA)]),
-	
 	get_devices(Keys, Acc).

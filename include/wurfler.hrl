@@ -8,3 +8,4 @@
 -record(brand_index, {brand_name, models=[]}).
 -record(capabilities_devices, {capabilities=[], devices=[], key,  created=wurfler_date_util:get_uc_time(), lastmodified=wurfler_date_util:get_uc_time()}).
 -record(capability_description, {name, type, description}).
+-record(os_device_id, {device_os, os_reg, device_ids=[]}).

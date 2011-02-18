@@ -32,7 +32,7 @@
 -export([post_is_create/2, process_post/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
--record(context, {device}).
+-record(context, {device, group}).
 %%
 %% API Functions
 %%
@@ -46,6 +46,10 @@ content_types_provided(ReqData, Context) ->
 allowed_methods(ReqData, Context) ->
     {['GET', 'DELETE', 'POST'], ReqData, Context}.
 
+
+to_html(ReqData, #context{device=[], group=Group}=Context) ->
+	io:format("Group rendering here : ~p~n",[Group]);
+
 to_html(ReqData, #context{device=Device}=Context) ->
      {ok, Content} = device_dtl:render(record_to_tuple(device, Device)),
      {Content, ReqData, Context}.
@@ -55,11 +59,11 @@ to_xml(ReqData, #context{device = Device} = Context) ->
     {D, ReqData, Context}.
  
 resource_exists(ReqData, Context) ->
-	case get_device(wrq:path_info(device, ReqData), ReqData) of
-		[] -> {false, ReqData, Context#context{device=[]}};
-		Device -> {true, ReqData, Context#context{device=Device}}
-	end.
-
+	io:format("1... ~p, ~p , ~n",[wrq:path_info(device, ReqData), wrq:path_tokens(ReqData)]),
+	Device = wrq:path_info(device, ReqData),
+	Group  = wrq:path_tokens(ReqData),
+	process_request(Device, Group, ReqData, Context).
+	
 post_is_create(ReqData, Context) ->
 	{false, ReqData, Context}.
 
@@ -87,11 +91,24 @@ redirect(Target, ReqData) ->
 delete_device(Id) ->
 	wurfler:delete_device(Id).
 
-get_device(undefined, ReqData) ->
+process_request(undefined, [], ReqData, Context) ->
 	error_logger:info_msg("UA ~p~n", [wrq:get_req_header("User-Agent", ReqData)]),
-	wurfler:searchByUA(wrq:get_req_header("User-Agent", ReqData));
-get_device(Value, _ReqData) ->
-	wurfler:searchByDeviceName(Value).
+	case wurfler:searchByUA(wrq:get_req_header("User-Agent", ReqData)) of
+		[] -> {false, ReqData, Context#context{device=[]}};
+		Device -> {true, ReqData, Context#context{device=Device}}
+	end;
+process_request(Value, [], ReqData, Context) ->
+	case wurfler:searchByDeviceName(Value) of
+		[] -> {false, ReqData, Context#context{device=[]}};
+		Device -> {true, ReqData, Context#context{device=Device}}
+	end;
+
+process_request(Device_Id, [Group_Name], ReqData, Context) ->
+	case wurfler_db:find_group_of_device(devicesTbl, Device_Id, Group_Name) of
+		[] -> {false, ReqData, Context#context{group=[]}};
+		[Group] -> {true, ReqData, Context#context{group=Group}}
+	end.
+
 %% --------------------------------------------------------------------
 %%
 %% --------------------------------------------------------------------
@@ -143,6 +160,6 @@ device_resource_test_() ->
 	 	end
 	 }.
 setup() ->
-	mnesia:clear_table(devicesTbl),
-	mnesia:clear_table(brand_index),
+%%	mnesia:clear_table(devicesTbl),
+%%	mnesia:clear_table(brand_index),
 	mnesia:load_textfile("data/test.data").

@@ -190,9 +190,9 @@ get_device_by_id_404_to_html(_Config) ->
 	{ok, "404", _C, _D}=ibrowse:send_req("http://localhost:8000/device/unknown", ?HTML_CONTENT_TYPE, get).
 
 get_device_by_ua(_Config) ->
-	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/xml"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/xml"}, {"User-Agent", "Mozilla/5.0 (Linux; U; Android 1.1; en-us; T-Mobile G1 Build/PLAT-RC33) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2"}], get).
 get_device_by_ua_to_html(_Config) ->
-	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/html"}, {"Accept", "text/html"}, {"User-Agent", "Nokia6061/2.0 (4.10) Profile/MIDP-2.0 Configuration/CLDC-1.1"}], get).
+	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/html"}, {"Accept", "text/html"}, {"User-Agent", "Mozilla/5.0 (Linux; U; Android 1.1; en-us; T-Mobile G1 Build/PLAT-RC33) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2"}], get).
 
 %% Tests for the device service (POST)
 post_cap_query(_Config) ->

@@ -35,6 +35,7 @@
 -export([clear_capabilities_devices/0, find_devices_by_brand/2, find_capabilities_device_by_key/1]).
 -export([delete_device/1, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
 -export([get_all_cap_key/1, find_id_by_fall_back/2, find_os_device_id/1, save_os_device_id/1]).
+-export([find_group_of_device/3]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -84,9 +85,14 @@ save_os_device_id(Os_Device_Id) ->
 %% --------------------------------------------------------------------
 find_record_by_id(devicesTbl, Id) ->
 	mnesia:dirty_read(devicesTbl, Id).
+
 find_groups_by_id(devicesTbl, Id) ->
 	[Device] = find_record_by_id(devicesTbl, Id), 
 	{Device#device.fall_back, Device#device.groups}.
+
+find_group_of_device(devicesTbl, Device_Id, Group_Name) ->
+	[Device] = find_record_by_id(devicesTbl, Device_Id), 
+	[Group || Group <- Device#device.groups, Group#group.id =:= Group_Name].	
 
 find_capabilities_by_id(devicesTbl, Id) ->
 	case find_record_by_id(devicesTbl, Id) of
@@ -181,8 +187,8 @@ remove_device_from_brand(#device{id=Id, brand_name=Brand_name}) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-%%find_group_by_id_test() ->
-%%	find_groups_by_id(devicesTbl, "generic").
+find_group_of_device_test() ->
+	?assertMatch([{group,"sound_format",_}],find_group_of_device(devicesTbl, "generic","sound_format")).
 
 wurfler_db_test_() ->
 	{setup, 

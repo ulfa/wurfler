@@ -205,7 +205,7 @@ search_by_ua(UserAgent, _State)->
 	Keys = wurfler_db:get_all_keys(devicesTbl),
 	{Distance, Id, Ua} =  wurfler_string_metrics:levenshtein(useragent, Keys, UserAgent),
 	error_logger:info_msg("Distance : ~p Prozent : ~p~n", [Distance, calculate(Distance, UserAgent, Ua)]),
-	case calculate(Distance, UserAgent, Ua) > 20 of 
+	case calculate(Distance, UserAgent, Ua) > wurfler_config:get_value(levensthein) of 
 		true -> [];
 		false -> Id
 	end.

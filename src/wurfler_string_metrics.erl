@@ -80,27 +80,32 @@ pmap(UA, Keys) ->
 	Pids = lists:map(fun(Key) -> 
 						proc_lib:spawn_link(fun() -> do_it(Parent, UA, Key) end) 
 					 end, Keys),
- 	io:format("Pids ~p~n", [Pids]),
+%% 	io:format("Pids ~p~n", [Pids]),
 	case gather(Pids) of 
 		[] -> [];
 		A -> lists:keysort(1,A)
 	end.
 
 do_it(Parent, UA,  Key) ->
-	{Id, Ua} = get_id_ua(Key),
-	Distance = levenshtein(UA, invalidate_number(Ua)),
-	Parent ! {Distance, Id, Ua}.
+	case get_id_ua(Key) of
+		{Id, Ua} -> Distance = levenshtein(UA, invalidate_number(Ua)),
+					Parent ! {Distance, Id, Ua};
+		[] -> Parent ! {[]}
+	end.
 
 gather([_Pid|Pids]) ->
 	receive
-		{Distance, Id, Ua} -> [{Distance, Id, Ua}|gather(Pids)]
+		{Distance, Id, Ua} -> [{Distance, Id, Ua}|gather(Pids)];
+		{[]} -> gather(Pids)
 	end;
 gather([]) ->
 	[].
 
 get_id_ua(Key) ->
-	[#device{id=Id, user_agent=UA}] = wurfler_db:find_record_by_id(devicesTbl, Key),
-	{Id, UA}.
+	case wurfler_db:find_record_by_id(devicesTbl, Key) of 
+		[#device{id=Id, user_agent=UA}] -> {Id, UA};
+		[] -> []
+	end.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% -------------------------------------------------------------------

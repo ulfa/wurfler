@@ -39,7 +39,11 @@
 -export([import/1, process_device/1, process_group/1, process_capability/1, store_device/1, update_brand_model/0]).
 -export([set_brand_name/1, set_model_name/1, check_devices/1, create_brand_index/1]).
 -record(state, {}).
-
+-define(CONTAINS, fun(I) -> case I == Key of
+					true -> true;
+					false -> false
+				end
+		end).
 %% ====================================================================
 %% External functions
 %% ====================================================================
@@ -254,14 +258,39 @@ update_brand_model() ->
 	error_logger:info_msg("end : checking consistency ~n"),
 	error_logger:info_msg("start : creating brand index ~n"),
 	create_brand_index(Keys),
-	error_logger:info_msg("end : creating brand index ~n").
-	
+	error_logger:info_msg("end : creating brand index ~n"),
+	error_logger:info_msg("start : creating os_device_id ~n"),
+	create_os_device_id(Keys),
+	error_logger:info_msg("end : creating os_device_id ~n").
+
 create_brand_index([]) ->
 	ok;
 create_brand_index([Key|Keys]) ->
 	[#device{id=Id, brand_name=Brand_Name, model_name=Model_Name}] = wurfler_db:find_record_by_id(devicesTbl, Key),
 	wurfler_db:save_brand_index(Brand_Name, {Id, Model_Name}),
 	create_brand_index(Keys).
+
+create_os_device_id([]) ->
+	ok;
+create_os_device_id([Key|Keys]) ->
+	OS = get_os(wurfler_search:getAllCapabilities(Key)),
+	case wurfler_db:find_os_device_id(OS) of
+		[OS_Device_Id] -> insert_os_device_id(Key, OS_Device_Id);
+		[] -> error_logger:warning_msg("The OS : ~p is not in the database for key ~p . ~n", [OS, Key])
+	end,
+	create_os_device_id(Keys).
+
+insert_os_device_id(Key, OS_Device_Id) ->
+	case lists:any(?CONTAINS, OS_Device_Id#os_device_id.device_ids) of 
+		true -> ok;
+		false -> wurfler_db:save_os_device_id(OS_Device_Id#os_device_id{device_ids=[Key|OS_Device_Id#os_device_id.device_ids]})
+	end.
+
+get_os(Capabilities) ->
+	case [Cap || Cap <- Capabilities, Cap#capability.name == "device_os"] of
+		[Caps] -> Caps#capability.value;
+		[] -> error_logger:warning_msg("no os found"), undefined
+	end.
 	
 set_brand_name([]) ->
 	ok;
@@ -319,6 +348,21 @@ check_device(model_name, _Device, _Model_name) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+contains_test() ->
+	L = ["a", "b", "c", "d"],
+	Id = "c",
+	Contains = fun(I) -> case I == Id of
+					true -> true;
+					false -> false
+				end
+		end,
+	?assertEqual(true,lists:any(Contains, L)).
+	
+create_os_device_id_test() ->
+	Keys = wurfler_db:get_all_keys(devicesTbl),
+	create_os_device_id(Keys).
+get_os_test() ->
+	?assertEqual("Android" , get_os(wurfler_search:getAllCapabilities("htc_desire_a8181_ver1"))).
 get_brand_name_from_db_test() ->
 	?assertEqual("HTC", get_brand_name_from_db("htc_desire_a8181_ver1")).
 process_group_test()->

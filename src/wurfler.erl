@@ -186,7 +186,9 @@ search_by_device_id(DeviceName)->
 	end.
 
 search_by_ua(UserAgent, _State)->
-	Id = wurfler_search:searchByUA(UserAgent),
+	Device_Ids = wurfler_uaparser:parse(UserAgent),
+	error_logger:info_msg("1... ~p~n", [Device_Ids]),
+	Id = wurfler_search:searchByUA(UserAgent, Device_Ids),
 	wurfler_search:search_by_device_id(Id).
 
 search_by_capabilities(Capabilities, Timestamp) ->

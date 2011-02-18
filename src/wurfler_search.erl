@@ -33,7 +33,8 @@
 -compile([export_all]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
--export([searchByUA/1, searchByCapabilities/2, check_device/3, search_by_device_id/1]).
+-export([searchByUA/1, searchByUA/2, searchByCapabilities/2, check_device/3, search_by_device_id/1]).
+-export([getAllCapabilities/1]).
 -define(TIMEOUT, infinity).
 
 %% ====================================================================
@@ -43,11 +44,14 @@ searchByCapabilities(Capabilities, Timestamp) ->
 	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp}, ?TIMEOUT).
 searchByUA(UserAgent)->
 	gen_server:call(?MODULE, {search_by_ua, UserAgent}, ?TIMEOUT).
-searchById(UserAgent)->
-	gen_server:call(?MODULE, {search_by_id, UserAgent}, ?TIMEOUT).
+searchByUA(UserAgent, Device_Ids)->
+	gen_server:call(?MODULE, {search_by_ua, UserAgent, Device_Ids}, ?TIMEOUT).
+searchById(Id)->
+	gen_server:call(?MODULE, {search_by_id, Id}, ?TIMEOUT).
 check_device(Capabilities, Key, Id) ->
 	gen_server:call(?MODULE, {check_device, Capabilities, Key, Id}, ?TIMEOUT).
-
+getAllCapabilities(Device_Id) ->
+	gen_server:call(?MODULE, {get_all_capabilities, Device_Id}).
 
 %% --------------------------------------------------------------------
 %% record definitions
@@ -74,7 +78,7 @@ start() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-    {ok, #state{}}.
+    {ok, #state{devices=[], groups=[], capabilities=[]}}.
 
 %% --------------------------------------------------------------------
 %% Function: handle_call/3
@@ -92,12 +96,19 @@ handle_call({search_by_capabilities, Capabilities, Timestamp}, _From, State) ->
 handle_call({search_by_ua, User_Agent}, _From, State) ->
 	Result = search_by_ua(User_Agent, State),
     {reply, Result, State};
+handle_call({search_by_ua, User_Agent, Device_Ids}, _From, State) ->
+	Result = search_by_ua(User_Agent, Device_Ids, State),
+    {reply, Result, State};
 handle_call({search_by_id, Id}, _From, State) ->
 	Result = search_by_device_id(Id),
     {reply, Result, State};
 handle_call({check_device, Capabilities, Key, Id}, _From, _State) ->
 	Result = check_device(Capabilities, Key, Id, new_state()),
-	{reply, Result, new_state()}.
+	{reply, Result, new_state()};
+handle_call({get_all_capabilities, Device_Id}, _From, State) ->
+	Result = get_all_capabilities(Device_Id),
+    {reply, Result, State}.
+
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages
@@ -160,7 +171,7 @@ pmap(List_Of_Funs, Capabilities, Keys) ->
 	Pids = lists:map(fun(Key) -> 
 						proc_lib:spawn_link(fun() -> do_it(Parent, List_Of_Funs, Capabilities, Key) end) 
 					 end, Keys),
-	io:format("PIDS : ~p~n", [Pids]),
+	%io:format("PIDS : ~p~n", [Pids]),
 	xml_factory:create_devices(gather(Pids)).
 	
 
@@ -179,6 +190,15 @@ search_by_device_id(DeviceName)->
 	case wurfler_db:find_record_by_id(devicesTbl, DeviceName) of
 		[] -> [];
 		[Device] -> Device				
+	end.
+search_by_ua(UserAgent, Device_Ids, _State)->
+	case wurfler_string_metrics:levenshtein(useragent, Device_Ids, UserAgent) of
+		{Distance, Id, Ua} ->  error_logger:info_msg("Distance : ~p Prozent : ~p~n", [Distance, calculate(Distance, UserAgent, Ua)]),
+							   case calculate(Distance, UserAgent, Ua) > 20 of 
+									true -> [];
+									false -> Id
+								end;
+		[] -> []
 	end.
 
 search_by_ua(UserAgent, _State)->
@@ -213,6 +233,9 @@ get_all_groups(DeviceName, #state{groups=AllGroups}) ->
 	get_all_groups(Fall_back, #state{groups=lists:append(AllGroups,Groups)}).
 
 
+get_all_capabilities(DeviceName) ->
+	{ok, #state{capabilities=Caps}} = get_all_capabilities(DeviceName, #state{capabilities=get_generic_capabilities()}),
+	Caps.
 get_all_capabilities([], #state{capabilities=Caps}) ->
 	{ok, #state{capabilities=Caps}};
 get_all_capabilities("root", #state{capabilities=Caps}) ->
@@ -437,11 +460,10 @@ search_by_capabilities_test() ->
 overwrite_test() ->
 	Generic = get_generic_capabilities(),
 	C = [#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
-	?assertEqual(497,erlang:length(overwrite(Generic, C))).
+	?assertEqual(533,erlang:length(overwrite(Generic, C))).
 	
 optimization_test() ->
 	Generic = get_generic_capabilities(),
 	C = [{"device_os_version", {"3.0", "="}}, {"device_os", {"Test", "="}}, {"device_os1", {"Test", ">"}}],
 	Result = extract_only_need_capabilities(Generic, C),
 	?assertEqual(2, erlang:length(Result)).
-

@@ -10,6 +10,7 @@
              wurfler_importer,
              wurfler_update,
              wurfler_deps,
+             wurfler_uaparser,
              xml_factory,
              about_resource,
              static_resource,

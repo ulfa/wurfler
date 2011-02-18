@@ -34,7 +34,7 @@
 -export([get_brand/1, get_devices_by_model_name/2, save_capabilities_devices/1, get_capablities_devices/1]).
 -export([clear_capabilities_devices/0, find_devices_by_brand/2, find_capabilities_device_by_key/1]).
 -export([delete_device/1, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
--export([get_all_cap_key/1, find_id_by_fall_back/2]).
+-export([get_all_cap_key/1, find_id_by_fall_back/2, find_os_device_id/1, save_os_device_id/1]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -54,6 +54,7 @@ create_db() ->
 	mnesia:create_table(capability_description,[{disc_copies, [node()]}, {attributes, record_info(fields, capability_description)}]),
 	mnesia:create_table(os_device_id, [{disc_copies, [node()]}, {attributes, record_info(fields, os_device_id)}]),
 	mnesia:wait_for_tables([devicesTbl, brand_index, capabilities_devices, changed_caps_devices, capability_description, os_device_id], 100000),
+	upload_os_device_id(),
 	application:stop(mnesia).
 %% --------------------------------------------------------------------
 %% save functions
@@ -76,6 +77,8 @@ save_capabilities_devices(Caps_Devices) ->
 	mnesia:activity(transaction, fun() -> mnesia:write(capabilities_devices, Caps_Devices, write) end).
 save_changed_caps_devices(Caps_Devices) ->
 	mnesia:activity(transaction, fun() -> mnesia:write(changed_caps_devices, Caps_Devices, write) end).
+save_os_device_id(Os_Device_Id) ->
+	mnesia:activity(transaction, fun() -> mnesia:write(os_device_id, Os_Device_Id, write) end).
 %% --------------------------------------------------------------------
 %% finder functions
 %% --------------------------------------------------------------------
@@ -99,7 +102,9 @@ find_id_by_fall_back(devicesTbl, Fall_Back) ->
 get_all_cap_key(capabilities_devices) ->
 	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([{P#capabilities_devices.capabilities, P#capabilities_devices.key} || P <- mnesia:table(capabilities_devices)])) end).
 get_all_keys(devicesTbl) ->
-	get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP).
+	get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP);
+get_all_keys(os_device_id) ->
+	mnesia:dirty_all_keys(os_device_id).
 get_all_keys(devicesTbl, ?DEFAULT_TIMESTAMP) ->
  	mnesia:activity(sync_dirty, fun() -> qlc:e(qlc:q([P#device.id || P <- mnesia:table(devicesTbl), P#device.actual_device_root =:= "true" ])) end);
 get_all_keys(devicesTbl, Timestamp) ->
@@ -126,11 +131,17 @@ find_changed_caps_devices(Timestamp) ->
 	mnesia:activity(sync_dirty, fun() -> 
 								qlc:e(qlc:q([P || P <- mnesia:table(changed_caps_devices), P#capabilities_devices.lastmodified > T])) 
 								end).
+find_os_device_id(OS) ->
+	mnesia:dirty_read(os_device_id, OS).
 %% --------------------------------------------------------------------
 %%% Other functions
 %% --------------------------------------------------------------------
 clear_capabilities_devices() ->
 	mnesia:activity(transaction, fun() -> mnesia:clear_table(capabilities_devices) end).
+upload_os_device_id() ->
+	error_logger:info_msg("start : load the os_device_id content~n"),
+	mnesia:load_textfile("data/tables.dump"),
+	error_logger:info_msg("end : load the os_device_id content~n").
 %% --------------------------------------------------------------------
 %%% delete functions
 %% --------------------------------------------------------------------

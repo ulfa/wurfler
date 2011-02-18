@@ -44,7 +44,10 @@
 %% @end
 %%------------------------------------------------------------------------------
 levenshtein(useragent, Keys, UA)->
-	lists:nth(1, pmap(invalidate_number(UA), Keys)).
+	case pmap(invalidate_number(UA), Keys) of
+		[] -> [];
+		A ->  lists:nth(1, A)
+	end.
 
 levenshtein(Samestring, Samestring) -> 0;
 levenshtein(String, []) -> length(String);
@@ -77,8 +80,11 @@ pmap(UA, Keys) ->
 	Pids = lists:map(fun(Key) -> 
 						proc_lib:spawn_link(fun() -> do_it(Parent, UA, Key) end) 
 					 end, Keys),
-%% 	io:format("Pids ~p~n", [Pids]),
-	lists:keysort(1,gather(Pids)).
+ 	io:format("Pids ~p~n", [Pids]),
+	case gather(Pids) of 
+		[] -> [];
+		A -> lists:keysort(1,A)
+	end.
 
 do_it(Parent, UA,  Key) ->
 	{Id, Ua} = get_id_ua(Key),

@@ -249,7 +249,8 @@ get_capabilities_for_groups(Groups) ->
 
 update_brand_model() ->
 	error_logger:info_msg("start: update brand_model and model_name in devices~n"),
-	Keys = wurfler_db:get_all_keys(devicesTbl),
+	%%Keys = wurfler_db:get_all_keys(devicesTbl),
+	Keys = wurfler_db:get_keys(devicesTbl),
 	set_brand_name(Keys),
  	set_model_name(Keys),
 	error_logger:info_msg("end: update brand_model and model_name in devices~n"),

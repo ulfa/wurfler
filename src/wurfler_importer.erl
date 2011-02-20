@@ -260,7 +260,7 @@ update_brand_model() ->
 	create_brand_index(Keys),
 	error_logger:info_msg("end : creating brand index ~n"),
 	error_logger:info_msg("start : creating os_device_id ~n"),
-	create_os_device_id(Keys),
+	create_os_device_id(wurfler_db:get_keys(devicesTbl)),
 	error_logger:info_msg("end : creating os_device_id ~n").
 
 create_brand_index([]) ->

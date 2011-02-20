@@ -33,7 +33,7 @@
 -compile([export_all]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
--export([searchByUA/1, searchByUA/2, searchByCapabilities/2, check_device/3, search_by_device_id/1]).
+-export([searchByUA/2, searchByCapabilities/2, check_device/3, search_by_device_id/1]).
 -export([getAllCapabilities/1]).
 -define(TIMEOUT, infinity).
 
@@ -42,8 +42,6 @@
 %% ====================================================================
 searchByCapabilities(Capabilities, Timestamp) ->
 	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp}, ?TIMEOUT).
-searchByUA(UserAgent)->
-	gen_server:call(?MODULE, {search_by_ua, UserAgent}, ?TIMEOUT).
 searchByUA(UserAgent, Device_Ids)->
 	gen_server:call(?MODULE, {search_by_ua, UserAgent, Device_Ids}, ?TIMEOUT).
 searchById(Id)->
@@ -92,9 +90,6 @@ init([]) ->
 %% --------------------------------------------------------------------
 handle_call({search_by_capabilities, Capabilities, Timestamp}, _From, State) ->
 	Result = search_by_capabilities(Capabilities, Timestamp, new_state()),
-    {reply, Result, State};
-handle_call({search_by_ua, User_Agent}, _From, State) ->
-	Result = search_by_ua(User_Agent, State),
     {reply, Result, State};
 handle_call({search_by_ua, User_Agent, Device_Ids}, _From, State) ->
 	Result = search_by_ua(User_Agent, Device_Ids, State),
@@ -201,14 +196,7 @@ search_by_ua(UserAgent, Device_Ids, _State)->
 		[] -> []
 	end.
 
-search_by_ua(UserAgent, _State)->
-	Keys = wurfler_db:get_all_keys(devicesTbl),
-	{Distance, Id, Ua} =  wurfler_string_metrics:levenshtein(useragent, Keys, UserAgent),
-	error_logger:info_msg("Distance : ~p Prozent : ~p~n", [Distance, calculate(Distance, UserAgent, Ua)]),
-	case calculate(Distance, UserAgent, Ua) > wurfler_config:get_value(levensthein) of 
-		true -> [];
-		false -> Id
-	end.
+
 
 calculate(Distance, UA_1, UA_2) ->
 	Distance * 100 / (erlang:length(UA_1) + erlang:length(UA_2)).
@@ -373,7 +361,9 @@ create_fun(CheckName, CheckValue, '>=')->
 %%% Test functions
 %% --------------------------------------------------------------------
 search_by_ua_test() ->
-	search_by_ua("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like Mac OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7", new_state()).
+	%%search_by_ua("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like Mac OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7", new_state()),
+	search_by_ua("Mozilla/5.0 (Linux; U; Android 2.1-update1; de-ch; SonyEricssonX10i Build/2.0.A.0.504) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17",
+				 wurfler_db:find_os_device_id("Android"), new_state()).
 
 and_cond_test() ->
 	List=[{"device_os", {"iPhone OS", '='}}],

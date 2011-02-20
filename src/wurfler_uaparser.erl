@@ -131,7 +131,7 @@ parse_useragent([Key|Keys], User_Agent, Acc) ->
 		{match, _} -> io:format("Match found for OS : ~p , ~p~n", [Key, OS_Reg]), 
 					  Acc1 = lists:append(Device_Ids, Acc),
 				  	  parse_useragent(Keys, User_Agent, Acc1);
-		nomatch -> error_logger:info_msg("No match for OS : ~p~n", [Key]),
+		nomatch -> %%error_logger:info_msg("No match for OS : ~p~n", [Key]),
 				   parse_useragent(Keys, User_Agent, Acc)
 	end.
 

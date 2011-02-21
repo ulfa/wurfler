@@ -249,19 +249,19 @@ get_capabilities_for_groups(Groups) ->
 
 update_brand_model() ->
 	error_logger:info_msg("start: update brand_model and model_name in devices~n"),
-	%%Keys = wurfler_db:get_all_keys(devicesTbl),
-	Keys = wurfler_db:get_keys(devicesTbl),
-	set_brand_name(Keys),
- 	set_model_name(Keys),
+	True_Keys = wurfler_db:get_all_keys(devicesTbl),
+	All_Keys = wurfler_db:get_keys(devicesTbl),
+	set_brand_name(All_Keys),
+ 	set_model_name(All_Keys),
 	error_logger:info_msg("end: update brand_model and model_name in devices~n"),
 	error_logger:info_msg("start : checking consistency ~n"),
-	check_devices(Keys),
+	check_devices(All_Keys),
 	error_logger:info_msg("end : checking consistency ~n"),
 	error_logger:info_msg("start : creating brand index ~n"),
-	create_brand_index(Keys),
+	create_brand_index(True_Keys),
 	error_logger:info_msg("end : creating brand index ~n"),
 	error_logger:info_msg("start : creating os_device_id ~n"),
-	create_os_device_id(wurfler_db:get_keys(devicesTbl)),
+	create_os_device_id(All_Keys),
 	error_logger:info_msg("end : creating os_device_id ~n").
 
 create_brand_index([]) ->

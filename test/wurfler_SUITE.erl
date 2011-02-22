@@ -22,7 +22,7 @@
 -compile(export_all).
 -include_lib("xmerl/include/xmerl.hrl").
 -define(HTML_CONTENT_TYPE, [{"Content-Type", "text/html"}, {"Accept", "text/html"}]).
--define(XML_CONTENT_TYPE, [{"Content-Type", "text/html"}, {"Accept", "text/xml"}]).
+-define(XML_CONTENT_TYPE, [{"Content-Type", "text/xml"}, {"Accept", "text/xml"}]).
 %%--------------------------------------------------------------------
 %% Function: suite() -> Info
 %%
@@ -203,6 +203,7 @@ post_cap_query(_Config) ->
 %%	io:format("Anzahl : ~p~n", [erlang:length(Devices)]),
 %%	1743=erlang:length(Devices).
 
+
 post_cap_query_no_caps(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities/></query>",
 	{ok, "200", _C, Body}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A),
@@ -214,6 +215,10 @@ post_cap_query_with_timestamp(_Config) ->
 %%	Xml = xml_factory:parse(D),
 %%	Devices = xmerl_xpath:string("//devices/device", Xml),
 %%	1743=erlang:length(Devices).
+
+post_cap_query_with_type(_Config) ->
+	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query key=\"1110\" type=\"JVM (Java)\"><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"=\"/></capabilities></query>",
+	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/devices", ?XML_CONTENT_TYPE, post, A).
 
 post_cap_query_device_os_version(_Config) ->
 	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query key=\"1111\"><timestamp>01.01.2010</timestamp><capabilities><capability name=\"device_os\" value=\"iPhone OS\" operator=\"=\"/><capability name=\"device_os_version\" value=\"0.0\" operator=\">\"/></capabilities></query>",

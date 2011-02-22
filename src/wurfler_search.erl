@@ -155,7 +155,7 @@ search_by_capabilities(Capabilities, Timestamp, Type, _State) ->
 get_keys([], Timestamp) ->
 	wurfler_db:get_all_keys(devicesTbl, Timestamp);
 get_keys(Type, _Timestamp) ->
-	#os_device_id{device_ids=Device_Ids}=wurfler_db:find_os_device_id(Type),
+	[#os_device_id{device_ids=Device_Ids}]=wurfler_db:find_os_device_id(Type),
 	Device_Ids.
 	
 split_list(List, 2) ->

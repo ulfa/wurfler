@@ -33,15 +33,15 @@
 -compile([export_all]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
--export([searchByUA/2, searchByCapabilities/2, check_device/3, search_by_device_id/1]).
+-export([searchByUA/2, searchByCapabilities/3, check_device/3, search_by_device_id/1]).
 -export([getAllCapabilities/1]).
 -define(TIMEOUT, infinity).
 
 %% ====================================================================
 %% External functions
 %% ====================================================================
-searchByCapabilities(Capabilities, Timestamp) ->
-	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp}, ?TIMEOUT).
+searchByCapabilities(Capabilities, Timestamp, Type) ->
+	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp, Type}, ?TIMEOUT).
 searchByUA(UserAgent, Device_Ids)->
 	gen_server:call(?MODULE, {search_by_ua, UserAgent, Device_Ids}, ?TIMEOUT).
 searchById(Id)->
@@ -88,8 +88,8 @@ init([]) ->
 %%          {stop, Reason, Reply, State}   | (terminate/2 is called)
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_call({search_by_capabilities, Capabilities, Timestamp}, _From, State) ->
-	Result = search_by_capabilities(Capabilities, Timestamp, new_state()),
+handle_call({search_by_capabilities, Capabilities, Timestamp, Type}, _From, State) ->
+	Result = search_by_capabilities(Capabilities, Timestamp, Type, new_state()),
     {reply, Result, State};
 handle_call({search_by_ua, User_Agent, Device_Ids}, _From, State) ->
 	Result = search_by_ua(User_Agent, Device_Ids, State),
@@ -146,12 +146,18 @@ code_change(_OldVsn, State, _Extra) ->
 new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
 
-search_by_capabilities(Capabilities, Timestamp, _State) ->
+search_by_capabilities(Capabilities, Timestamp, Type, _State) ->
 	List_Of_Funs=create_funs_from_list(Capabilities),
-	Keys = wurfler_db:get_all_keys(devicesTbl, Timestamp),
+	Keys = get_keys(Type, Timestamp),
 	pmap(List_Of_Funs, Capabilities, split_list(Keys, erlang:system_info(schedulers))).
 	%%get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
+get_keys([], Timestamp) ->
+	wurfler_db:get_all_keys(devicesTbl, Timestamp);
+get_keys(Type, _Timestamp) ->
+	#os_device_id{device_ids=Device_Ids}=wurfler_db:find_os_device_id(Type),
+	Device_Ids.
+	
 split_list(List, 2) ->
 	{L1, L2} = lists:split(length(List) div 2, List),
 	[L1, L2];
@@ -443,7 +449,7 @@ search_by_capabilities_test() ->
 	List=[{"handheldfriendly", {"false", '='}},
 	 {"playback_mp4", {"false", '='}},
 	 {"playback_wmv", {"none", '='}}],
-	Devices = search_by_capabilities(List, "01.01.2011", new_state()),
+	Devices = search_by_capabilities(List, "01.01.2011", [],new_state()),
 %%  	io:format("Devices : ~p~n", [Devices]),
 	?assertEqual(1, erlang:length(Devices)).
 	

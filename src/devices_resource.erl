@@ -70,8 +70,9 @@ process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
 	Caps = get_capabilities(Body),
 	Key = get_key(Body),
+	Type = get_type(Body),
 	Timestamp = get_timestamp(Body),
-	Devices = get_devices(Caps, Timestamp),
+	Devices = get_devices(Caps, Timestamp, Type),
 	%%save_caps_devices(Caps, Devices, Key),
 	D = xml_factory:to_xml(Devices),
 	{true, wrq:append_to_response_body(D, ReqData), Context}.
@@ -81,17 +82,20 @@ process_post(ReqData, Context) ->
 get_key(Body) ->
 	Xml = xml_factory:parse(Body),
 	xml_factory:get_attribute("/query/@key", Xml).
+get_type(Body) ->
+	Xml = xml_factory:parse(Body),
+	xml_factory:get_attribute("/query/@type", Xml).
 get_capabilities(Body) ->
 	Xml = xml_factory:parse(Body),
 	Caps = xmerl_xpath:string ("/query/capabilities/capability", Xml),
 	[create_cap(Cap)||Cap <- Caps].	
 
-get_devices([], _Timestamp) ->
+get_devices([], _Timestamp, Type) ->
 	xml_factory:create_devices([]);
-get_devices(Capabilities, []) ->
-	wurfler:searchByCapabilities(Capabilities, ?DEFAULT_TIMESTAMP);
-get_devices(Capabilities, Timestamp) ->
-	wurfler:searchByCapabilities(Capabilities, Timestamp).
+get_devices(Capabilities, [], Type) ->
+	wurfler:searchByCapabilities(Capabilities, ?DEFAULT_TIMESTAMP, Type);
+get_devices(Capabilities, Timestamp, Type) ->
+	wurfler:searchByCapabilities(Capabilities, Timestamp, Type).
 
 get_devices_by_model(Model_Name) ->
 	wurfler:get_devices_by_model(Model_Name).
@@ -130,7 +134,7 @@ get_timestamp_not_present_test() ->
 
 get_devices_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
-	D=get_devices(get_capabilities(Xml_Bin), "01.01.2010"),
+	D=get_devices(get_capabilities(Xml_Bin), "01.01.2010", []),
 	D1=xml_factory:to_xml(D),
 	binary_to_list(D1),
 %% 	xmerl_xpath:string("/device", D2),
@@ -138,5 +142,5 @@ get_devices_test() ->
 
 xml_test() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
-	A=lists:flatten(xmerl:export_simple_content(get_devices(get_capabilities(Xml_Bin), "01.01.2010"), xmerl_xml)),
+	A=lists:flatten(xmerl:export_simple_content(get_devices(get_capabilities(Xml_Bin), "01.01.2010", []), xmerl_xml)),
 	?assertEqual(451787, erlang:length(A)).

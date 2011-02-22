@@ -33,7 +33,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
--export([searchByUA/1, searchByCapabilities/2, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
+-export([searchByUA/1, searchByCapabilities/3, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
 -export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/3, delete_device/1, delete_brand/1]).
 -compile([export_all]).
 -define(TIMEOUT, infinity).
@@ -51,8 +51,8 @@
 %% ====================================================================
 import_wurfl(Filename) ->
 	gen_server:cast(?MODULE, {import_wurfl, Filename}).
-searchByCapabilities(Capabilities, Timestamp) ->
-	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp}, ?TIMEOUT).
+searchByCapabilities(Capabilities, Timestamp, Type) ->
+	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp, Type}, ?TIMEOUT).
 searchByUA(UserAgent)->
 	gen_server:call(?MODULE, {search_by_ua, UserAgent}, ?TIMEOUT).
 searchByDeviceName(DeviceName) ->
@@ -109,8 +109,8 @@ init([]) ->
 %%          {stop, Reason, Reply, State}   | (terminate/2 is called)
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-handle_call({search_by_capabilities, Capabilities, Timestamp}, _From, State) ->
-	Result = search_by_capabilities(Capabilities, Timestamp),
+handle_call({search_by_capabilities, Capabilities, Timestamp, Type}, _From, State) ->
+	Result = search_by_capabilities(Capabilities, Timestamp, Type),
     {reply, Result, State};
 handle_call({search_by_ua, User_Agent}, _From, State) ->
 	Result = search_by_ua(User_Agent, State),
@@ -191,8 +191,8 @@ search_by_ua(UserAgent, _State)->
 	Id = wurfler_search:searchByUA(UserAgent, Device_Ids),
 	wurfler_search:search_by_device_id(Id).
 
-search_by_capabilities(Capabilities, Timestamp) ->
-	wurfler_search:searchByCapabilities(Capabilities, Timestamp).
+search_by_capabilities(Capabilities, Timestamp, Type) ->
+	wurfler_search:searchByCapabilities(Capabilities, Timestamp, Type).
 
 check_device(Capabilities, Key, DeviceId, _State) ->
 	wurfler_search:check_device(Capabilities, Key, DeviceId).

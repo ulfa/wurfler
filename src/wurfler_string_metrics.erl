@@ -37,18 +37,16 @@
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
-%%------------------------------------------------------------------------------
-%% @spec levenshtein(StringA, StringB) -> integer()
-%%		StringA = StringB = string()
-%% @doc Calculates the Levenshtein distance between two strings
-%% @end
-%%------------------------------------------------------------------------------
 levenshtein(useragent, Keys, UA)->
 	case pmap(invalidate_number(UA), Keys) of
 		[] -> [];
 		A ->  lists:nth(1, A)
 	end.
-
+%%------------------------------------------------------------------------------
+%% @spec levenshtein(string(), string()) -> integer() 
+%% @doc Calculates the Levenshtein distance between two strings
+%% @end
+%%------------------------------------------------------------------------------
 levenshtein(Samestring, Samestring) -> 0;
 levenshtein(String, []) -> length(String);
 levenshtein([], String) -> length(String);

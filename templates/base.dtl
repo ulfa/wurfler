@@ -8,13 +8,13 @@
 		<link rel="stylesheet" type="text/css" media="screen" href="/css/wurfler.css">
 	</head>
 	<body>
+		<div id="wrapper">
     	<header>
 			<hgroup>
 				<h1>Wurfler</h1>
-				<h3>Find all the information of a device you need to know</h3>
 			</hgroup>							
 		</header>
-		<section id="navigation>		
+		<section id="navigation">		
 		{% block navigation %}{% endblock %}
 		</section>
 		<section id="left_content"> 
@@ -24,5 +24,6 @@
 		{% block content %}{% endblock %}
 		</section> 
 	</body>
-	<footer class="copyright">@2011 Ulf Angermann</footer>
+	<footer>@2011 Ulf Angermann</footer>
+	</div>
 </html>    

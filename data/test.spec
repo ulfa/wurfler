@@ -2,4 +2,4 @@
 {label, "wurfler"}.
 {alias, t1, "/Users/ulfangermann/projects/erlang/apps/wurflerservice/test"}.
 {suites, t1, all}.
-%%{cover, "/Users/ulfangermann/projects/erlang/apps/wurflerservice/cover.spec"}.
+{cover, "/Users/ulfangermann/projects/erlang/apps/wurflerservice/cover.spec"}.

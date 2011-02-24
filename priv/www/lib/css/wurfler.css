@@ -25,12 +25,37 @@ h6 {	font-size:1.52em;}
 	width:72px;
 }
 
-footer.copyright {
-    font-size: 0.75em;
-    text-align: center;
+body {
+  background: #fff;
+  font-size: 12px;
+  font-color: #444;
+  font-family: Verdana, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-#navigation {}
-#content {}
-#left_content {}
+footer {
+	position:absolut;
+	font-size: 0.75em;
+  	text-align: center;
+  	clear: both;
+  	text-align: center;
+  	padding: 10px 15px;
+  	margin: 10px 0 0 0;
+  	
+}
+
+#navigation {
+	float: left;
+}
+#content {
+	float: left;
+	width: 440px;
+  padding: 0 15px;
+  margin: 0 0 10px 0;
+
+}
+#left_content {
+	float: left;
+}
 

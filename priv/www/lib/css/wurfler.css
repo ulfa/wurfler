@@ -9,6 +9,7 @@ hgroup.left { text-align:left; }
 	-webkit-column-gap: 20px;
 	-moz-column-rule: 1px solid #ddccb5;
 	-webkit-column-rule: 1px solid #ddccb5;
+	list-style-type: none;
 	}
 
 /* ** ** Header Styles ** ** */

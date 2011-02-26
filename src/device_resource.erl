@@ -111,7 +111,7 @@ process_request(Device_Id, [Group_Name], ReqData, Context) ->
 
 expires(ReqData, Context) -> {wurfler_date_util:date_plus(calendar:now_to_datetime(now()), 1), ReqData, Context}.
 
-generate_etag(ReqData, Context) -> {wrq:raw_path(ReqData), ReqData, Context}.
+generate_etag(ReqData, Context) -> {mochihex:to_hex(erlang:phash2(Context)), ReqData, Context}.
 
 %% --------------------------------------------------------------------
 %%

@@ -22,13 +22,11 @@ resource_exists(ReqData, Context) ->
       case filelib:is_regular(Path) of
         true ->
           case file:read_file_info(Path) of
-            {ok, FileInfo} ->
-              {true, ReqData, Context#context{fileinfo=FileInfo}};
-            {error, _} ->
-              {false, ReqData, Context}
+            {ok, FileInfo} -> {true, ReqData, Context#context{fileinfo=FileInfo}};
+            {error, _} -> {false, ReqData, Context}
           end;
-        _ -> {false, ReqData, Context}
-      end
+        _ ->  {false, ReqData, Context}
+		end
   end.
  
 content_types_provided(ReqData, Context) ->
@@ -56,6 +54,7 @@ get_full_path(DocRoot, Path) ->
           FullPath
       end
     end.
+
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

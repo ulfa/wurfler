@@ -11,7 +11,7 @@
 </nav>
 {% endblock %}
 {% block content %}
-	<img id="device" src="/device_image/{{id}}.gif"/>
+	<img id="device" src="/device_image/{{picture}}"/>
 		<ul style="list-style-type:none">
 			<li><label for="{{id}}">Id : </label>{{id}}</li>  
 			<li><label for="{{brand_name}}">Brand name :</label>{{brand_name}}</li>

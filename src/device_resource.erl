@@ -59,7 +59,7 @@ to_xml(ReqData, #context{device = Device} = Context) ->
     {D, ReqData, Context}.
  
 resource_exists(ReqData, Context) ->
-	io:format("1... ~p, ~p , ~n",[wrq:path_info(device, ReqData), wrq:path_tokens(ReqData)]),
+	%%io:format("1... ~p, ~p , ~n",[wrq:path_info(device, ReqData), wrq:path_tokens(ReqData)]),
 	Device = wrq:path_info(device, ReqData),
 	Group  = wrq:path_tokens(ReqData),
 	process_request(Device, Group, ReqData, Context).
@@ -109,6 +109,10 @@ process_request(Device_Id, [Group_Name], ReqData, Context) ->
 		[Group] -> {true, ReqData, Context#context{group=Group}}
 	end.
 
+expires(ReqData, Context) -> {wurfler_date_util:date_plus(calendar:now_to_datetime(now()), 1), ReqData, Context}.
+
+generate_etag(ReqData, Context) -> {wrq:raw_path(ReqData), ReqData, Context}.
+
 %% --------------------------------------------------------------------
 %%
 %% --------------------------------------------------------------------
@@ -116,7 +120,7 @@ record_to_tuple(device, Record) ->
 	Groups = record_to_tuple(groups, Record#device.groups, []),
 	Keys = record_info(fields, device),
 	Data = lists:nthtail(1,tuple_to_list(Record#device{groups=Groups})),
-	lists:zip(Keys, Data);
+	[{picture, get_picture("priv/www/lib/devices/",Record#device.id)}|lists:zip(Keys, Data)];
 record_to_tuple(group, Record) ->	
 	Capabilities = record_to_tuple(capabilities, Record#group.capabilites, []),
 	Data = lists:nthtail(1,tuple_to_list(Record#group{capabilites=Capabilities})),
@@ -133,9 +137,20 @@ record_to_tuple(capabilities, [], Acc) ->
 	Acc;
 record_to_tuple(capabilities, [Capability|Capabilities], Acc) ->
 	record_to_tuple(capabilities, Capabilities, lists:merge(record_to_tuple(capability, Capability), Acc)).
+
+get_picture(Path, Id) ->
+	io:format("1... ~p~n", [Path]),
+	case filelib:is_regular(Path ++ Id ++ ".gif") of
+		true -> Id ++ ".gif";
+		false -> "no_image.gif"
+	end.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+get_picture_test() ->
+	{ok, Pwd} = file:get_cwd(),
+	io:format("2... ~p~n", [Pwd]),
+	?assertEqual("acer_e101_ver1.gif", get_picture(lists:append(Pwd, "/priv/www/lib/devices/"), "acer_e101_ver1")).
 record_to_tuple_test() ->
 	Device = #device{id="1", 
 					 user_agent="ua", 

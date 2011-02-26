@@ -28,7 +28,7 @@
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
--export([get_uc_time/0, parse_to_datetime/1,parse_to_datetime/2]).
+-export([get_uc_time/0, parse_to_datetime/1,parse_to_datetime/2, date_plus/2]).
 %% --------------------------------------------------------------------
 %% record definitions
 %% --------------------------------------------------------------------
@@ -41,7 +41,9 @@ parse_to_datetime(DateString) ->
 parse_to_datetime(without_dot, DateString) ->
 	Parse = fun (Start, Length) -> {I, _} = string:to_integer(string:substr(DateString, Start, Length)), I end,
 	{{Parse(5, 4), Parse(3, 2), Parse(1, 2)}, {0, 0, 0}}.
-	
+date_plus(Date, Days) ->
+	NowSecs = calendar:datetime_to_gregorian_seconds(Date),
+	calendar:gregorian_seconds_to_datetime(NowSecs + (Days * 24 * 60 * 60)).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -53,3 +55,5 @@ parse_to_datetime_test() ->
 	?assertEqual({{2010, 12, 19}, {00,00,00}},parse_to_datetime("19.12.2010")).
 parse_to_datetime_without_dot_test() ->
 	?assertEqual({{2010, 12, 19}, {00,00,00}},parse_to_datetime(without_dot,"19122010")).
+date_plus_test() ->
+	?assertEqual({{2011, 01, 02}, {00,00,00}}, date_plus({{2011,01,01}, {00,00,00}},1)).

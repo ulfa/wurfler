@@ -195,7 +195,7 @@ find_group_of_device_test() ->
 wurfler_db_test_() ->
 	{setup, 
 	 	fun() -> setup() end,
-	 	fun(_) ->
+	 	fun() ->
 			[?_assertEqual(2,erlang:length(get_all_keys(devicesTbl, "01.01.2010"))),
 			 ?_assertEqual(0,erlang:length(get_all_keys(devicesTbl, "01.01.2099"))),
 			 ?_assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")),

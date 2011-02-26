@@ -9,21 +9,21 @@
 	</head>
 	<body>
 		<div id="wrapper">
-    	<header>
-			<hgroup>
-				<h1>Wurfler</h1>
-			</hgroup>							
-		</header>
-		<section id="navigation">		
-		{% block navigation %}{% endblock %}
-		</section>
-		<section id="left_content"> 
-		{% block aside %}{% endblock %}
-		</section>
-		<section id="content"> 
-		{% block content %}{% endblock %}
-		</section> 
+    		<header>
+				<hgroup>
+					<h1>Wurfler</h1>
+				</hgroup>							
+			</header>
+			<section id="navigation">		
+				{% block navigation %}{% endblock %}
+			</section>
+			<section id="left_content"> 
+				{% block aside %}{% endblock %}
+			</section>
+			<section id="content"> 
+				{% block content %}{% endblock %}
+			</section>
+		</div> 
 	</body>
 	<footer>@2011 Ulf Angermann</footer>
-	</div>
 </html>    

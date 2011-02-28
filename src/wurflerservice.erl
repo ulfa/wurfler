@@ -1,5 +1,5 @@
 %%% -------------------------------------------------------------------
-%%% Author  : Ulf uaforum1@googlemail.com
+%%% Author  : Ulf Angermann
 %%% Description :
 %%%
 %%% Created : 

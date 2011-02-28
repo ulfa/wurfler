@@ -1,4 +1,4 @@
-%% Author: ua
+%% Author: Ulf Angermann
 %% Created: Nov 18, 2010
 %% Description: TODO: Add description to device_resource
 
@@ -55,11 +55,10 @@ to_html(ReqData, #context{device=Device}=Context) ->
      {Content, ReqData, Context}.
 
 to_xml(ReqData, #context{device = Device} = Context) ->
-    D = xml_factory:to_xml([xml_factory:create_xml(device, Device)]),
+    D = xml_factory:to_xml([xml_factory:create_xml(device, insertURI(ReqData, Device))]),
     {D, ReqData, Context}.
  
 resource_exists(ReqData, Context) ->
-	%%io:format("1... ~p, ~p , ~n",[wrq:path_info(device, ReqData), wrq:path_tokens(ReqData)]),
 	Device = wrq:path_info(device, ReqData),
 	Group  = wrq:path_tokens(ReqData),
 	process_request(Device, Group, ReqData, Context).
@@ -108,6 +107,9 @@ process_request(Device_Id, [Group_Name], ReqData, Context) ->
 		[] -> {false, ReqData, Context#context{group=[]}};
 		[Group] -> {true, ReqData, Context#context{group=Group}}
 	end.
+
+insertURI(ReqData, Device) ->
+	Device#device{id="http://" ++ wrq:get_req_header(?HOST, ReqData) ++ "/device/" ++ Device#device.id}.
 
 expires(ReqData, Context) -> {wurfler_date_util:date_plus(calendar:now_to_datetime(now()), 1), ReqData, Context}.
 

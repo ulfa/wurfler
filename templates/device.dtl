@@ -1,3 +1,17 @@
+%% Copyright 2010 Ulf Angermann
+%%
+%% Licensed under the Apache License, Version 2.0 (the "License");
+%% you may not use this file except in compliance with the License.
+%% You may obtain a copy of the License at
+%% 
+%%     http://www.apache.org/licenses/LICENSE-2.0
+%% 
+%% Unless required by applicable law or agreed to in writing, software
+%% distributed under the License is distributed on an "AS IS" BASIS,
+%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%% See the License for the specific language governing permissions and
+%% limitations under the License.
+
 {% extends "base.dtl" %}
 
 {% block title %}Device{% endblock %}
@@ -13,7 +27,7 @@
 {% block content %}
 	<img id="device" src="/device_image/{{picture}}"/>
 		<ul style="list-style-type:none">
-			<li><label for="{{id}}">Id : </label>{{id}}</li>  
+			<li><label for="{{id}}">Id :</label><a href="/device/{{id}}">{{id}}</a></li>  
 			<li><label for="{{brand_name}}">Brand name :</label>{{brand_name}}</li>
 			<li><label for="{{model_name}}">Model name :</label>{{model_name}}</li>
 			<li><label for="{{user_agent}}">User Agent :</label>{{user_agent}}</li>

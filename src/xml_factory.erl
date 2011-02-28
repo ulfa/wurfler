@@ -36,11 +36,11 @@
 %%
 %% API Functions
 %%
-create_xml(devices, Devices) ->
-    [create_xml(device, Device) || Device <- Devices];
 create_xml(device, #device{id = Id, user_agent = U_A, actual_device_root = A_D_R, fall_back = F_B, groups = Groups}) ->
     {device, [{id, Id}, {user_agent, U_A}, {actual_device_root, A_D_R}, {fall_back, F_B}],
      create_xml(groups, Groups)};
+create_xml(devices, Devices) ->
+    [create_xml(device, Device) || Device <- Devices];
 create_xml(groups, Groups) ->
     [create_xml(group, Group) || Group <- Groups];
 create_xml(capabilities, Capabilities) ->

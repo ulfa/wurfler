@@ -81,10 +81,4 @@ record_to_tuple(brand, Record) ->
 %% --------------------------------------------------------------------
 record_to_tuple_brand_test() ->
 	Record={brand_index,"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]},
-	?assertEqual({"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]}, record_to_tuple(brand, Record)).
-record_to_tuple_brands_test() ->
-	Records=[{brand_index,"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]},
-			 {brand_index,"Nintendo1", [{"nintendo_ds_ver11","DS1"}, {"nintendo_wii_browser1","Wii1"}, {"nintendo_dsi_ver11","DSi1"}]}
-			 ],
-	?assertEqual(2, erlang:length(record_to_tuple(brands, Records))).
-									
+	?assertEqual({"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]}, record_to_tuple(brand, Record)).									

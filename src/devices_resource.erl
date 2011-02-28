@@ -1,4 +1,4 @@
-%% Author: ulf
+%% Author: ulf Angermann
 %% Created: Nov 23, 2010
 %% Description: TODO: Add description to devices_resource
 

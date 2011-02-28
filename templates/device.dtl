@@ -13,7 +13,7 @@
 {% block content %}
 	<img id="device" src="/device_image/{{picture}}"/>
 		<ul style="list-style-type:none">
-			<li><label for="{{id}}">Id : </label>{{id}}</li>  
+			<li><label for="{{id}}">Id :</label><a href="/device/{{id}}">{{id}}</a></li>  
 			<li><label for="{{brand_name}}">Brand name :</label>{{brand_name}}</li>
 			<li><label for="{{model_name}}">Model name :</label>{{model_name}}</li>
 			<li><label for="{{user_agent}}">User Agent :</label>{{user_agent}}</li>

@@ -147,7 +147,7 @@ new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
 
 search_by_capabilities(Capabilities, Timestamp, Type, _State) ->
-	List_Of_Funs=create_funs_from_list(Capabilities),
+	List_Of_Funs = create_funs_from_list(Capabilities),
 	Keys = get_keys(Type, Timestamp),
 	pmap(List_Of_Funs, Capabilities, split_list(Keys, erlang:system_info(schedulers))).
 	%%get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
@@ -172,9 +172,7 @@ pmap(List_Of_Funs, Capabilities, Keys) ->
 	Pids = lists:map(fun(Key) -> 
 						proc_lib:spawn_link(fun() -> do_it(Parent, List_Of_Funs, Capabilities, Key) end) 
 					 end, Keys),
-	%io:format("PIDS : ~p~n", [Pids]),
 	xml_factory:create_devices(gather(Pids)).
-	
 
 do_it(Parent, List_Of_Funs, Capabilities, Keys) ->
 	Parent ! {get_devices_for_caps(List_Of_Funs, Keys, #state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)})}.
@@ -185,7 +183,6 @@ gather([_Pid|Pids]) ->
 	end;
 gather([]) ->
 	[].
-
 
 search_by_device_id(DeviceName)->	
 	case wurfler_db:find_record_by_id(devicesTbl, DeviceName) of

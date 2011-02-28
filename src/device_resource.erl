@@ -55,11 +55,10 @@ to_html(ReqData, #context{device=Device}=Context) ->
      {Content, ReqData, Context}.
 
 to_xml(ReqData, #context{device = Device} = Context) ->
-    D = xml_factory:to_xml([xml_factory:create_xml(device, Device)]),
+    D = xml_factory:to_xml([xml_factory:create_xml(device, insertURI(ReqData, Device))]),
     {D, ReqData, Context}.
  
 resource_exists(ReqData, Context) ->
-	%%io:format("1... ~p, ~p , ~n",[wrq:path_info(device, ReqData), wrq:path_tokens(ReqData)]),
 	Device = wrq:path_info(device, ReqData),
 	Group  = wrq:path_tokens(ReqData),
 	process_request(Device, Group, ReqData, Context).
@@ -109,6 +108,9 @@ process_request(Device_Id, [Group_Name], ReqData, Context) ->
 		[Group] -> {true, ReqData, Context#context{group=Group}}
 	end.
 
+insertURI(ReqData, Device) ->
+	Device#device{id="http://" ++ wrq:get_req_header(?HOST, ReqData) ++ "/device/" ++ Device#device.id}.
+
 expires(ReqData, Context) -> {wurfler_date_util:date_plus(calendar:now_to_datetime(now()), 1), ReqData, Context}.
 
 generate_etag(ReqData, Context) -> {mochihex:to_hex(erlang:phash2(Context)), ReqData, Context}.
@@ -139,7 +141,6 @@ record_to_tuple(capabilities, [Capability|Capabilities], Acc) ->
 	record_to_tuple(capabilities, Capabilities, lists:merge(record_to_tuple(capability, Capability), Acc)).
 
 get_picture(Path, Id) ->
-	io:format("1... ~p~n", [Path]),
 	case filelib:is_regular(Path ++ Id ++ ".gif") of
 		true -> Id ++ ".gif";
 		false -> "no_image.gif"
@@ -149,7 +150,6 @@ get_picture(Path, Id) ->
 %% --------------------------------------------------------------------
 get_picture_test() ->
 	{ok, Pwd} = file:get_cwd(),
-	io:format("2... ~p~n", [Pwd]),
 	?assertEqual("acer_e101_ver1.gif", get_picture(lists:append(Pwd, "/priv/www/lib/devices/"), "acer_e101_ver1")).
 record_to_tuple_test() ->
 	Device = #device{id="1", 

@@ -28,7 +28,7 @@
 %% Exported Functions
 %%
 -export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2, 
-		 delete_resource/2, delete_completed/2, allowed_methods/2]).
+		 delete_resource/2, delete_completed/2, allowed_methods/2, generate_etag/2, expires/2]).
 -export([post_is_create/2, process_post/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
@@ -37,8 +37,8 @@
 %% API Functions
 %%
 init(_Config) -> 
-%% 	{{trace, "/tmp"}, #context{device=[]}}.
-	{ok, #context{device=[]}}.
+ 	{{trace, "/tmp"}, #context{device=[]}}.
+	%%{ok, #context{device=[]}}.
 
 content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.

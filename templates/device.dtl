@@ -18,7 +18,7 @@
 			<li><label for="{{model_name}}">Model name :</label>{{model_name}}</li>
 			<li><label for="{{user_agent}}">User Agent :</label>{{user_agent}}</li>
 			<li><label for="{{actual_device_root}}">Actual device :</label>{{actual_device_root}}</li>
-			<li><label for="{{fall_back}}">Fallback :</label>{{fall_back}}</li>
+			<li><label for="{{fall_back}}">Fallback :</label><a href="/device/{{fall_back}}">{{fall_back}}</a></li>
 			<li><label for="{{created}}">Created :</label>{{created|date:"r"}}</li>
 			<li><label for="{{lastmodified}}">Last modified :</label>{{lastmodified|date:"r"}}</li>
 			<li><label for="{{filter}}">filter :</label>{{filter}}</li>

@@ -195,6 +195,7 @@ find_group_of_device_test() ->
 wurfler_db_test_() ->
 	{setup, 
 	 	fun() -> setup() end,
+	 	fun() -> teardown() end,
 	 	fun() ->
 			[?_assertEqual(2,erlang:length(get_all_keys(devicesTbl, "01.01.2010"))),
 			 ?_assertEqual(0,erlang:length(get_all_keys(devicesTbl, "01.01.2099"))),
@@ -210,7 +211,11 @@ wurfler_db_test_() ->
 	 }.
 	
 setup() ->
+	mnesia:start(),
 	mnesia:clear_table(devicesTbl),
 	mnesia:clear_table(brand_index),
 	mnesia:load_textfile("data/test.data").
+teardown() ->
+	mnesia:stop().
+	
     

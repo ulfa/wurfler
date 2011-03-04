@@ -364,7 +364,6 @@ create_fun(CheckName, CheckValue, '>=')->
 %%% Test functions
 %% --------------------------------------------------------------------
 search_by_ua_test() ->
-	%%search_by_ua("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like Mac OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7", new_state()),
 	search_by_ua("Mozilla/5.0 (Linux; U; Android 2.1-update1; de-ch; SonyEricssonX10i Build/2.0.A.0.504) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17",
 				 wurfler_db:find_os_device_id("Android"), new_state()).
 

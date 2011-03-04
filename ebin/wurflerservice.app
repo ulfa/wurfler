@@ -23,6 +23,7 @@
              wurfler_search,           
              wurfler_file_poller,
              wurfler_string_metrics,
+             wurfler_test_setup,
 	wurfler_patch,
 		wurfler_date_util,
 	% ErlyDTL templates

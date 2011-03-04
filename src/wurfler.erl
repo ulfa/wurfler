@@ -268,7 +268,7 @@ deleteBrand(Brand_name) ->
 deleteDevice(Id) ->
 	case get_children_plus_parent(Id) of
 		[] -> [];
-		List -> [wurfler_db:delete_device(Key) || Key <- List]
+		List -> [wurfler_db:delete_device(Key) || Key <- List]				
 	end.
 	
 %% --------------------------------------------------------------------

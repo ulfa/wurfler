@@ -155,7 +155,6 @@ get_picture_test() ->
 		false -> false
 	end,
 	{ok, Pwd} = file:get_cwd(),
-	io:format("1... ~p~n", [Pwd]),
 	?assertEqual("acer_e101_ver1.gif", get_picture(lists:append(Pwd, "/priv/www/lib/devices/"), "acer_e101_ver1")).
 record_to_tuple_test() ->
 	Device = #device{id="1", 
@@ -182,9 +181,7 @@ device_resource_test_() ->
 	 	end
 	 }.
 setup() ->
-	wurfler:start(),
-%%	mnesia:clear_table(devicesTbl),
-%%	mnesia:clear_table(brand_index),
+	wurfler_test_setup:setup(),
 	mnesia:load_textfile("data/test.data").
 teardown() ->
-	wurfler:terminate("", "_").
+	wurfler_test_setup:teardown().

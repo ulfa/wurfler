@@ -25,6 +25,7 @@
 -include_lib("xmerl/include/xmerl.hrl").
 
 
+
 %%
 %% Exported Functions
 %%
@@ -69,7 +70,7 @@ resource_exists(ReqData, Context) ->
 process_post(ReqData, Context) ->
 	Body = wrq:req_body(ReqData),
 	Caps = get_capabilities(Body),
-	Key = get_key(Body),
+	_Key = get_key(Body),
 	Type = get_type(Body),
 	Timestamp = get_timestamp(Body),
 	Devices = get_devices(Caps, Timestamp, Type),
@@ -123,41 +124,39 @@ insertURI(device,ReqData, {'device', [{id, Id}, {model_name,Model_name}, {brand_
 %% --------------------------------------------------------------------
 %% Test functions
 %% --------------------------------------------------------------------
-%% insertURI_test_() ->
-%% 	ReqData= #wm_reqdata{req_headers=mochiweb_headers:make([{host, "localhost"}])},
-%% 	D=[{'devices', [], [{'device', [{id, "Id_1"}, {model_name,"Model_name"}, {brand_name,"Brand_name"}], []},
-%% 					  {'device', [{id, "Id2"}, {model_name,"Model_name"}, {brand_name,"Brand_name"}], []}]}],
-%% 	%%io:format("2... ~p~n", [insertURI(devices, ReqData, D)]),
+test_insertURI() ->
+ 	ReqData= #wm_reqdata{req_headers=mochiweb_headers:make([{host, "localhost"}])},
+ 	D=[{'devices', [], [{'device', [{id, "Id_1"}, {model_name,"Model_name"}, {brand_name,"Brand_name"}], []},
+ 					  {'device', [{id, "Id2"}, {model_name,"Model_name"}, {brand_name,"Brand_name"}], []}]}],
+	insertURI(devices, ReqData, D).
 %% 	?assertEqual([{device,[{id,"http://localhost/device/Id_1"}, {model_name,"Model_name"},{brand_name,"Brand_name"}], []},
 %%       {device,[{id,"http://localhost/device/Id2"},{model_name,"Model_name"},{brand_name,"Brand_name"}], []}],insertURI(devices, ReqData, D)).
 
-get_key_test_() ->
+test_get_key() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query key=\"1111\">\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
-	%%?assertEqual("1111", get_key(Xml_Bin)).
 	get_key(Xml_Bin).
 
-get_capabilities_test_() ->
+test_get_capabilities() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query key=\"1111\">\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
-	%%?assertEqual([{"j2me_cldc_1_1",{"true",'='}},{"j2me_midp_1_1",{"true",'='}}],  get_capabilities(Xml_Bin)).
 	get_capabilities(Xml_Bin).
 
-get_timestamp_test_() ->
+get_timestamp() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><timestamp>19.12.2010</timestamp><capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
-	?assertEqual("19.12.2010",get_timestamp(Xml_Bin)).
+	get_timestamp(Xml_Bin).
 
-get_timestamp_not_present_test_() ->
+get_timestamp_not_present() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query><capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	get_timestamp(Xml_Bin).
 	
-get_devices_test_() ->
+get_devices() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	D=get_devices(get_capabilities(Xml_Bin), "01.01.2010", []),
 	D1=xml_factory:to_xml(D),
-	binary_to_list(D1),
+	binary_to_list(D1).
 %% 	xmerl_xpath:string("/device", D2),
- 	?assertEqual(1, erlang:length(D)).
+ 	%%?assertEqual(1, erlang:length(D)).
 
-xml_test_() ->
+test_xml() ->
 	Xml_Bin = <<"<?xml version=\"1.0\" encoding=\"utf-8\"?><query>\t<capabilities>\t\t<capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/>\t\t<capability name=\"j2me_midp_1_1\" value=\"true\" operator=\"=\"/>\t</capabilities></query>">>,
 	lists:flatten(xmerl:export_simple_content(get_devices(get_capabilities(Xml_Bin), "01.01.2010", []), xmerl_xml)).
 	%%?assertNot([] =:= A).
@@ -165,21 +164,21 @@ xml_test_() ->
 devices_resource_test_() ->
 	{setup, 
 	 	fun() -> setup() end,
+	 	fun(_) -> teardown() end,
 	 	fun(_) ->
 			[
-			 ?_assertEqual("1","2"),
-			 ?_assertEqual([], get_timestamp_not_present_test_()),
-			 ?_assertNot([] =:= xml_test_()),
-			 ?_assertEqual([{"j2me_cldc_1_1",{"true",'='}},{"j2me_midp_1_1",{"true",'='}}],  get_capabilities_test_()),
-			 ?_assertEqual("1111",get_devices_test_())
+			 ?_assertEqual([],get_timestamp_not_present()),
+			 ?_assertEqual("19.12.2010",get_timestamp()),
+			 ?_assertEqual([{"j2me_cldc_1_1",{"true",'='}},{"j2me_midp_1_1",{"true",'='}}], test_get_capabilities()),
+			 ?_assertEqual("1111",test_get_key()),
+			 ?_assertEqual([{device,[{id,"http://localhost/device/Id_1"}, {model_name,"Model_name"},{brand_name,"Brand_name"}], []},
+       					   {device,[{id,"http://localhost/device/Id2"},{model_name,"Model_name"},{brand_name,"Brand_name"}], []}], test_insertURI())
 			 ]
 	 	end
 	 }.
 
 setup() ->
-	wurfler:start(),
-%%	mnesia:clear_table(devicesTbl),
-%%	mnesia:clear_table(brand_index),
+	wurfler_test_setup:setup(),
 	mnesia:load_textfile("data/test.data").
 teardown() ->
-	wurfler:terminate("", "_").
+	wurfler_test_setup:teardown().

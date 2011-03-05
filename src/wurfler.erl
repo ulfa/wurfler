@@ -179,10 +179,10 @@ get_version() ->
 new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
 
-get_device_by_id(DeviceName)->	
-	case wurfler_db:find_record_by_id(devicesTbl, DeviceName) of
+get_device_by_id(Device_Id)->	
+	case wurfler_search:searchByDeviceId(Device_Id) of
 		[] -> [];
-		[Device] -> Device				
+		Device -> Device				
 	end.
 
 search_by_ua(UserAgent, _State)->
@@ -287,8 +287,7 @@ wurfler_test_() ->
 	 }.
 
 setup() ->
-	mnesia:clear_table(devicesTbl),
-	mnesia:clear_table(brand_index),
+	wurfler_test_setup:setup(),
 	mnesia:load_textfile("data/test.data").
 
 

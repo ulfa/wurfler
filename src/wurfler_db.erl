@@ -35,7 +35,7 @@
 -export([clear_capabilities_devices/0, find_devices_by_brand/2, find_capabilities_device_by_key/1]).
 -export([delete_device/1, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
 -export([get_all_cap_key/1, find_id_by_fall_back/2, find_os_device_id/1, save_os_device_id/1]).
--export([find_group_of_device/3, get_keys/1]).
+-export([find_group_of_device/3, get_keys/1, get_all_group_names/0]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -141,6 +141,9 @@ find_changed_caps_devices(Timestamp) ->
 								end).
 find_os_device_id(OS) ->
 	mnesia:dirty_read(os_device_id, OS).
+get_all_group_names() ->
+	[Generic] = find_record_by_id(devicesTbl, "generic"),
+	[Group#group.id || Group <- Generic#device.groups].
 %% --------------------------------------------------------------------
 %%% Other functions
 %% --------------------------------------------------------------------
@@ -197,7 +200,8 @@ wurfler_db_test_() ->
 	 	fun() -> setup() end,
 	 	fun() -> teardown() end,
 	 	fun() ->
-			[?_assertEqual(2,erlang:length(get_all_keys(devicesTbl, "01.01.2010"))),
+			[
+			 ?_assertEqual(2,erlang:length(get_all_keys(devicesTbl, "01.01.2010"))),
 			 ?_assertEqual(0,erlang:length(get_all_keys(devicesTbl, "01.01.2099"))),
 			 ?_assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")),
 			 ?_assertMatch([{device, "htc_desire_a8181_ver1_sub2_2",_,_,_,_,_,_,_,_,_}], find_record_by_id(devicesTbl, "htc_desire_a8181_ver1_sub2_2")),
@@ -205,17 +209,16 @@ wurfler_db_test_() ->
 				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")),
 			 ?_assertEqual({ok,"samsung_gt_i9000_ver1"},delete_device("samsung_gt_i9000_ver1")),
 			 ?_assert({nok, "not_known"} =:= delete_device("not_known")),
-			 ?_assertEqual(2, erlang:length(find_id_by_fall_back(devicesTbl, "generic")))
+			 ?_assertEqual(2, erlang:length(find_id_by_fall_back(devicesTbl, "generic"))),
+			 ?_assertEqual(30,erlang:length(get_all_group_names()))
 			 ]
 	 	end
 	 }.
 	
 setup() ->
-	mnesia:start(),
-	mnesia:clear_table(devicesTbl),
-	mnesia:clear_table(brand_index),
+	wurfler_test_setup:setup(),
 	mnesia:load_textfile("data/test.data").
 teardown() ->
-	mnesia:stop().
+	wurfler_test_setup:teardown().
 	
     

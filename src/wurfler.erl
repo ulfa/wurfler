@@ -33,7 +33,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
--export([searchByUA/1, searchByCapabilities/3, searchByDeviceName/1, getAllCapabilities/1, getVersion/0]).
+-export([searchByUA/1, searchByCapabilities/3, getDeviceById/1, getAllCapabilities/1, getVersion/0]).
 -export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/3, delete_device/1, delete_brand/1]).
 -compile([export_all]).
 -define(TIMEOUT, infinity).
@@ -55,8 +55,8 @@ searchByCapabilities(Capabilities, Timestamp, Type) ->
 	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp, Type}, ?TIMEOUT).
 searchByUA(UserAgent)->
 	gen_server:call(?MODULE, {search_by_ua, UserAgent}, ?TIMEOUT).
-searchByDeviceName(DeviceName) ->
-	gen_server:call(?MODULE, {search_by_device_id, DeviceName}, ?TIMEOUT).
+getDeviceById(Device_Id) ->
+	gen_server:call(?MODULE, {get_device_by_id, Device_Id}, ?TIMEOUT).
 getAllCapabilities(DeviceName)->
 	gen_server:call(?MODULE, {get_all_capabilities, DeviceName}, ?TIMEOUT).
 get_brands() ->
@@ -115,8 +115,8 @@ handle_call({search_by_capabilities, Capabilities, Timestamp, Type}, _From, Stat
 handle_call({search_by_ua, User_Agent}, _From, State) ->
 	Result = search_by_ua(User_Agent, State),
     {reply, Result, State};
-handle_call({search_by_device_id, DeviceName}, _From, _State) ->
-	Result=search_by_device_id(DeviceName),
+handle_call({get_device_by_id, Device_Id}, _From, _State) ->
+	Result = get_device_by_id(Device_Id),
     {reply, Result, new_state()};
 handle_call({get_brands}, _From, State) ->
 	{ok, Result}=get_all_brands(),
@@ -179,7 +179,7 @@ get_version() ->
 new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
 
-search_by_device_id(DeviceName)->	
+get_device_by_id(DeviceName)->	
 	case wurfler_db:find_record_by_id(devicesTbl, DeviceName) of
 		[] -> [];
 		[Device] -> Device				
@@ -205,17 +205,6 @@ getDeviceByModelName(Model_Name) ->
 	R =  wurfler_db:get_devices_by_model_name(devicesTbl, Model_Name),
 	Result = [xml_factory:create_device(D) || D <- R],
 	{ok, Result}.
-
-get_all_groups([], #state{groups=Groups}) ->
-	{ok, #state{groups=Groups}};
-get_all_groups("root", #state{groups=Groups}) ->
-	{ok, #state{groups=Groups}};
-get_all_groups("generic", #state{groups=Groups}) ->
- 	{ok, #state{groups=Groups}};
-get_all_groups(DeviceName, #state{groups=AllGroups}) ->
-	{Fall_back, Groups} = wurfler_db:find_groups_by_id(devicesTbl, DeviceName),
-	get_all_groups(Fall_back, #state{groups=lists:append(AllGroups,Groups)}).
-
 
 %% @spec get_children_plus_parent(Id::string()) -> List
 %%	List = [string()]
@@ -251,9 +240,6 @@ flatten([F|R]) ->
 %% Here i can optimize the create_fun stuff.
 %% Perhaps i will use erl_scan and co.
 %%------------------------------------------------------------------------------
-
-
-
 add_device_to_devices(_Fun, Device, #state{devices=[]}=State) ->
 	State#state{devices=[xml_factory:create_device(Device)|State#state.devices]};
 add_device_to_devices(Fun, Device, #state{devices=Devices}=State) ->

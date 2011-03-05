@@ -97,7 +97,7 @@ process_request(undefined, [], ReqData, Context) ->
 		Device -> {true, ReqData, Context#context{device=Device}}
 	end;
 process_request(Value, [], ReqData, Context) ->
-	case wurfler:searchByDeviceName(Value) of
+	case wurfler:getDeviceById(Value) of
 		[] -> {false, ReqData, Context#context{device=[]}};
 		Device -> {true, ReqData, Context#context{device=Device}}
 	end;

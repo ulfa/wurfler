@@ -119,7 +119,7 @@ generate_etag(ReqData, Context) -> {mochihex:to_hex(erlang:phash2(Context)), Req
 %%
 %% --------------------------------------------------------------------
 record_to_tuple(device, Record) ->
-	Groups = record_to_tuple(groups, Record#device.groups, []),
+	Groups = lists:reverse(record_to_tuple(groups, Record#device.groups, [])),
 	Keys = record_info(fields, device),
 	Data = lists:nthtail(1,tuple_to_list(Record#device{groups=Groups})),
 	[{picture, get_picture("priv/www/lib/devices/",Record#device.id)}|lists:zip(Keys, Data)];

@@ -39,9 +39,9 @@ setup() ->
 	wurfler:start(),
 	wurfler_search:start(),
 	mnesia:start(),
-	mnesia:wait_for_tables([devicesTbl, brand_index, capabilities_devices, changed_caps_devices, capability_description, os_device_id], 3000),
-	mnesia:clear_table(devicesTbl),
-	mnesia:clear_table(brand_index).
+	mnesia:wait_for_tables([devicesTbl, brand_index, capabilities_devices, changed_caps_devices, capability_description, os_device_id], 3000).
+%%	mnesia:clear_table(devicesTbl),
+%%	mnesia:clear_table(brand_index).
 
 teardown() ->
 	wurfler:terminate([], []),

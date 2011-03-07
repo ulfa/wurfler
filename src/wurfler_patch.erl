@@ -153,6 +153,9 @@ process_device(DeviceXml, _State) ->
 					   wurfler_update:update_device(D)
 	end.
 
+invalid_cache_for(Device) ->
+	ok.
+
 get_device(devicesTbl, Id) ->
 	wurfler_db:find_record_by_id(devicesTbl, Id).
 

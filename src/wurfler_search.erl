@@ -216,8 +216,6 @@ get_all_groups([], #state{groups=Groups}) ->
 	Groups;
 get_all_groups("root", #state{groups=Groups}) ->
 	Groups;
-get_all_groups("generic1", #state{groups=Groups}) ->
- 	Groups;
 get_all_groups(Device_Id, #state{groups=AllGroups}) ->
 	{Fall_back, Groups} = wurfler_db:find_groups_by_id(devicesTbl, Device_Id),
 	get_all_groups(Fall_back, #state{groups=lists:append(AllGroups,Groups)}).

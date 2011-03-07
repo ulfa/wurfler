@@ -54,6 +54,7 @@ create_db() ->
 	mnesia:create_table(capabilities_devices,[{disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
 	mnesia:create_table(capability_description,[{disc_copies, [node()]}, {attributes, record_info(fields, capability_description)}]),
 	mnesia:create_table(os_device_id, [{disc_copies, [node()]}, {attributes, record_info(fields, os_device_id)}]),
+	mnesia:create_table(etag_cache, [{ram_copies, [node()]}, {attributes, record_info(fields, etag_cache)}]),
 	mnesia:wait_for_tables([devicesTbl, brand_index, capabilities_devices, changed_caps_devices, capability_description, os_device_id], 100000),
 	upload_os_device_id(),
 	application:stop(mnesia).

@@ -28,7 +28,7 @@
 %% Exported Functions
 %%
 -export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2, 
-		 delete_resource/2, delete_completed/2, allowed_methods/2, generate_etag/2, expires/2]).
+		 delete_resource/2, delete_completed/2, allowed_methods/2, generate_etag/2]).
 -export([post_is_create/2, process_post/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
@@ -45,10 +45,6 @@ content_types_provided(ReqData, Context) ->
 
 allowed_methods(ReqData, Context) ->
     {['GET', 'DELETE', 'POST'], ReqData, Context}.
-
-
-to_html(ReqData, #context{device=[], group=Group}=Context) ->
-	io:format("Group rendering here : ~p~n",[Group]);
 
 to_html(ReqData, #context{device=Device}=Context) ->
      {ok, Content} = device_dtl:render(record_to_tuple(device, Device)),
@@ -96,27 +92,30 @@ process_request(undefined, [], ReqData, Context) ->
 		[] -> {false, ReqData, Context#context{device=[]}};
 		Device -> {true, ReqData, Context#context{device=Device}}
 	end;
-process_request(Value, [], ReqData, Context) ->
-	case wurfler:getDeviceById(Value) of
+process_request(Device_Id, [], ReqData, Context) ->
+	case wurfler:getDeviceById(Device_Id) of
 		[] -> {false, ReqData, Context#context{device=[]}};
 		Device -> {true, ReqData, Context#context{device=Device}}
 	end;
 
 process_request(Device_Id, [Group_Name], ReqData, Context) ->
-	case wurfler_db:find_group_of_device(devicesTbl, Device_Id, Group_Name) of
-		[] -> {false, ReqData, Context#context{group=[]}};
-		[Group] -> {true, ReqData, Context#context{group=Group}}
+	case wurfler:getDeviceById(Device_Id) of
+		[] -> {false, ReqData, Context#context{device=[]}};
+		Device -> {true, ReqData, Context#context{device=Device}}
 	end.
+
+filter_group(Device, Group_Name) ->
+	[Group || Group <- Device#device.groups].
 
 insertURI(ReqData, Device) ->
 	Device#device{id="http://" ++ wrq:get_req_header(?HOST, ReqData) ++ "/device/" ++ Device#device.id}.
 
-expires(ReqData, Context) -> {wurfler_date_util:date_plus(calendar:now_to_datetime(now()), 1), ReqData, Context}.
+%%expires(ReqData, Context) -> {wurfler_date_util:date_plus(calendar:now_to_datetime(now()), 1), ReqData, Context}.
 
-generate_etag(ReqData, Context) -> {mochihex:to_hex(erlang:phash2(Context)), ReqData, Context}.
+generate_etag(ReqData, #context{device = Device} = Context) ->  {mochihex:to_hex(erlang:phash2(Device)), ReqData, Context}.
 
 %% --------------------------------------------------------------------
-%%
+%% internal functions
 %% --------------------------------------------------------------------
 record_to_tuple(device, Record) ->
 	Groups = lists:reverse(record_to_tuple(groups, Record#device.groups, [])),

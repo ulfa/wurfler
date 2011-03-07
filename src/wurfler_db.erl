@@ -36,6 +36,7 @@
 -export([delete_device/1, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
 -export([get_all_cap_key/1, find_id_by_fall_back/2, find_os_device_id/1, save_os_device_id/1]).
 -export([find_group_of_device/3, get_keys/1, get_all_group_names/0]).
+-export([lookup/1, delete/1, clear/0, put/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
@@ -190,6 +191,17 @@ remove_device_from_brand(#device{id=Id, brand_name=Brand_name}) ->
 						end
 	end.
 
+%% --------------------------------------------------------------------
+%%% etag cache functions
+%% --------------------------------------------------------------------
+lookup(Key) ->
+	mnesia:dirty_read(etag_cache, Key).
+clear() ->
+	mnesia:clear_table(etag_cache).
+put(Key, Term) ->
+	mnesia:write(etag_cache, #etag_cache{id=Key, term=Term}).
+delete(Key) ->
+	mnesia:delete(etag_cache, Key).
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------

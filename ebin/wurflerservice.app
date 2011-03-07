@@ -7,6 +7,7 @@
              wurfler,
              wurfler_cache,
              wurfler_etag_cache,
+             wurfler_util,
              wurflerservice,
              wurfler_importer,
              wurfler_update,

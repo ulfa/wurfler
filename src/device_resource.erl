@@ -93,16 +93,10 @@ process_request(undefined, [], ReqData, Context) ->
 		Device -> {true, ReqData, Context#context{device=Device}}
 	end;
 process_request(Device_Id, [], ReqData, Context) ->
-	case wurfler:getDeviceById(Device_Id) of
-		[] -> {false, ReqData, Context#context{device=[]}};
-		Device -> {true, ReqData, Context#context{device=Device}}
-	end;
+	get_device_by_id(ReqData, Context, Device_Id);
 
 process_request(Device_Id, [Group_Name], ReqData, Context) ->
-	case wurfler:getDeviceById(Device_Id) of
-		[] -> {false, ReqData, Context#context{device=[]}};
-		Device -> {true, ReqData, Context#context{device=Device}}
-	end.
+	get_device_by_id(ReqData, Context, Device_Id).
 
 filter_group(Device, Group_Name) ->
 	[Group || Group <- Device#device.groups].
@@ -112,11 +106,20 @@ insertURI(ReqData, Device) ->
 
 %%expires(ReqData, Context) -> {wurfler_date_util:date_plus(calendar:now_to_datetime(now()), 1), ReqData, Context}.
 
-generate_etag(ReqData, #context{device = Device} = Context) ->  {mochihex:to_hex(erlang:phash2(Device)), ReqData, Context}.
+generate_etag(ReqData, #context{device = Device} = Context) ->  {wurfler_util:generate_etag(Device), ReqData, Context}.
 
 %% --------------------------------------------------------------------
 %% internal functions
 %% --------------------------------------------------------------------
+get_device_by_id(ReqData, Context, Device_Id) ->
+	case wurfler_etag_cache:lookup(wurfler_util:generate_etag(Device_Id)) of
+		[] ->  case wurfler:getDeviceById(Device_Id) of
+					[] -> {false, ReqData, Context#context{device=[]}};
+					Device -> wurfler_etag_cache:put(wurfler_util:generate_etag(Device), Device), 
+							  {true, ReqData, Context#context{device=Device}}
+				end;
+		Device -> {true, ReqData, Context#context{device=Device}}
+	end.
 record_to_tuple(device, Record) ->
 	Groups = lists:reverse(record_to_tuple(groups, Record#device.groups, [])),
 	Keys = record_info(fields, device),

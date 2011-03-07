@@ -25,7 +25,7 @@
 %% Include files
 %% --------------------------------------------------------------------
 -include_lib("eunit/include/eunit.hrl").
-
+-include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
 %% External exports
 
@@ -82,7 +82,11 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({lookup, Key}, _From, State) ->
-    {reply, wurfler_db:lookup(Key), State}.
+	case wurfler_db:lookup(Key) of
+		[] -> Data = [];
+		[#etag_cache{id=Key, term=Data}] -> Data 
+	end,
+    {reply, Data, State}.
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages
@@ -91,11 +95,13 @@ handle_call({lookup, Key}, _From, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_cast({delete, Key}, State) ->
+	wurfler_db:delete(etag, Key),
     {noreply, State};
 handle_cast({put, Key, Term}, State) ->
 	wurfler_db:put(Key, Term),
     {noreply, State};
 handle_cast({clear}, State) ->
+	wurfler_db:clear(),
     {noreply, State}.
 %% --------------------------------------------------------------------
 %% Function: handle_info/2
@@ -130,10 +136,21 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Test functions
 %% --------------------------------------------------------------------
 put_test()->
-	setup(),
 	wurfler_etag_cache:put("test", "data"),
 	?assertEqual("data", wurfler_etag_cache:lookup("test")).
 	
+delete_test() ->
+	wurfler_etag_cache:put("delete", "data"),
+	wurfler_etag_cache:delete("delete"),
+	?assertEqual([], wurfler_etag_cache:lookup("delete")).
+	
+clear_test() ->
+	wurfler_etag_cache:put("test_1", "data"),
+	wurfler_etag_cache:put("test_2", "data"),
+	wurfler_etag_cache:clear(),
+	?assertEqual([], wurfler_etag_cache:lookup("test_1")),
+	?assertEqual([], wurfler_etag_cache:lookup("test_2")).
+
 setup() ->
 	mnesia:start(),
 	wurfler_etag_cache:start().

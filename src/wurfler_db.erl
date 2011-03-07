@@ -199,7 +199,7 @@ lookup(Key) ->
 clear() ->
 	mnesia:clear_table(etag_cache).
 put(Key, Term) ->
-	mnesia:write(etag_cache, #etag_cache{id=Key, term=Term}).
+	mnesia:activity(transaction, fun() -> mnesia:write(etag_cache, #etag_cache{id=Key, term=Term}, write) end).
 delete(Key) ->
 	mnesia:delete(etag_cache, Key).
 %% --------------------------------------------------------------------

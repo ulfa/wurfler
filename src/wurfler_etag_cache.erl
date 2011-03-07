@@ -82,7 +82,7 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({lookup, Key}, _From, State) ->
-    {reply, ok, State}.
+    {reply, wurfler_db:lookup(Key), State}.
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages
@@ -93,6 +93,7 @@ handle_call({lookup, Key}, _From, State) ->
 handle_cast({delete, Key}, State) ->
     {noreply, State};
 handle_cast({put, Key, Term}, State) ->
+	wurfler_db:put(Key, Term),
     {noreply, State};
 handle_cast({clear}, State) ->
     {noreply, State}.
@@ -128,4 +129,11 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-
+put_test()->
+	setup(),
+	wurfler_etag_cache:put("test", "data"),
+	?assertEqual("data", wurfler_etag_cache:lookup("test")).
+	
+setup() ->
+	mnesia:start(),
+	wurfler_etag_cache:start().

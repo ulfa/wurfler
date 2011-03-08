@@ -5,7 +5,7 @@
 <nav>
 		<ul>
 			{% for group, caps in groups %}
-				<li><a href="/device/{{id}}/{{group}}">{{group}}</a></li>
+				<li><a href="/device/{{id}}/group/{{group}}">{{group}}</a></li>
 			{% endfor %}
 		</ul>
 </nav>

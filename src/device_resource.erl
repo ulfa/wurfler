@@ -56,9 +56,14 @@ to_xml(ReqData, #context{device = Device} = Context) ->
  
 resource_exists(ReqData, Context) ->
 	Device = wrq:path_info(device, ReqData),
-	Group  = wrq:path_tokens(ReqData),
+	Group = get_group(ReqData),
 	process_request(Device, Group, ReqData, Context).
-	
+
+get_group(ReqData) ->
+	case wrq:path_tokens(ReqData) of
+		["group",Group] -> Group;
+		_ -> []
+	end.
 post_is_create(ReqData, Context) ->
 	{false, ReqData, Context}.
 
@@ -86,20 +91,17 @@ redirect(Target, ReqData) ->
 delete_device(Id) ->
 	wurfler:delete_device(Id).
 
-process_request(undefined, [], ReqData, Context) ->
+process_request(undefined, undefined, ReqData, Context) ->
 	error_logger:info_msg("UA ~p~n", [wrq:get_req_header("User-Agent", ReqData)]),
 	case wurfler:searchByUA(wrq:get_req_header("User-Agent", ReqData)) of
 		[] -> {false, ReqData, Context#context{device=[]}};
 		Device -> {true, ReqData, Context#context{device=Device}}
 	end;
-process_request(Device_Id, [], ReqData, Context) ->
+process_request(Device_Id, undefined, ReqData, Context) ->
 	get_device_by_id(ReqData, Context, Device_Id);
 
-process_request(Device_Id, [Group_Name], ReqData, Context) ->
+process_request(Device_Id, Group_Name, ReqData, Context) ->
 	get_device_by_id(ReqData, Context, Device_Id).
-
-filter_group(Device, Group_Name) ->
-	[Group || Group <- Device#device.groups].
 
 insertURI(ReqData, Device) ->
 	Device#device{id="http://" ++ wrq:get_req_header(?HOST, ReqData) ++ "/device/" ++ Device#device.id}.

@@ -112,16 +112,20 @@ generate_etag(ReqData, #context{device = Device} = Context) ->  {wurfler_util:ge
 %% internal functions
 %% --------------------------------------------------------------------
 get_device_by_id(ReqData, Context, Device_Id) ->
-	case wurfler_etag_cache:lookup(wrq:get_req_header("If-None-Match", ReqData)) of
-		[] -> io:format("2... ~n"), 
-			  case wurfler:getDeviceById(Device_Id) of
+	
+	case lookup_etag(wrq:get_req_header("If-None-Match", ReqData)) of
+		[] ->  case wurfler:getDeviceById(Device_Id) of
 					[] -> {false, ReqData, Context#context{device=[]}};
 					Device -> wurfler_etag_cache:put(wurfler_util:generate_etag(Device), Device), 
 							  {true, ReqData, Context#context{device=Device}}
 				end;
-		Device -> io:format("1... ~n"),
-					{true, ReqData, Context#context{device=Device}}
+		Device -> {true, ReqData, Context#context{device=Device}}
 	end.
+
+lookup_etag(undefined) ->
+	[];
+lookup_etag(Etag) ->
+	wurfler_etag_cache:lookup(webmachine_util:split_quoted_strings(Etag)).
 record_to_tuple(device, Record) ->
 	Groups = lists:reverse(record_to_tuple(groups, Record#device.groups, [])),
 	Keys = record_info(fields, device),

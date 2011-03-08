@@ -82,7 +82,6 @@ init([]) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_call({lookup, Key}, _From, State) ->
-	io:format("3... : ~p~n", [Key]),
 	case wurfler_db:lookup(Key) of
 		[] -> Data = [];
 		[#etag_cache{id=Key, term=Data}] -> Data 

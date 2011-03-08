@@ -1,6 +1,7 @@
 {% extends "base.dtl" %}
 
 {% block title %}Brands{% endblock %}
+<section> 
 {% block content %}        	
 		<ul id="multicolumns">
 		{% for brand, models in brands %}
@@ -9,3 +10,4 @@
 		</ul>
 		</br>
 {% endblock %}
+</section>

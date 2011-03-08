@@ -20,9 +20,7 @@
 			<section id="left_content"> 
 				{% block aside %}{% endblock %}
 			</section>
-			<section id="content"> 
 				{% block content %}{% endblock %}
-			</section>
 		</div> 
 	</body>
 	<footer>@2011 Ulf Angermann</footer>

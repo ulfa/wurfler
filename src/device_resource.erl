@@ -139,7 +139,7 @@ lookup_etag(undefined) ->
 lookup_etag(Etag) ->
 	wurfler_etag_cache:lookup(webmachine_util:split_quoted_strings(Etag)).
 record_to_tuple(device, Record) ->
-	Groups = lists:reverse(record_to_tuple(groups, Record#device.groups, [])),
+	Groups = record_to_tuple(groups, Record#device.groups, []),
 	Keys = record_info(fields, device),
 	Data = lists:nthtail(1,tuple_to_list(Record#device{groups=Groups})),
 	[{picture, get_picture("priv/www/lib/devices/",Record#device.id)}|lists:zip(Keys, Data)];

@@ -32,7 +32,7 @@
 -export([post_is_create/2, process_post/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
--record(context, {device, group}).
+-record(context, {device, group, group_name}).
 %%
 %% API Functions
 %%
@@ -46,9 +46,10 @@ content_types_provided(ReqData, Context) ->
 allowed_methods(ReqData, Context) ->
     {['GET', 'DELETE', 'POST'], ReqData, Context}.
 
-to_html(ReqData, #context{device=Device}=Context) ->
-     {ok, Content} = device_dtl:render(record_to_tuple(device, Device)),
-     {Content, ReqData, Context}.
+to_html(ReqData, #context{device=Device, group_name=Group_Name}=Context) ->
+	D = Device#device{groups=delete_caps_from_groups(Device#device.groups, Group_Name, [])},
+	{ok, Content} = device_dtl:render(record_to_tuple(device, D)),
+	{Content, ReqData, Context}.
 
 to_xml(ReqData, #context{device = Device} = Context) ->
     D = xml_factory:to_xml([xml_factory:create_xml(device, insertURI(ReqData, Device))]),
@@ -62,7 +63,7 @@ resource_exists(ReqData, Context) ->
 get_group(ReqData) ->
 	case wrq:path_tokens(ReqData) of
 		["group",Group] -> Group;
-		_ -> []
+		_ -> "product_info"
 	end.
 post_is_create(ReqData, Context) ->
 	{false, ReqData, Context}.
@@ -101,7 +102,17 @@ process_request(Device_Id, undefined, ReqData, Context) ->
 	get_device_by_id(ReqData, Context, Device_Id);
 
 process_request(Device_Id, Group_Name, ReqData, Context) ->
-	get_device_by_id(ReqData, Context, Device_Id).
+	get_device_by_id(ReqData, Context#context{group_name=Group_Name}, Device_Id).
+
+delete_caps_from_groups(Groups, Group_Name) ->
+	delete_caps_from_groups(Groups, Group_Name, []).
+delete_caps_from_groups([], _Group_Name, Acc) ->
+	Acc;
+delete_caps_from_groups([Group|Groups], Group_Name, Acc) ->
+	case Group#group.id of
+		Group_Name ->  delete_caps_from_groups(Groups, Group_Name, [Group|Acc]);
+		_ -> delete_caps_from_groups(Groups, Group_Name, [Group#group{capabilites=[]}|Acc])
+	end.
 
 insertURI(ReqData, Device) ->
 	Device#device{id="http://" ++ wrq:get_req_header(?HOST, ReqData) ++ "/device/" ++ Device#device.id}.
@@ -114,7 +125,6 @@ generate_etag(ReqData, #context{device = Device} = Context) ->  {wurfler_util:ge
 %% internal functions
 %% --------------------------------------------------------------------
 get_device_by_id(ReqData, Context, Device_Id) ->
-	
 	case lookup_etag(wrq:get_req_header("If-None-Match", ReqData)) of
 		[] ->  case wurfler:getDeviceById(Device_Id) of
 					[] -> {false, ReqData, Context#context{device=[]}};
@@ -158,6 +168,15 @@ get_picture(Path, Id) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+delete_caps_from_groups_test() ->
+	A=[
+	   #group{id="a", capabilites=[#capability{name="test", value="value"}]},
+	   #group{id="b", capabilites=[#capability{name="test", value="value"}]},
+	   #group{id="c", capabilites=[#capability{name="test", value="value"}]}
+		],
+	?assertEqual([{group,"c",[]},{group,"b",[{capability,"test","value"}]},{group,"a",[]}],delete_caps_from_groups(A, "b")).
+
+
 get_picture_test() ->
 	{ok, Path} = file:get_cwd(),
 	case string:rstr(Path, ".eunit") > 0 of

@@ -12,30 +12,33 @@
 {% endblock %}
 {% block content %}
 	<img id="device" src="/device_image/{{picture}}"/>
-		<ul id="#multicolumns">
-			<li><label for="{{id}}">Id :</label><a href="/device/{{id}}">{{id}}</a></li>  
-			<li><label for="{{brand_name}}">Brand name :</label>{{brand_name}}</li>
-			<li><label for="{{model_name}}">Model name :</label>{{model_name}}</li>
-			<li><label for="{{user_agent}}">User Agent :</label>{{user_agent}}</li>
-			<li><label for="{{actual_device_root}}">Actual device :</label>{{actual_device_root}}</li>
-			<li><label for="{{fall_back}}">Fallback :</label><a href="/device/{{fall_back}}">{{fall_back}}</a></li>
-			<li><label for="{{created}}">Created :</label>{{created|date:"r"}}</li>
-			<li><label for="{{lastmodified}}">Last modified :</label>{{lastmodified|date:"r"}}</li>
-			<li><label for="{{filter}}">filter :</label>{{filter}}</li>
-		</ul>
+		<table>
+			<tr><td>Id</td><td><a href="/device/{{id}}">{{id}}</a></td></tr>  
+			<tr><td>Brand name</td><td>{{brand_name}}</td></tr>
+			<tr><td>Model name</td><td>{{model_name}}</td></tr>
+			<tr><td>User Agent</td><td>{{user_agent}}</td></tr>
+			<tr><td>Actual device</td><td>{{actual_device_root}}</td></tr>
+			<tr><td>Fallback :</label><td><a href="/device/{{fall_back}}">{{fall_back}}</a></td></tr>
+			<tr><td>Created</td><td>{{created|date:"r"}}</td></tr>
+			<tr><td>Last modified</td><td>{{lastmodified|date:"r"}}</td></tr>
+			<tr><td>filter</td><td>{{filter}}</td></tr>
+		</table>
 		<br/><br/><br/>
+		<table>
 		{% for group, caps in groups %}
 			<ul style="list-style-type:none">
+			
 			{% for c, d in caps %}
+			<tr>
 				{% ifequal c "uaprof" %}
-					<li>{{c}} : <a href="{{d}}">{{d}}</a></li>
+					<td>{{c}}</td><td><a href="{{d}}">{{d}}</a></td>
 				{% else %}
-					<li>{{c}} : {{d}}</li>
+					<td>{{c}}</td><td>{{d}}</td>
 				{% endifequal %}
+			</tr>
 			{% endfor %}
-			</ul>
 		{% endfor %}
-		
+		</table>
 		<form action="/device/{{id}}" method="post">
 			<button type="submit" id="delete-id" name="device" value="{{id}}">Delete</button>
 		</form>		

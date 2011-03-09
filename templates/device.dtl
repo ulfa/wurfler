@@ -12,7 +12,7 @@
 {% endblock %}
 {% block content %}
 	<img id="device" src="/device_image/{{picture}}"/>
-		<ul style="list-style-type:none">
+		<ul id="#multicolumns">
 			<li><label for="{{id}}">Id :</label><a href="/device/{{id}}">{{id}}</a></li>  
 			<li><label for="{{brand_name}}">Brand name :</label>{{brand_name}}</li>
 			<li><label for="{{model_name}}">Model name :</label>{{model_name}}</li>
@@ -23,6 +23,19 @@
 			<li><label for="{{lastmodified}}">Last modified :</label>{{lastmodified|date:"r"}}</li>
 			<li><label for="{{filter}}">filter :</label>{{filter}}</li>
 		</ul>
+		<br/><br/><br/>
+		{% for group, caps in groups %}
+			<ul style="list-style-type:none">
+			{% for c, d in caps %}
+				{% ifequal c "uaprof" %}
+					<li>{{c}} : <a href="{{d}}">{{d}}</a></li>
+				{% else %}
+					<li>{{c}} : {{d}}</li>
+				{% endifequal %}
+			{% endfor %}
+			</ul>
+		{% endfor %}
+		
 		<form action="/device/{{id}}" method="post">
 			<button type="submit" id="delete-id" name="device" value="{{id}}">Delete</button>
 		</form>		

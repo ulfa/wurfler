@@ -32,13 +32,13 @@
 -export([post_is_create/2, process_post/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
--record(context, {device, group, group_name}).
+-record(context, {device, group_name}).
 %%
 %% API Functions
 %%
 init(_Config) -> 
- 	{{trace, "/tmp"}, #context{device=[]}}.
-	%%{ok, #context{device=[]}}.
+ 	%%{{trace, "/tmp"}, #context{device=[]}}.
+	{ok, #context{device=[]}}.
 
 content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.
@@ -104,6 +104,8 @@ process_request(Device_Id, undefined, ReqData, Context) ->
 process_request(Device_Id, Group_Name, ReqData, Context) ->
 	get_device_by_id(ReqData, Context#context{group_name=Group_Name}, Device_Id).
 
+delete_caps_from_groups(Groups, []) ->
+	Groups;
 delete_caps_from_groups(Groups, Group_Name) ->
 	delete_caps_from_groups(Groups, Group_Name, []).
 delete_caps_from_groups([], _Group_Name, Acc) ->
@@ -138,6 +140,7 @@ lookup_etag(undefined) ->
 	[];
 lookup_etag(Etag) ->
 	wurfler_etag_cache:lookup(webmachine_util:split_quoted_strings(Etag)).
+
 record_to_tuple(device, Record) ->
 	Groups = record_to_tuple(groups, Record#device.groups, []),
 	Keys = record_info(fields, device),
@@ -147,10 +150,8 @@ record_to_tuple(group, Record) ->
 	Capabilities = record_to_tuple(capabilities, Record#group.capabilites, []),
 	Data = lists:nthtail(1,tuple_to_list(Record#group{capabilites=Capabilities})),
 	{lists:nth(1, Data), lists:nth(2, Data)};
-record_to_tuple(capability, Record)->									  
-	Keys = record_info(fields, capability),
-	Data = lists:nthtail(1,tuple_to_list(Record)),
-	lists:zip(Keys, Data).
+record_to_tuple(capability, Record) ->									  
+	{Record#capability.name, Record#capability.value}.
 record_to_tuple(groups, [], Acc) ->
 	Acc;
 record_to_tuple(groups, [Group|Groups], Acc) ->
@@ -158,7 +159,7 @@ record_to_tuple(groups, [Group|Groups], Acc) ->
 record_to_tuple(capabilities, [], Acc) ->
 	Acc;
 record_to_tuple(capabilities, [Capability|Capabilities], Acc) ->
-	record_to_tuple(capabilities, Capabilities, lists:merge(record_to_tuple(capability, Capability), Acc)).
+	record_to_tuple(capabilities, Capabilities, [record_to_tuple(capability, Capability)|Acc]).
 
 get_picture(Path, Id) ->
 	case filelib:is_regular(Path ++ Id ++ ".gif") of
@@ -174,7 +175,10 @@ delete_caps_from_groups_test() ->
 	   #group{id="b", capabilites=[#capability{name="test", value="value"}]},
 	   #group{id="c", capabilites=[#capability{name="test", value="value"}]}
 		],
-	?assertEqual([{group,"c",[]},{group,"b",[{capability,"test","value"}]},{group,"a",[]}],delete_caps_from_groups(A, "b")).
+	?assertEqual([{group,"c",[]},{group,"b",[{capability,"test","value"}]},{group,"a",[]}],delete_caps_from_groups(A, "b")),
+	?assertEqual([{group,"a",[{capability,"test","value"}]},{group,"b",[{capability,"test","value"}]},{group,"c",[{capability,"test","value"}]}],
+				 delete_caps_from_groups(A, [])).
+
 
 
 get_picture_test() ->

@@ -37,14 +37,24 @@
 %% API Functions
 %%
 init(_Config) -> 
- 	%%{{trace, "/tmp"}, #context{device=[]}}.
-	{ok, #context{device=[]}}.
+ 	{{trace, "/tmp"}, #context{device=[]}}.
+	%%{ok, #context{device=[]}}.
 
 content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.
 
+content_types_accepted(ReqData, Context) ->
+	{[{"application/x-www-form-urlencoded", save_device}], ReqData, Context}.
+
+save_device(ReqData, Context) ->
+	case wrq:method(ReqData) of
+		'PUT' -> io:format("1... ~p~n", [wrq:req_body(ReqData)]),				 	   
+				{true, wrq:set_resp_body(<<"fuck">>, ReqData), Context};
+		_ -> {false, ReqData, Context}
+	end.
+
 allowed_methods(ReqData, Context) ->
-    {['GET', 'DELETE', 'POST'], ReqData, Context}.
+    {['GET', 'DELETE', 'POST', 'PUT'], ReqData, Context}.
 
 to_html(ReqData, #context{device=Device, group_name=Group_Name}=Context) ->
 	D = Device#device{groups=delete_caps_from_groups(Device#device.groups, Group_Name, [])},
@@ -56,6 +66,7 @@ to_xml(ReqData, #context{device = Device} = Context) ->
     {D, ReqData, Context}.
  
 resource_exists(ReqData, Context) ->
+	io:format("2...~n"),
 	Device = wrq:path_info(device, ReqData),
 	Group = get_group(ReqData),
 	process_request(Device, Group, ReqData, Context).

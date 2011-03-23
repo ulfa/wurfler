@@ -50,6 +50,8 @@ create_db() ->
 	application:start(mnesia),
 	mnesia:create_table(devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},
 									{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
+	mnesia:create_table(new_devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},
+									{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),	
 	mnesia:create_table(brand_index,[{disc_copies, [node()]}, {attributes, record_info(fields, brand_index)}]),
 	mnesia:create_table(changed_caps_devices,[{record_name, capabilities_devices}, {disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
 	mnesia:create_table(capabilities_devices,[{disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
@@ -62,6 +64,8 @@ create_db() ->
 %% --------------------------------------------------------------------
 %% save functions
 %% --------------------------------------------------------------------
+save_device(new_devicesTbl, Device) ->
+	mnesia:activity(transaction, fun() -> mnesia:write(new_devicesTbl, Device, write) end);
 save_device(devicesTbl, Device)->
 	mnesia:activity(transaction, fun() -> mnesia:write(devicesTbl, Device, write) end).
 

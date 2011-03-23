@@ -35,6 +35,7 @@
 -export([start_link/0, start/0]).
 -export([searchByUA/1, searchByCapabilities/3, getDeviceById/1, getAllCapabilities/1, getVersion/0]).
 -export([get_brands/0, get_brand/1, get_devices_by_model/1, check_device/3, delete_device/1, delete_brand/1]).
+-export([saveDevice/2]).
 -compile([export_all]).
 -define(TIMEOUT, infinity).
 -define(CONTAINS, fun({device, [{model_name, Model_Name},_], []}) ->					   					   
@@ -69,6 +70,8 @@ getVersion() ->
 	gen_server:call(?MODULE, {version}).
 check_device(Capabilities, Key, Id) ->
 	gen_server:call(?MODULE, {check_device, Capabilities, Key, Id}, ?TIMEOUT).
+saveDevice(newdevice, Device_Tuple) ->
+	gen_server:call(?MODULE, {save_new_device, Device_Tuple}, ?TIMEOUT).
 %% @spec delete_device(Id::string()) -> List of device Ids
 %% List = [string()] 
 %% @doc This functions gets an device Id and than seeks all device which depends
@@ -136,8 +139,12 @@ handle_call({delete_device, Id}, _From, State) ->
 handle_call({delete_brand, Brand}, _From, State) ->
 	Result = deleteBrand(Brand),
 	{reply, Result, State};
+handle_call({save_new_device, Device_Tuple}, _From, State) ->
+	Result = save_new_device(Device_Tuple),
+    {reply, Result, State};
 handle_call({version}, _From, State) ->
     {reply, get_version(), State}.
+
 %% --------------------------------------------------------------------
 %% Function: handle_cast/2
 %% Description: Handling cast messages
@@ -173,6 +180,8 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+save_new_device(Device_Tuple) ->
+	ok.
 get_version() ->
 	{ok, Version} = application:get_key(wurflerservice, vsn),
 	Version.

@@ -28,11 +28,14 @@
 %% Exported Functions
 %%
 -export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2, 
-		 delete_resource/2, delete_completed/2, allowed_methods/2, generate_etag/2]).
+		 delete_resource/2, delete_completed/2, allowed_methods/2, generate_etag/2, 
+		 allow_missing_post/2, create_path/2]).
 -export([post_is_create/2, process_post/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
--record(context, {device, group_name}).
+-include("../deps/webmachine/include/wm_reqstate.hrl").
+
+-record(context, {device, group_name, id}).
 %%
 %% API Functions
 %%
@@ -43,21 +46,16 @@ init(_Config) ->
 content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.
 
-content_types_accepted(ReqData, Context) ->
-	{[{"application/x-www-form-urlencoded", save_device}], ReqData, Context}.
-
-save_device(ReqData, Context) ->
-	case wrq:method(ReqData) of
-		'PUT' -> io:format("1... ~p~n", [wrq:req_body(ReqData)]),				 	   
-				{true, wrq:set_resp_body(<<"fuck">>, ReqData), Context};
-		_ -> {false, ReqData, Context}
-	end.
-
+		
 allowed_methods(ReqData, Context) ->
-    {['GET', 'DELETE', 'POST', 'PUT'], ReqData, Context}.
+    {['GET', 'DELETE', 'POST'], ReqData, Context}.
+
+allow_missing_post(ReqData, Context) ->
+	{true, ReqData, Context}.
 
 to_html(ReqData, #context{device=Device, group_name=Group_Name}=Context) ->
 	D = Device#device{groups=delete_caps_from_groups(Device#device.groups, Group_Name, [])},
+	io:format("1.. ~p~n", [D]),
 	{ok, Content} = device_dtl:render(record_to_tuple(device, D)),
 	{Content, ReqData, Context}.
 
@@ -66,18 +64,24 @@ to_xml(ReqData, #context{device = Device} = Context) ->
     {D, ReqData, Context}.
  
 resource_exists(ReqData, Context) ->
-	io:format("2...~n"),
 	Device = wrq:path_info(device, ReqData),
 	Group = get_group(ReqData),
 	process_request(Device, Group, ReqData, Context).
 
+	
 get_group(ReqData) ->
 	case wrq:path_tokens(ReqData) of
 		["group",Group] -> Group;
 		_ -> "product_info"
 	end.
+
 post_is_create(ReqData, Context) ->
 	{false, ReqData, Context}.
+
+create_path(ReqData, Context) ->
+	LOC = "http://" ++ wrq:get_req_header("host", ReqData) ++"/device/111",
+    ReqData1 = wrq:set_resp_header("Location", LOC, ReqData),
+	{LOC, ReqData1, Context}.
 
 process_post(ReqData, Context) ->
 	ReqData1 = redirect("/brands", ReqData),
@@ -92,6 +96,7 @@ delete_resource(ReqData, Context)->
 
 delete_completed(ReqData, Context) ->
 	{true, ReqData, Context}.
+
 %%
 %% Local Functions
 %%
@@ -156,6 +161,7 @@ record_to_tuple(device, Record) ->
 	Groups = record_to_tuple(groups, Record#device.groups, []),
 	Keys = record_info(fields, device),
 	Data = lists:nthtail(1,tuple_to_list(Record#device{groups=Groups})),
+	io:format("1...~p~n", [Keys]),
 	[{picture, get_picture("priv/www/lib/devices/",Record#device.id)}|lists:zip(Keys, Data)];
 record_to_tuple(group, Record) ->	
 	Capabilities = record_to_tuple(capabilities, Record#group.capabilites, []),
@@ -208,8 +214,9 @@ record_to_tuple_test() ->
 					 brand_name="Nokia", 
 					 model_name="N95", 
 					 groups=[#group{id="j2me", capabilites=[#capability{name="test", value="value"}, #capability{name="test_1", value="value_1"}]}],
-					 created=undefined,
-					 lastmodified=undefined},
+					 created={{2011,3,7},{16,14,32}},
+					 lastmodified={{2011,3,7},{16,14,32}},
+					 filter=undefined},
 	io:format("2... : ~p~n" ,[record_to_tuple(device,Device)]). 
 
 	

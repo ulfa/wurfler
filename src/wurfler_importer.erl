@@ -205,11 +205,11 @@ process_attribute(capability, Attribute)->
 
 create_device(Attributes, Groups)->
 	#device{id=proplists:get_value(id, Attributes), 
-			user_agent=proplists:get_value(user_agent, Attributes),
-			actual_device_root=proplists:get_value(actual_device_root, Attributes),
-			fall_back=proplists:get_value(fall_back, Attributes),
-			brand_name=proplists:get_value(brand_name, Attributes),
-			model_name=proplists:get_value(model_name, Attributes),
+			user_agent=proplists:get_value(user_agent, Attributes, []),
+			actual_device_root=proplists:get_value(actual_device_root, Attributes, false),
+			fall_back=proplists:get_value(fall_back, Attributes, []),
+			brand_name=proplists:get_value(brand_name, Attributes, []),
+			model_name=proplists:get_value(model_name, Attributes, []),
 			groups=Groups,
 			created=wurfler_date_util:get_uc_time(),
 			lastmodified=wurfler_date_util:get_uc_time()}.

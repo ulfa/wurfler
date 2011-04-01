@@ -1,0 +1,94 @@
+{tables,
+    [{os_device_id,
+         [{record_name,os_device_id},
+          {attributes,[device_os,os_reg,device_ids]}]}]}.
+{os_device_id,"Palm OS","palm",
+              []}.
+{os_device_id,"Windows ME","Win 9x 4.90|.*windows me( |;).*",[]}.
+{os_device_id,"OpenBSD",".*openbsd.*",[]}.
+{os_device_id,"Mac OS X 10.4 Tiger","Mac OS X (10_4|10.4)",[]}.
+{os_device_id,"Linux (SUSE)","linux.*suse|suse-linux|Konqueror.*SUSE",[]}.
+{os_device_id,"Linux (Maemo)","Mozilla.*Linux.*Maemo",[]}.
+{os_device_id,"Windows XP",
+              ".*windows nt 5.1( |;).*|Windows NT 5.1|Windows_XP/5.1|.*windows XP.*",
+              []}.
+{os_device_id,"Linux (Arch Linux)","Arch Linux ([0-9a-zA-Z.-]+)",[]}.
+{os_device_id,"Linux (Ubuntu)","ubuntu",[]}.
+{os_device_id,"Solaris","Solaris|sunos",[]}.
+{os_device_id,"Windows Vista",".*windows nt 6.0( |;).*|Windows NT 6.0",[]}.
+{os_device_id,"AIX","aix",[]}.
+{os_device_id,"Mac OS X 10.5 Leopard","Mac OS X (10_5|10.5)",[]}.
+{os_device_id,"webOS 1.0","webOS/1.0.*AppleWebKit",[]}.
+{os_device_id,"RISK OS","RISC.OS|riscos",[]}.
+{os_device_id,"Mac OS X 10.6 Snow Leopard","Mac OS X (10_6|10.6)",[]}.
+{os_device_id,"OS/2","os/2",[]}.
+{os_device_id,"Linux (Mandriva)","linux.*mandriva|linux.*mdk",[]}.
+{os_device_id,"Windows CE","windows ce|PocketPC",[]}.
+{os_device_id,"SCO OpenServer","SCO_SV",[]}.
+{os_device_id,"Linux (Gentoo)","linux.*gentoo|Gentoo i686",[]}.
+{os_device_id,"Linux (Kanotix)","linux.*kanotix",[]}.
+{os_device_id,"Syllable","Syllable",[]}.
+{os_device_id,"JVM (Platform Micro Edition)",
+              "j2me|NetFront.*Profile/MIDP|Obigo.*MIDP|Teleca.*MIDP",[]}.
+{os_device_id,"HP-UX","hp-ux",[]}.
+{os_device_id,"OS/2 Warp","os/2.*warp",[]}.
+{os_device_id,"IRIX","irix",[]}.
+{os_device_id,"FreeBSD",".*freebsd.*",[]}.
+{os_device_id,"BeOS","beos",[]}.
+{os_device_id,"Mac OS X","Mac OS X",[]}.
+{os_device_id,"Mac OS",
+              "mac_powerpc|Macintosh|powerpc-apple|os=Mac|SO=MAC10,6|so=Mac 10.5.8| mac",
+              []}.
+{os_device_id,"Linux (Knoppix)","linux.*knoppix",[]}.
+{os_device_id,"MorphOS","MorphOS",[]}.
+{os_device_id,"Linux","linux",[]}.
+{os_device_id,"Linux (CentOS)","centos",[]}.
+{os_device_id,"Windows NT 4.0","NT4.0",[]}.
+{os_device_id,"NetBSD",".*netbsd.*",[]}.
+{os_device_id,"Symbian OS","symbian|SonyEricssonP900|^DoCoMo.*F900i",
+              []}.
+{os_device_id,"Windows 3.1",".*windows 3.1.*",[]}.
+{os_device_id,"Windows 98","windows 98|.*win98( |;).*|.*windows 4.10( |;).*",
+              []}.
+{os_device_id,"Symbian OS 7.0s","Series90.*Nokia7710",[]}.
+{os_device_id,"WebTV (msnTV)","webtv",[]}.
+{os_device_id,"JVM (Java)","java/[0-9a-z.]+|java[0-9a-z.]+",[]}.
+{os_device_id,"RIM OS","BlackBerry",
+              []}.
+{os_device_id,"Windows NT","winnt|WinNT4.0|Windows-NT",[]}.
+{os_device_id,"Nintendo Wii","Nintendo.Wii",[]}.
+{os_device_id,"Haiku OS","BeOS.*Haiku BePC",[]}.
+{os_device_id,"Windows 95",".*windows 95.*|.*win95.*",[]}.
+{os_device_id,"Windows 2000",
+              ".*windows nt 5.0( |;).*|CYGWIN_NT-5.0|.*windows 2000( |;).*",
+              []}.
+{os_device_id,"Series 80 Platform 2nd Edition","Series80/2.0",[]}.
+{os_device_id,"Windows 2003 Server",".*windows nt 5.2( |;).*",[]}.
+{os_device_id,"Linux (VectorLinux)","Vector Linux",[]}.
+{os_device_id,"DragonFly BSD",".*dragonfly.*",[]}.
+{os_device_id,"Windows 3.x",".*win16( |;).*",[]}.
+{os_device_id,"Danger Hiptop","Danger hiptop [0-9.]+",[]}.
+{os_device_id,"Windows 7",".*windows nt 6.1( |;).*|.*windows 7.*",[]}.
+{os_device_id,"Plan 9","plan 9",[]}.
+{os_device_id,"iPhone OS",
+              "iPhone OS ([0-9_]+) like Mac OS X|iPhone OS 2_0|iPhone OS [0-9.]+",
+              []}.
+{os_device_id,"OpenVMS","open.*vms",[]}.
+{os_device_id,"Windows Mobile OS","windows ce",
+              []}.
+{os_device_id,"Linux (RedHat)",
+              "linux.*redhat|linux.*red hat|Red Hat modified",[]}.
+{os_device_id,"Android","Android ([0-9.]+)",
+              []}.
+{os_device_id,"Windows","windows|Win32",[]}.
+{os_device_id,"Linux (Debian)","linux.*debian",[]}.
+{os_device_id,"Linux (Slackware)",
+              "linux.*slackware|linux.*(Dropline GNOME).*",[]}.
+{os_device_id,"Amiga OS","amiga",[]}.
+{os_device_id,"PlayStation Portable","psp.*playstation.*portable",[]}.
+{os_device_id,"SkyOS","SkyOS",[]}.
+{os_device_id,"Linux (Mint)","Linux Mint",[]}.
+{os_device_id,"Linux (Fedora)","linux.*fedora|Konqueror.*Fedora",[]}.
+{os_device_id,"Symbian S60","Series60|Series 60",[]}.
+{os_device_id,"QNX x86pc","QNX x86pc",[]}.
+{os_device_id,"Linux (Linspire)","linux.*linspire",[]}.

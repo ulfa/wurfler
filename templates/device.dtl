@@ -40,6 +40,6 @@
 		{% endfor %}
 		</table>
 		<form action="/device/{{id}}" method="post">
-			<button type="submit" id="delete-id" name="device" value="{{id}}">Delete</button>
+			<button type="submit" id="delete-id" name="method" value="DELETE">Delete</button>
 		</form>		
 {% endblock %}

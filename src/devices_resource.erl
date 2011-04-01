@@ -55,6 +55,23 @@ to_html(ReqData, #context{devices=Devices}=Context) ->
 	{ok, Content} = devices_dtl:render([{devices, Devices}]),
      {Content, ReqData, Context}.
 
+content_types_accepted(ReqData, Context) ->
+	{[{"application/x-www-form-urlencoded", process_form}], ReqData, Context}.
+
+process_form(ReqData, Context) ->
+	case wrq:method(ReqData) of
+		'POST' -> io:format("1... ~p~n", [wrq:req_body(ReqData)]),				 
+					  
+				{true, ReqData, Context};
+		_ -> {false, ReqData, Context}
+	end.
+
+is_tunneld_delete(ReqData, Context) ->
+	case wrq:req_body(ReqData) of
+		<<"method=DELETE">> -> true;
+		_ -> false
+	end.
+
 allow_missing_post(ReqData, Context) ->
 	{true, ReqData, Context}.
 

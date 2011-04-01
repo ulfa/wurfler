@@ -66,6 +66,7 @@ to_xml(ReqData, #context{device = Device} = Context) ->
 resource_exists(ReqData, Context) ->
 	Device = wrq:path_info(device, ReqData),
 	Group = get_group(ReqData),
+	error_logger:info_msg("0.. ~p : ~p~n",[Device, Group]),
 	process_request(Device, Group, ReqData, Context).
 
 	
@@ -108,7 +109,7 @@ redirect(Target, ReqData) ->
 delete_device(Id) ->
 	wurfler:delete_device(Id).
 
-process_request(undefined, undefined, ReqData, Context) ->
+process_request(undefined, _Group_Name, ReqData, Context) ->
 	error_logger:info_msg("UA ~p~n", [wrq:get_req_header("User-Agent", ReqData)]),
 	case wurfler:searchByUA(wrq:get_req_header("User-Agent", ReqData)) of
 		[] -> {false, ReqData, Context#context{device=[]}};
@@ -134,8 +135,6 @@ delete_caps_from_groups([Group|Groups], Group_Name, Acc) ->
 
 insertURI(ReqData, Device) ->
 	Device#device{id="http://" ++ wrq:get_req_header(?HOST, ReqData) ++ "/device/" ++ Device#device.id}.
-
-%%expires(ReqData, Context) -> {wurfler_date_util:date_plus(calendar:now_to_datetime(now()), 1), ReqData, Context}.
 
 generate_etag(ReqData, #context{device = Device} = Context) ->  {wurfler_util:generate_etag(Device), ReqData, Context}.
 

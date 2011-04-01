@@ -237,7 +237,6 @@ get_generic_capabilities() ->
 	{_Fall_back, Generic} = wurfler_db:find_capabilities_by_id(devicesTbl, "generic"),
 	Generic.
 
-
 add_device_to_devices(Device, State) ->
 	State#state{devices=[xml_factory:create_device(Device)|State#state.devices]}.
 

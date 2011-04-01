@@ -68,7 +68,6 @@ resource_exists(ReqData, Context) ->
 	Group = get_group(ReqData),
 	error_logger:info_msg("0.. ~p : ~p~n",[Device, Group]),
 	process_request(Device, Group, ReqData, Context).
-
 	
 get_group(ReqData) ->
 	case wrq:path_tokens(ReqData) of
@@ -76,8 +75,6 @@ get_group(ReqData) ->
 		_ -> "product_info"
 	end.
 
-post_is_create(ReqData, Context) ->
-	{false, ReqData, Context}.
 
 create_path(ReqData, Context) ->
 	LOC = "http://" ++ wrq:get_req_header("host", ReqData) ++"/device/111",
@@ -87,6 +84,9 @@ create_path(ReqData, Context) ->
 process_post(ReqData, Context) ->
 	ReqData1 = redirect("/brands", ReqData),
 	delete_resource(ReqData1, Context).
+
+post_is_create(ReqData, Context) ->
+	{false, ReqData, Context}.
 
 delete_resource(ReqData, Context)->
 	Device = wrq:path_info(device, ReqData),

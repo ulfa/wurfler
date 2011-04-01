@@ -38,7 +38,8 @@
 %% API Functions
 %%
 init([]) -> 
-	{ok, #context{devices=[]}}.
+	{{trace, "/tmp"}, #context{devices=[]}}.
+	%%{ok, #context{devices=[]}}.
 
 content_types_provided(ReqData, Context) ->
     {[{"text/xml", to_xml}, {"text/html", to_html}],ReqData, Context}.
@@ -47,6 +48,7 @@ content_types_provided(ReqData, Context) ->
 allowed_methods(ReqData, Context) ->
     {['POST', 'GET'], ReqData, Context}.
 
+
 to_xml(ReqData, #context{devices=Devices}=Context)->
 	Content = xml_factory:to_xml(Devices),
 	{Content, ReqData, Context}.
@@ -54,23 +56,6 @@ to_xml(ReqData, #context{devices=Devices}=Context)->
 to_html(ReqData, #context{devices=Devices}=Context) ->
 	{ok, Content} = devices_dtl:render([{devices, Devices}]),
      {Content, ReqData, Context}.
-
-content_types_accepted(ReqData, Context) ->
-	{[{"application/x-www-form-urlencoded", process_form}], ReqData, Context}.
-
-process_form(ReqData, Context) ->
-	case wrq:method(ReqData) of
-		'POST' -> io:format("1... ~p~n", [wrq:req_body(ReqData)]),				 
-					  
-				{true, ReqData, Context};
-		_ -> {false, ReqData, Context}
-	end.
-
-is_tunneld_delete(ReqData, Context) ->
-	case wrq:req_body(ReqData) of
-		<<"method=DELETE">> -> true;
-		_ -> false
-	end.
 
 allow_missing_post(ReqData, Context) ->
 	{true, ReqData, Context}.

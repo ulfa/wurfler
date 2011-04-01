@@ -157,7 +157,7 @@ clear_capabilities_devices() ->
 	mnesia:activity(transaction, fun() -> mnesia:clear_table(capabilities_devices) end).
 upload_os_device_id() ->
 	error_logger:info_msg("start : load the os_device_id content~n"),
-	mnesia:load_textfile("data/tables.dump"),
+	mnesia:load_textfile("data/osDeviceId.data"),
 	error_logger:info_msg("end : load the os_device_id content~n").
 %% --------------------------------------------------------------------
 %%% delete functions

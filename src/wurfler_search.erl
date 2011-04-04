@@ -202,15 +202,37 @@ check_device(Capabilities, Key, DeviceId, State) ->
 		[{devices,[],[]}] -> [];
 		Devices -> {Capabilities, Key, Devices}
 	end.
+
 get_all_groups(Device_Id) ->
-	get_all_groups(Device_Id, #state{groups=[]}).
+	List_of_devices = wurfler_db:find_list_of_devices(devicesTbl, Device_Id),
+	get_all_groups(List_of_devices,  #state{groups=[]}).
 get_all_groups([], #state{groups=Groups}) ->
-	Groups;
-get_all_groups("root", #state{groups=Groups}) ->
-	Groups;
-get_all_groups(Device_Id, #state{groups=AllGroups}) ->
-	{Fall_back, Groups} = wurfler_db:find_groups_by_id(devicesTbl, Device_Id),
-	get_all_groups(Fall_back, #state{groups=lists:append(AllGroups, Groups)}).
+	lists:keysort(2, Groups);
+get_all_groups("root",  #state{groups=Groups}) ->
+	lists:keysort(2, Groups);
+get_all_groups([Device_Id|Device_Ids], #state{groups=AllGroups}) ->
+	{_Fall_back, Groups} = wurfler_db:find_groups_by_id(devicesTbl, Device_Id),
+	get_all_groups(Device_Ids, #state{groups=check_groups(AllGroups, Groups)}).
+
+check_groups(AllGroups, []) ->
+	AllGroups;
+check_groups(AllGroups, [Group|Groups]) ->
+	AllGroups1 = case lists:keyfind(Group#group.id, 2, AllGroups) of 
+					false -> [Group|AllGroups];
+					Group_Of_All -> Caps = check_capabilities(Group_Of_All#group.capabilites, Group#group.capabilites),
+									lists:keyreplace(Group#group.id, 2, AllGroups, Group#group{capabilites=Caps})
+				 end,		
+	check_groups(AllGroups1, Groups).
+
+check_capabilities(AllCapabilities, []) ->
+	AllCapabilities;
+check_capabilities(AllCapabilities, [Capability|Capabilities]) ->
+	AllCapabilities1 = case lists:keyfind(Capability#capability.name, 2, AllCapabilities) of
+						   	false -> error_logger:error_info("The capability ~p is not in the pool of capabilities", [Capability]),
+								    AllCapabilities;
+						   _ -> lists:keyreplace(Capability#capability.name, 2, AllCapabilities, Capability)
+					   end,
+	check_capabilities(AllCapabilities1, Capabilities).
 
 get_all_capabilities(Device_Id) ->
 	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device_Id, #state{capabilities=get_generic_capabilities()}),

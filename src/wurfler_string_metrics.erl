@@ -28,7 +28,7 @@
 %% --------------------------------------------------------------------
 %% External exports
 %% --------------------------------------------------------------------
--export([levenshtein/2, levenshtein/3]).
+-export([levenshtein/3]).
 -compile([export_all]).
 
 %% --------------------------------------------------------------------
@@ -38,7 +38,7 @@
 %%% Internal functions
 %% --------------------------------------------------------------------
 levenshtein(useragent, Keys, UA)->
-	case pmap(invalidate_number(UA), Keys) of
+	case pmap(invalidate_number(UA), wurfler_util:split_list(Keys, erlang:system_info(schedulers))) of
 		[] -> [];
 		A ->  lists:nth(1, A)
 	end.
@@ -66,6 +66,18 @@ levenshtein_distlist([TargetHead|TargetTail], [DLH|DLT], SourceChar, NewDistList
 levenshtein_distlist([], _, _, NewDistList, _) ->
 	NewDistList.
 
+levenshtein1(UA, Keys) ->
+	levenshtein1(UA, Keys, []).
+levenshtein1(_UA, [], Acc) ->
+	Acc;
+levenshtein1(UA, [Key|Keys], Acc) ->
+	Acc1 = case get_id_ua(Key) of
+		{Id, Ua} -> Distance = levenshtein(UA, invalidate_number(Ua)),
+					[{Distance, Id, Ua}|Acc];
+		[] -> []
+	end,
+	levenshtein1(UA, Keys, Acc1).
+
 invalidate_number(UA) ->
 	re:replace(UA, "AppleWebKit/[0-9]+.[0-9]+.[0-9]+|Version/[0-9]+.[0-9]+.[0-9]+|Mobile/[0-9]+[A-Z][0-9]+|Safari/[0-9]+.[0-9]+", "X", [global, {return, list}]).
 
@@ -78,28 +90,24 @@ pmap(UA, Keys) ->
 	Pids = lists:map(fun(Key) -> 
 						proc_lib:spawn_link(fun() -> do_it(Parent, UA, Key) end) 
 					 end, Keys),
-%% 	io:format("Pids ~p~n", [Pids]),
+ 	io:format("Pids ~p~n", [Pids]),
 	case gather(Pids) of 
 		[] -> [];
 		A -> lists:keysort(1,A)
 	end.
 
-do_it(Parent, UA,  Key) ->
-	case get_id_ua(Key) of
-		{Id, Ua} -> Distance = levenshtein(UA, invalidate_number(Ua)),
-					Parent ! {Distance, Id, Ua};
-		[] -> Parent ! {[]}
-	end.
-
+do_it(Parent, UA,  List_of_Keys) ->
+	Parent ! levenshtein1(UA, List_of_Keys).
+	
 gather([_Pid|Pids]) ->
 	receive
-		{Distance, Id, Ua} -> [{Distance, Id, Ua}|gather(Pids)];
-		{[]} -> gather(Pids)
+		List -> lists:flatten(lists:append(List, gather(Pids)))
 	end;
 gather([]) ->
 	[].
 
 get_id_ua(Key) ->
+	
 	case wurfler_db:find_record_by_id(devicesTbl, Key) of 
 		[#device{id=Id, user_agent=UA}] -> {Id, UA};
 		[] -> []
@@ -130,13 +138,13 @@ setup() ->
 levenshtein_DB_test_() ->
 	Keys = wurfler_db:get_all_keys(devicesTbl),
 	A="Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7",
-	pmap(invalidate_number(A), Keys).
+	pmap(invalidate_number(A),  wurfler_util:split_list(Keys, erlang:system_info(schedulers))).
 	%%get_devices(Keys, []).
 
 levenshtein_1_test_() ->
 	Keys = wurfler_db:get_all_keys(devicesTbl),
 	A="Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_1 like MacM OS X; de-de) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8B117 Safari/6531.22.7",
-	pmap(invalidate_number(A), Keys).
+	pmap(invalidate_number(A), wurfler_util:split_list(Keys, erlang:system_info(schedulers))).
 	
 
 get_devices([], Acc)->

@@ -55,7 +55,6 @@ allow_missing_post(ReqData, Context) ->
 
 to_html(ReqData, #context{device=Device, group_name=Group_Name}=Context) ->
 	D = Device#device{groups=delete_caps_from_groups(Device#device.groups, Group_Name, [])},
-	io:format("1.. ~p~n", [D]),
 	{ok, Content} = device_dtl:render(record_to_tuple(device, D)),
 	{Content, ReqData, Context}.
 
@@ -74,7 +73,6 @@ get_group(ReqData) ->
 		["group",Group] -> Group;
 		_ -> "product_info"
 	end.
-
 
 create_path(ReqData, Context) ->
 	LOC = "http://" ++ wrq:get_req_header("host", ReqData) ++"/device/111",
@@ -160,7 +158,6 @@ record_to_tuple(device, Record) ->
 	Groups = record_to_tuple(groups, Record#device.groups, []),
 	Keys = record_info(fields, device),
 	Data = lists:nthtail(1,tuple_to_list(Record#device{groups=Groups})),
-	io:format("1...~p~n", [Keys]),
 	[{picture, get_picture("priv/www/lib/devices/",Record#device.id)}|lists:zip(Keys, Data)];
 record_to_tuple(group, Record) ->	
 	Capabilities = record_to_tuple(capabilities, Record#group.capabilites, []),

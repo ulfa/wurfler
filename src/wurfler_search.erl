@@ -149,7 +149,7 @@ new_state() ->
 search_by_capabilities(Capabilities, Timestamp, Type, _State) ->
 	List_Of_Funs = create_funs_from_list(Capabilities),
 	Keys = get_keys(Type, Timestamp),
-	pmap(List_Of_Funs, Capabilities, split_list(Keys, erlang:system_info(schedulers))).
+	pmap(List_Of_Funs, Capabilities, wurfler_util:split_list(Keys, erlang:system_info(schedulers))).
 	%%get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
 get_keys([], Timestamp) ->
@@ -158,15 +158,6 @@ get_keys(Type, _Timestamp) ->
 	[#os_device_id{device_ids=Device_Ids}]=wurfler_db:find_os_device_id(Type),
 	Device_Ids.
 	
-split_list(List, 2) ->
-	{L1, L2} = lists:split(length(List) div 2, List),
-	[L1, L2];
-split_list(List, 4) ->
-	{L1, L2} = lists:split(length(List) div 2, List),
-	{L3, L4} = lists:split(length(L1) div 2, L1),
-	{L5, L6} = lists:split(length(L2) div 2, L2),
-	[L3,L4,L5,L6].
-
 pmap(List_Of_Funs, Capabilities, Keys) ->
 	Parent = self(),
 	Pids = lists:map(fun(Key) -> 
@@ -189,6 +180,7 @@ search_by_device_id(Device_Id)->
 		[] -> [];
 		[Device] -> Device#device{groups=get_all_groups(Device_Id)}				
 	end.
+
 search_by_ua(UserAgent, Device_Ids, _State)->
 	case wurfler_string_metrics:levenshtein(useragent, Device_Ids, UserAgent) of
 		{Distance, Id, Ua} ->  error_logger:info_msg("Distance : ~p Prozent : ~p~n", [Distance, calculate(Distance, UserAgent, Ua)]),

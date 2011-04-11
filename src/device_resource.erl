@@ -29,7 +29,7 @@
 %%
 -export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2, 
 		 delete_resource/2, delete_completed/2, allowed_methods/2, generate_etag/2, 
-		 allow_missing_post/2, create_path/2]).
+		 allow_missing_post/2]).
 -export([post_is_create/2, process_post/2]).
 -compile([export_all]).
 -include_lib("../deps/webmachine/include/webmachine.hrl").
@@ -65,7 +65,6 @@ to_xml(ReqData, #context{device = Device} = Context) ->
 resource_exists(ReqData, Context) ->
 	Device = wrq:path_info(device, ReqData),
 	Group = get_group(ReqData),
-	error_logger:info_msg("0.. ~p : ~p~n",[Device, Group]),
 	process_request(Device, Group, ReqData, Context).
 	
 get_group(ReqData) ->
@@ -73,11 +72,6 @@ get_group(ReqData) ->
 		["group",Group] -> Group;
 		_ -> "product_info"
 	end.
-
-create_path(ReqData, Context) ->
-	LOC = "http://" ++ wrq:get_req_header("host", ReqData) ++"/device/111",
-    ReqData1 = wrq:set_resp_header("Location", LOC, ReqData),
-	{LOC, ReqData1, Context}.
 
 process_post(ReqData, Context) ->
 	ReqData1 = redirect("/brands", ReqData),

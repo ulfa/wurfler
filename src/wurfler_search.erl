@@ -34,7 +34,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 -export([start_link/0, start/0]).
 -export([searchByUA/2, searchByCapabilities/3, check_device/3, searchByDeviceId/1]).
--export([getAllCapabilities/1, get_all_groups/1]).
+-export([getAllCapabilities/1, get_capability/2, get_all_groups/1]).
 -define(TIMEOUT, infinity).
 
 %% ====================================================================
@@ -101,7 +101,7 @@ handle_call({check_device, Capabilities, Key, Id}, _From, _State) ->
 	Result = check_device(Capabilities, Key, Id, new_state()),
 	{reply, Result, new_state()};
 handle_call({get_all_capabilities, Device_Id}, _From, State) ->
-	Result = get_all_capabilities(Device_Id),
+	Result = get_all_capabilities(wurfler_db:find_list_of_devices_with_generic(devicesTbl, Device_Id)),
     {reply, Result, State}.
 
 %% --------------------------------------------------------------------
@@ -146,34 +146,49 @@ code_change(_OldVsn, State, _Extra) ->
 new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
 
+search_by_capabilities(Capabilities, Timestamp, [], _State) ->
+	List_Of_Funs = create_funs_from_list(Capabilities),
+	Keys = get_keys([], Timestamp),
+	pmap(List_Of_Funs, Capabilities, wurfler_util:split_list(Keys, erlang:system_info(schedulers)));
+	%%get_devices_for_caps(List_Of_Funs, Keys, #state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)});
 search_by_capabilities(Capabilities, Timestamp, Type, _State) ->
 	List_Of_Funs = create_funs_from_list(Capabilities),
 	Keys = get_keys(Type, Timestamp),
 	pmap(List_Of_Funs, Capabilities, wurfler_util:split_list(Keys, erlang:system_info(schedulers))).
-	%%get_devices_for_caps(List_Of_Funs, Keys, State#state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)}).
 
 get_keys([], Timestamp) ->
 	wurfler_db:get_all_keys(devicesTbl, Timestamp);
 get_keys(Type, _Timestamp) ->
-	[#os_device_id{device_ids=Device_Ids}]=wurfler_db:find_os_device_id(Type),
-	Device_Ids.
-	
+	case wurfler_db:find_os_device_id(Type) of
+		[#os_device_id{device_ids=Device_Ids}] -> Device_Ids;
+		[] -> []
+	end.
+
+pmap(_List_Of_Funs, _Capabilities, []) ->
+	xml_factory:create_devices([]);
 pmap(List_Of_Funs, Capabilities, Keys) ->
 	Parent = self(),
 	Pids = lists:map(fun(Key) -> 
 						proc_lib:spawn_link(fun() -> do_it(Parent, List_Of_Funs, Capabilities, Key) end) 
 					 end, Keys),
-	xml_factory:create_devices(gather(Pids)).
+	xml_factory:create_devices(gather(Pids, [])).
 
 do_it(Parent, List_Of_Funs, Capabilities, Keys) ->
 	Parent ! {get_devices_for_caps(List_Of_Funs, Keys, #state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)})}.
 
-gather([_Pid|Pids]) ->
+gather([Pid|Pids], Acc) ->
 	receive
-		{Devices} -> lists:append(Devices,gather(Pids))
+		{[]} -> gather(Pids, Acc);
+		{Devices} -> gather(Pids, lists:append(Devices,Acc))
 	end;
-gather([]) ->
-	[].
+gather([], Acc) ->
+	Acc.
+
+search_by_device_id_only(Device_Id)->	
+	case wurfler_db:find_record_by_id(devicesTbl, Device_Id) of
+		[] -> [];
+		[Device] -> Device				
+	end.
 
 search_by_device_id(Device_Id)->	
 	case wurfler_db:find_record_by_id(devicesTbl, Device_Id) of
@@ -204,7 +219,7 @@ check_device(Capabilities, Key, DeviceId, State) ->
 	end.
 
 get_all_groups(Device_Id) ->
-	List_of_devices = wurfler_db:find_list_of_devices(devicesTbl, Device_Id),
+	List_of_devices = wurfler_db:find_list_of_devices_with_generic(devicesTbl, Device_Id),
 	get_all_groups(List_of_devices,  #state{groups=[]}).
 get_all_groups([], #state{groups=Groups}) ->
 	lists:keysort(2, Groups);
@@ -234,37 +249,30 @@ check_capabilities(AllCapabilities, [Capability|Capabilities]) ->
 					   end,
 	check_capabilities(AllCapabilities1, Capabilities).
 
-get_all_capabilities(Device_Id) ->
-	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device_Id, #state{capabilities=get_generic_capabilities()}),
-	Caps.
-get_all_capabilities([], #state{capabilities=Caps}) ->
-	{ok, #state{capabilities=Caps}};
-get_all_capabilities("root", #state{capabilities=Caps}) ->
-	{ok, #state{capabilities=Caps}};
-get_all_capabilities("generic", #state{capabilities=Caps}) ->
-   	{ok, #state{capabilities=Caps}};
-get_all_capabilities(Device_Id, #state{capabilities=Caps}) ->
-	{Fall_back, Capabilities} = wurfler_db:find_capabilities_by_id(devicesTbl, Device_Id),
-	get_all_capabilities(Fall_back, #state{capabilities=overwrite(capabilities,Caps, Capabilities)}).
+
+get_all_capabilities(List_Of_Fall_Back) ->
+	get_all_capabilities(List_Of_Fall_Back, []).
+
+get_all_capabilities([], Acc) ->
+	Acc;
+get_all_capabilities([Fall_Back|List_Of_Fall_Back], Acc) ->
+	Capabilities = wurfler_db:find_capabilities_by_id (devicesTbl, Fall_Back),
+	get_all_capabilities(List_Of_Fall_Back, overwrite(capabilities, Capabilities, Acc)).
 
 get_generic_capabilities() ->
-	{_Fall_back, Generic} = wurfler_db:find_capabilities_by_id(devicesTbl, "generic"),
-	Generic.
+	wurfler_db:find_capabilities_by_id(devicesTbl, "generic").
 
 add_device_to_devices(Device, State) ->
 	State#state{devices=[xml_factory:create_device(Device)|State#state.devices]}.
 
 get_devices_for_caps([], _Keys, State) ->
 	State#state.devices;
-
 get_devices_for_caps(_List_Of_Funs, [], State) ->
 	State#state.devices;
-
-get_devices_for_caps(List_Of_Funs, [Key|Keys], State)->
-	Device = search_by_device_id(Key),	
-	{ok, #state{capabilities=Caps}} = get_all_capabilities(Device#device.id, State),
+get_devices_for_caps(List_Of_Funs, [Key|Keys], #state{capabilities=Needed_Caps}=State)->
+	Caps = get_all_capabilities(wurfler_db:find_list_of_devices(devicesTbl, Key), Needed_Caps),
 	case run_funs_against_list(List_Of_Funs, Caps, {nok}) of
-  		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, add_device_to_devices(Device, State));
+  		{ok} ->  get_devices_for_caps(List_Of_Funs, Keys, add_device_to_devices(search_by_device_id_only(Key), State));
 		{nok} -> get_devices_for_caps(List_Of_Funs, Keys, State)
 	end.
 
@@ -286,14 +294,17 @@ and_cond([Fun|Funs], {CheckName, CheckValue}, Acc) ->
 and_cond([], {_CheckName, _CheckValue}, Acc) -> 
 	Acc.
   
-overwrite(capabilities,Generic, #capability{name=Name}=Capability) ->	
-	lists:keyreplace(Name, 2, Generic, Capability);
-overwrite(capabilities,Generic, List_Of_Capabilities) ->
-	overwrite(capabilities,Generic, List_Of_Capabilities, Generic).
-overwrite(capabilities,_Generic, [], Acc) ->
+
+overwrite(capability, #capability{name = Name} = Capability, Acc) ->	
+	lists:keyreplace(Name, 2, Acc, Capability);
+
+overwrite(capabilities, List_Of_Capabilities, []) ->
+	overwrite(capabilities, List_Of_Capabilities, List_Of_Capabilities);
+overwrite(capabilities, [], Acc) ->
 	Acc;
-overwrite(capabilities,Generic, [Capability|List_Of_Capabilities], Acc) ->
-	overwrite(capabilities,Generic, List_Of_Capabilities, overwrite(capabilities,Acc, Capability)).
+overwrite(capabilities, [Capability|List_Of_Capabilities], Acc) ->
+	Acc1 = overwrite(capability, Capability, Acc),
+	overwrite(capabilities, List_Of_Capabilities, Acc1).
 
 
 extract_only_need_capabilities(Generic, List_Of_Capabilities) ->
@@ -303,6 +314,9 @@ extract_one_capabilty(Generic, {Name, {_Value,_Operator}}) ->
  		false -> [];
 		Cap -> Cap
 	end.
+
+get_capability(Capability_Name, Capabilities) ->
+	lists:keyfind(Capability_Name, 2, Capabilities).
 
 create_funs_from_list(List) ->
 	[create_fun(Name, Value, Operator) || {Name, {Value, Operator}} <- List].
@@ -435,34 +449,72 @@ create_funs_from_list_test() ->
 	?assertEqual(3, erlang:length(create_funs_from_list(List))).
 
 run_funs_against_list_test() ->
-	
 	List_of_para=[{"jpg", {"true", '='}}, {"gif", {"true", '='}},  {"png", {"true", '='}}],
 	Funs = create_funs_from_list(List_of_para),
-	Capa_List = [#capability{name="jpg", value="true"}, #capability{name="gif", value="true"}, #capability{name="png", value="true"}],
-	{ok, #state{capabilities=Caps1}} = get_all_capabilities("htc_desire_a8181_ver1", #state{capabilities=Capa_List}),
-	?assertEqual({ok},run_funs_against_list(Funs, Caps1, [])),
+	Capa_List_1 = [{"jpg", {"true", '='}}, {"gif", {"true", '='}}, {"png", {"true", '='}}],
+	Caps1 = get_all_capabilities(["generic", "htc_desire_a8181_ver1"]),
+	?assertEqual({ok},run_funs_against_list(Funs, extract_only_need_capabilities(Caps1, Capa_List_1), [])),
 
 	List_of_para2=[{"jpg", {"true", '='}}, {"gif", {"true", '='}}, {"png", {"false", '='}}],
 	Funs2 = create_funs_from_list(List_of_para2),
-	Capa_List_2 = [#capability{name="jpg", value="true"}, #capability{name="gif", value="true"}, #capability{name="png", value="true"}],
-	{ok, #state{capabilities=Caps2}} = get_all_capabilities("htc_desire_a8181_ver1", #state{capabilities=Capa_List_2}),
-	?assertEqual({nok},run_funs_against_list(Funs2, Caps2, [])).
+	Capa_List_2 = [{"jpg", {"true", '='}}, {"gif", {"true", '='}}, {"png", {"true", '='}}],
+	Caps2 = get_all_capabilities(["generic", "htc_desire_a8181_ver1"]),
+	?assertEqual({nok},run_funs_against_list(Funs2, extract_only_need_capabilities(Caps2, Capa_List_2), [])).
 
 search_by_capabilities_test() ->
 	List=[{"handheldfriendly", {"false", '='}},
 	 {"playback_mp4", {"false", '='}},
 	 {"playback_wmv", {"none", '='}}],
 	Devices = search_by_capabilities(List, "01.01.2011", [],new_state()),
-%%  	io:format("Devices : ~p~n", [Devices]),
 	?assertEqual(1, erlang:length(Devices)).
 	
-overwrite_test() ->
+overwrite_capability_test() ->
 	Generic = get_generic_capabilities(),
 	C = [#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
-	?assertEqual(533,erlang:length(overwrite(capabilities,Generic, C))).
+	D = overwrite(capabilities, C, Generic),
+	Cap1 = get_capability("device_os_version", D),
+	Cap2 = get_capability("device_os", D),
+	?assertEqual("3.0", Cap1#capability.value),
+	?assertEqual("Test", Cap2#capability.value).
+
+overwrite_capabilities_test() ->
+	Generic = wurfler_db:find_capabilities_by_id(devicesTbl, "generic"),
+	Acc = overwrite(capabilities, Generic, []),
+	Capabilities = wurfler_db:find_capabilities_by_id(devicesTbl, "apple_ipad_ver1"),
+	Caps = overwrite(capabilities, Capabilities, Acc),
+	Brand = get_capability("brand_name", Caps),
+	Model = get_capability("model_name", Caps),
+	Is_tablet = get_capability("is_tablet", Caps),
+	?assertEqual([], Brand#capability.value),
+	?assertEqual("iPad", Model#capability.value),
+	?assertEqual("true", Is_tablet#capability.value).
+
+get_devices_for_caps_test() ->
+	List=[{"model_name", {"iPad", '='}},{"brand_name", {"Apple", '='}}],
+	List_Of_Funs = create_funs_from_list(List),
+	Keys = get_keys("iPhone OS", []),
+	State = #state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), List)},
+	?assertEqual(10, erlang:length(get_devices_for_caps(List_Of_Funs, Keys, State))).
 	
 optimization_test() ->
 	Generic = get_generic_capabilities(),
 	C = [{"device_os_version", {"3.0", "="}}, {"device_os", {"Test", "="}}, {"device_os1", {"Test", ">"}}],
 	Result = extract_only_need_capabilities(Generic, C),
 	?assertEqual(2, erlang:length(Result)).
+
+get_all_capabilities_test() ->
+	Caps = get_all_capabilities(["generic","generic_xhtml","apple_generic","apple_ipad_ver1"]),
+	Model = get_capability("model_name", Caps),
+	?assertEqual("iPad", Model#capability.value).
+
+
+
+
+
+
+
+
+
+
+
+

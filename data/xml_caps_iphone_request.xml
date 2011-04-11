@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<query type="iPhone OS">
+	<capabilities>
+		<capability name="brand_name" value="Apple" operator="="/>
+		<capability name="model_name" value="iPad" operator="="/>
+	</capabilities>
+</query>

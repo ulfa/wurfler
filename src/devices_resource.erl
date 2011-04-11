@@ -46,7 +46,7 @@ content_types_provided(ReqData, Context) ->
 
 
 allowed_methods(ReqData, Context) ->
-    {['POST', 'GET'], ReqData, Context}.
+    {['POST'], ReqData, Context}.
 
 
 to_xml(ReqData, #context{devices=Devices}=Context)->
@@ -76,7 +76,6 @@ process_post(ReqData, Context) ->
 	Type = get_type(Body),
 	Timestamp = get_timestamp(Body),
 	Devices = get_devices(Caps, Timestamp, Type),
-	%%save_caps_devices(Caps, Devices, Key),
 	D = xml_factory:to_xml(xml_factory:create_devices(insertURI(devices, ReqData, Devices))),
 	{true, wrq:append_to_response_body(D, ReqData), Context}.
 %%

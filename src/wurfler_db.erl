@@ -35,7 +35,7 @@
 -export([clear_capabilities_devices/0, find_devices_by_brand/2, find_capabilities_device_by_key/1]).
 -export([delete_device/1, delete_brand/1, save_changed_caps_devices/1, find_changed_caps_devices/1]).
 -export([get_all_cap_key/1, find_id_by_fall_back/2, find_os_device_id/1, save_os_device_id/1]).
--export([find_group_of_device/3, get_keys/1, get_all_group_names/0, find_list_of_devices/2]).
+-export([find_group_of_device/3, get_keys/1, get_all_group_names/0, find_list_of_devices/2, find_list_of_devices_with_generic/2]).
 -export([lookup/1, delete/2, clear/0, put/2]).
 %% --------------------------------------------------------------------
 %%% Internal functions
@@ -48,7 +48,7 @@ create_db() ->
 		_ -> error_logger:info_msg("schema created ~n")
 	end,
 	application:start(mnesia),
-	mnesia:create_table(devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},
+	mnesia:create_table(devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root, groups, lastmodified]},
 									{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
 	mnesia:create_table(new_devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},
 									{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),	
@@ -92,13 +92,18 @@ save_os_device_id(Os_Device_Id) ->
 find_record_by_id(devicesTbl, Id) ->
 	mnesia:dirty_read(devicesTbl, Id).
 
+find_list_of_devices(devicesTbl, []) ->
+	[];
 find_list_of_devices(devicesTbl, Id) ->
 	find_list_of_devices(devicesTbl, Id, []).
-find_list_of_devices(devicesTbl, "root", Acc) ->
+find_list_of_devices(devicesTbl, "generic", Acc) ->
 	Acc;
 find_list_of_devices(devicesTbl, Id, Acc) ->
 	[Device] = find_record_by_id(devicesTbl, Id),
 	find_list_of_devices(devicesTbl, Device#device.fall_back, [Device#device.id|Acc]).
+
+find_list_of_devices_with_generic(devicesTbl, Id) ->
+	["generic"|find_list_of_devices(devicesTbl, Id)].
 
 	
 find_groups_by_id(devicesTbl, Id) ->
@@ -111,9 +116,8 @@ find_group_of_device(devicesTbl, Device_Id, Group_Name) ->
 
 find_capabilities_by_id(devicesTbl, Id) ->
 	case find_record_by_id(devicesTbl, Id) of
-		[Device] -> Caps = lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups)),
-					{Device#device.fall_back, Caps};
-		[] -> {[], []}
+		[Device] -> lists:append(lists:foldl(fun(Group,Result) -> [Group#group.capabilites|Result] end, [], Device#device.groups));
+		[] -> []
 	end.
 
 find_record_by_ua(devicesTbl, Ua) ->
@@ -229,7 +233,7 @@ wurfler_db_test_() ->
 			[
 			 ?_assertEqual(2,erlang:length(get_all_keys(devicesTbl, "01.01.2010"))),
 			 ?_assertEqual(0,erlang:length(get_all_keys(devicesTbl, "01.01.2099"))),
-			 ?_assertMatch({"root", _}, find_capabilities_by_id(devicesTbl, "generic")),
+			 ?_assertMatch([], find_capabilities_by_id(devicesTbl, "generic")),
 			 ?_assertMatch([{device, "htc_desire_a8181_ver1_sub2_2",_,_,_,_,_,_,_,_,_}], find_record_by_id(devicesTbl, "htc_desire_a8181_ver1_sub2_2")),
 			 ?_assertMatch([{device, _Id,"Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17", _,_,_,_,_,_,_,_}], 
 				 find_record_by_ua(devicesTbl, "Mozilla/5.0 (Linux; U; Android 2.1-update1; en-au; GT-I9000T Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17")),

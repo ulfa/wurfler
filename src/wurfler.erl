@@ -54,6 +54,8 @@ import_wurfl(Filename) ->
 	gen_server:cast(?MODULE, {import_wurfl, Filename}).
 searchByCapabilities(Capabilities, Timestamp, Type) ->
 	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp, Type}, ?TIMEOUT).
+searchByUA(undefined)->
+	[];
 searchByUA(UserAgent)->
 	gen_server:call(?MODULE, {search_by_ua, UserAgent}, ?TIMEOUT).
 getDeviceById(Device_Id) ->

@@ -147,14 +147,16 @@ new_state() ->
 	#state{devices=[], groups=[], capabilities=[]}.
 
 search_by_capabilities(Capabilities, Timestamp, [], _State) ->
-	List_Of_Funs = create_funs_from_list(Capabilities),
 	Keys = get_keys([], Timestamp),
-	pmap(List_Of_Funs, Capabilities, wurfler_util:split_list(Keys, erlang:system_info(schedulers)));
-	%%get_devices_for_caps(List_Of_Funs, Keys, #state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)});
+	search_by_capabilities(Capabilities, Keys);
 search_by_capabilities(Capabilities, Timestamp, Type, _State) ->
-	List_Of_Funs = create_funs_from_list(Capabilities),
 	Keys = get_keys(Type, Timestamp),
-	pmap(List_Of_Funs, Capabilities, wurfler_util:split_list(Keys, erlang:system_info(schedulers))).
+	search_by_capabilities(Capabilities, Keys).
+
+search_by_capabilities(Capabilities, Keys) ->
+	Caps = extract_only_need_capabilities(get_generic_capabilities(), Capabilities),
+	List_Of_Funs = create_funs_from_list(Capabilities),
+	pmap(List_Of_Funs, Caps, wurfler_util:split_list(Keys, erlang:system_info(schedulers))).
 
 get_keys([], Timestamp) ->
 	wurfler_db:get_all_keys(devicesTbl, Timestamp);
@@ -174,9 +176,9 @@ pmap(List_Of_Funs, Capabilities, Keys) ->
 	xml_factory:create_devices(gather(Pids, [])).
 
 do_it(Parent, List_Of_Funs, Capabilities, Keys) ->
-	Parent ! {get_devices_for_caps(List_Of_Funs, Keys, #state{capabilities=extract_only_need_capabilities(get_generic_capabilities(), Capabilities)})}.
+	Parent ! {get_devices_for_caps(List_Of_Funs, Keys, #state{capabilities=Capabilities})}.
 
-gather([Pid|Pids], Acc) ->
+gather([_Pid|Pids], Acc) ->
 	receive
 		{[]} -> gather(Pids, Acc);
 		{Devices} -> gather(Pids, lists:append(Devices,Acc))
@@ -295,7 +297,7 @@ and_cond([], {_CheckName, _CheckValue}, Acc) ->
 	Acc.
   
 
-overwrite(capability, #capability{name = Name} = Capability, Acc) ->	
+overwrite(capability, #capability{name = Name} = Capability, Acc) ->
 	lists:keyreplace(Name, 2, Acc, Capability);
 
 overwrite(capabilities, List_Of_Capabilities, []) ->

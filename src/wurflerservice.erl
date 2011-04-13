@@ -56,7 +56,7 @@ ensure_started(App) ->
 init([]) ->
 	Ip = case os:getenv("WEBMACHINE_IP") of false -> "0.0.0.0"; Any -> Any end,
     {ok, Dispatch} = file:consult(filename:join(
-                         [filename:dirname(code:which(?MODULE)),
+                        [filename:dirname(code:which(?MODULE)),
                           "..", "priv", "dispatch.conf"])),
 	WurflerConfig={wurfler_config,
 				{wurfler_config, start_link, []},
@@ -94,7 +94,6 @@ init([]) ->
               	10000,
               	worker,
               	[wurfler_etag_cache]},
-
 	WurflerFilePoller={wurfler_file_poller,
 				{wurfler_file_poller, start_link, []},
               	permanent,
@@ -123,7 +122,7 @@ init([]) ->
                  {ip, Ip},
                  {backlog, 1000},
                  {port, 8000},
-                 {log_dir, "logs/weblog"},
+                 {log_dir, "log/weblog"},
                  {dispatch, Dispatch}],
     Web = {webmachine_mochiweb,
            {webmachine_mochiweb, start, [WebConfig]},
@@ -152,6 +151,7 @@ init([]) ->
 %%          {error, Reason}
 %% --------------------------------------------------------------------
 start() ->
+	wurfler_db:create_db(),
 	ensure_started(crypto),
 	ensure_started(mnesia),
     ensure_started(webmachine),

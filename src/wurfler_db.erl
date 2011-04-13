@@ -40,27 +40,29 @@
 %% --------------------------------------------------------------------
 %%% Internal functions
 %% --------------------------------------------------------------------
+
 start() ->
 	create_db().	
 create_db() ->
 	case mnesia:create_schema([node()]) of 
-		{error, Reason} -> exit(Reason);
-		_ -> error_logger:info_msg("schema created ~n")
-	end,
-	application:start(mnesia),
-	mnesia:create_table(devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root, groups, lastmodified]},
+		{error, Reason} -> error_logger:info_msg(Reason),
+						   false;
+		_ -> application:start(mnesia),
+			 mnesia:create_table(devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root, groups, lastmodified]},
 									{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),
-	mnesia:create_table(new_devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},
+			 mnesia:create_table(new_devicesTbl,[{type, set},{index, [user_agent,fall_back, actual_device_root]},
 									{record_name, device},{disc_copies, [node()]}, {attributes, record_info(fields, device)}]),	
-	mnesia:create_table(brand_index,[{disc_copies, [node()]}, {attributes, record_info(fields, brand_index)}]),
-	mnesia:create_table(changed_caps_devices,[{record_name, capabilities_devices}, {disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
-	mnesia:create_table(capabilities_devices,[{disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
-	mnesia:create_table(capability_description,[{disc_copies, [node()]}, {attributes, record_info(fields, capability_description)}]),
-	mnesia:create_table(os_device_id, [{disc_copies, [node()]}, {attributes, record_info(fields, os_device_id)}]),
-	mnesia:create_table(etag_cache, [{ram_copies, [node()]}, {attributes, record_info(fields, etag_cache)}]),
-	mnesia:wait_for_tables([devicesTbl, brand_index, capabilities_devices, changed_caps_devices, capability_description, os_device_id], 100000),
-	upload_os_device_id(),
-	application:stop(mnesia).
+			 mnesia:create_table(brand_index,[{disc_copies, [node()]}, {attributes, record_info(fields, brand_index)}]),
+			 mnesia:create_table(changed_caps_devices,[{record_name, capabilities_devices}, {disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
+		 	 mnesia:create_table(capabilities_devices,[{disc_copies, [node()]}, {attributes, record_info(fields, capabilities_devices)}]),
+			 mnesia:create_table(capability_description,[{disc_copies, [node()]}, {attributes, record_info(fields, capability_description)}]),
+			 mnesia:create_table(os_device_id, [{disc_copies, [node()]}, {attributes, record_info(fields, os_device_id)}]),
+			 mnesia:create_table(etag_cache, [{ram_copies, [node()]}, {attributes, record_info(fields, etag_cache)}]),
+			 mnesia:wait_for_tables([devicesTbl, brand_index, capabilities_devices, changed_caps_devices, capability_description, os_device_id], 100000),
+			 upload_os_device_id(),
+			 application:stop(mnesia),
+			 ok
+	end.
 %% --------------------------------------------------------------------
 %% save functions
 %% --------------------------------------------------------------------

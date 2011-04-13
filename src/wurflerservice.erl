@@ -55,9 +55,8 @@ ensure_started(App) ->
 %% --------------------------------------------------------------------
 init([]) ->
 	Ip = case os:getenv("WEBMACHINE_IP") of false -> "0.0.0.0"; Any -> Any end,
-    {ok, Dispatch} = file:consult(filename:join(
-                        [filename:dirname(code:which(?MODULE)),
-                          "..", "priv", "dispatch.conf"])),
+	%%io:format("1... ~p~n",[filename:join([code:priv_dir(?MODULE), "dispatch.conf"])]),
+    {ok, Dispatch} = file:consult(filename:join([code:priv_dir(?MODULE), "dispatch.conf"])),
 	WurflerConfig={wurfler_config,
 				{wurfler_config, start_link, []},
               	permanent,
@@ -166,7 +165,11 @@ start_link(_Type, _Args) ->
 %%          {error, Reason}
 %% --------------------------------------------------------------------
 start(_Type, _Args) ->
-    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
+	wurfler_db:create_db(),
+	ensure_started(crypto),
+	ensure_started(mnesia),
+    ensure_started(webmachine),	
+	supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 %% --------------------------------------------------------------------
 %% Func: stop/0
 %% Returns: any
@@ -181,6 +184,7 @@ stop() ->
 %% Returns: any
 %% --------------------------------------------------------------------
 stop(_State) ->
+	stop(),
     ok.
 %% --------------------------------------------------------------------
 %% Func: restart/0

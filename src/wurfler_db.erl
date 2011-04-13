@@ -60,7 +60,7 @@ create_db() ->
 			 mnesia:create_table(etag_cache, [{ram_copies, [node()]}, {attributes, record_info(fields, etag_cache)}]),
 			 mnesia:wait_for_tables([devicesTbl, brand_index, capabilities_devices, changed_caps_devices, capability_description, os_device_id], 100000),
 			 upload_os_device_id(),
-			 application:stop(mnesia),
+			 %%application:stop(mnesia),
 			 ok
 	end.
 %% --------------------------------------------------------------------

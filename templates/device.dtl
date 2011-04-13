@@ -21,7 +21,7 @@
 			<tr><td>Fallback :</label><td><a href="/device/{{fall_back}}">{{fall_back}}</a></td></tr>
 			<tr><td>Created</td><td>{{created|date:"r"}}</td></tr>
 			<tr><td>Last modified</td><td>{{lastmodified|date:"r"}}</td></tr>
-			<tr><td>filter</td><td>{{filter}}</td></tr>
+			
 		</table>
 		<br/><br/><br/>
 		<table>

@@ -13,7 +13,7 @@
 -record(context, {docroot,fullpath,fileinfo}).
  
 init(DocRoot) -> 
-	{ok, #context{docroot=DocRoot}}.
+	{ok, #context{docroot=filename:join(code:priv_dir(wurflerservice),DocRoot)}}.
  
 resource_exists(ReqData, Context) ->
   case get_full_path(Context#context.docroot, wrq:disp_path(ReqData)) of

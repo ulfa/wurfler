@@ -295,10 +295,12 @@ and_cond([Fun|Funs], {CheckName, CheckValue}, Acc) ->
     end;
 and_cond([], {_CheckName, _CheckValue}, Acc) -> 
 	Acc.
-  
-
+ 
 overwrite(capability, #capability{name = Name} = Capability, Acc) ->
-	lists:keyreplace(Name, 2, Acc, Capability);
+	case lists:keyfind(Name, 2, Acc) =:= Capability of
+		true -> Acc;
+		false -> lists:keyreplace(Name, 2, Acc, Capability)
+	end;
 
 overwrite(capabilities, List_Of_Capabilities, []) ->
 	overwrite(capabilities, List_Of_Capabilities, List_Of_Capabilities);
@@ -470,7 +472,7 @@ search_by_capabilities_test() ->
 	Devices = search_by_capabilities(List, "01.01.2011", [],new_state()),
 	?assertEqual(1, erlang:length(Devices)).
 	
-overwrite_capability_test() ->
+overwrite_capabilities_test() ->
 	Generic = get_generic_capabilities(),
 	C = [#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
 	D = overwrite(capabilities, C, Generic),
@@ -479,7 +481,7 @@ overwrite_capability_test() ->
 	?assertEqual("3.0", Cap1#capability.value),
 	?assertEqual("Test", Cap2#capability.value).
 
-overwrite_capabilities_test() ->
+overwrite_capabilities1_test() ->
 	Generic = wurfler_db:find_capabilities_by_id(devicesTbl, "generic"),
 	Acc = overwrite(capabilities, Generic, []),
 	Capabilities = wurfler_db:find_capabilities_by_id(devicesTbl, "apple_ipad_ver1"),
@@ -491,6 +493,15 @@ overwrite_capabilities_test() ->
 	?assertEqual("iPad", Model#capability.value),
 	?assertEqual("true", Is_tablet#capability.value).
 
+overwrite_capability_test() ->
+	C1 = [#capability{name="device_os_version", value="3.0"}, #capability{name="device_os", value="Test"}],
+	C2 = #capability{name="device_os_version", value="3.0"},
+	Acc1 = overwrite(capability, C2, C1),
+	C3 = #capability{name="device_os_version", value="3.1"},
+	Acc2 = overwrite(capability, C3, C1),
+	?assertEqual(Acc1, C1),
+	?assertEqual(Acc2, [#capability{name="device_os_version", value="3.1"},#capability{name="device_os", value="Test"}]).
+	
 get_devices_for_caps_test() ->
 	List=[{"model_name", {"iPad", '='}},{"brand_name", {"Apple", '='}}],
 	List_Of_Funs = create_funs_from_list(List),

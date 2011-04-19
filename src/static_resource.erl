@@ -8,7 +8,6 @@
  
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -include_lib("kernel/include/file.hrl").
--include_lib("eunit/include/eunit.hrl").
 
 -record(context, {docroot,fullpath,fileinfo}).
  
@@ -59,3 +58,6 @@ get_full_path(DocRoot, Path) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
+-endif.

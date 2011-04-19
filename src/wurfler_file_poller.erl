@@ -25,7 +25,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include_lib("kernel/include/file.hrl").
 -include("../include/wurfler.hrl").
 
@@ -170,9 +169,11 @@ new_poll_time(Date, Time) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 get_new_files_test() ->
 	Poll = new_poll_time(date(), time()),
 	NewState=get_new_files("./wurfl", "wurfl.xml$", wurfler_importer, #state{last_poll_time=Poll}),
  	?assert(NewState#state.last_poll_time >= Poll).
-
+-endif.
 

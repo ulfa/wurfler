@@ -23,7 +23,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
 -include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
@@ -79,6 +78,9 @@ record_to_tuple(brand, Record) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 record_to_tuple_brand_test() ->
 	Record={brand_index,"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]},
-	?assertEqual({"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]}, record_to_tuple(brand, Record)).									
+	?assertEqual({"Nintendo", [{"nintendo_ds_ver1","DS"}, {"nintendo_wii_browser","Wii"}, {"nintendo_dsi_ver1","DSi"}]}, record_to_tuple(brand, Record)).
+-endif.

@@ -27,7 +27,6 @@
 %% Include files
 %% --------------------------------------------------------------------
 -include("../include/wurfler.hrl").
--include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
 %% --------------------------------------------------------------------
 %% External exports
@@ -349,6 +348,8 @@ check_device(model_name, _Device, _Model_name) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 contains_test() ->
 	L = ["a", "b", "c", "d"],
 	Id = "c",
@@ -388,3 +389,4 @@ get_brand_name_without_test()->
 get_model_name_test() ->
 	{ok,[Device]} = file:consult("data/device"),
 	?assertEqual({model_name, "Legend"}, get_model_name(Device)).
+-endif.

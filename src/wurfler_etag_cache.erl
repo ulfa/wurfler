@@ -24,7 +24,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
 %% External exports
@@ -135,6 +134,8 @@ code_change(_OldVsn, State, _Extra) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 put_test()->
 	wurfler_etag_cache:put("test", "data"),
 	?assertEqual("data", wurfler_etag_cache:lookup("test")).
@@ -154,3 +155,4 @@ clear_test() ->
 setup() ->
 	mnesia:start(),
 	wurfler_etag_cache:start().
+-endif.

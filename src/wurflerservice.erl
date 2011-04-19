@@ -55,7 +55,6 @@ ensure_started(App) ->
 %% --------------------------------------------------------------------
 init([]) ->
 	Ip = case os:getenv("WEBMACHINE_IP") of false -> "0.0.0.0"; Any -> Any end,
-	%%io:format("1... ~p~n",[filename:join([code:priv_dir(?MODULE), "dispatch.conf"])]),
     {ok, Dispatch} = file:consult(filename:join([code:priv_dir(?MODULE), "dispatch.conf"])),
 	WurflerConfig={wurfler_config,
 				{wurfler_config, start_link, []},
@@ -197,4 +196,9 @@ restart() ->
 %% ====================================================================
 %% Internal functions
 %% ====================================================================
-
+%% --------------------------------------------------------------------
+%%% Test functions
+%% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
+-endif.

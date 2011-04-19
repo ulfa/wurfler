@@ -24,7 +24,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
 %% External exports
@@ -35,19 +34,18 @@
 -export([start_link/0, start/0]).
 -export([searchByUA/2, searchByCapabilities/3, check_device/3, searchByDeviceId/1]).
 -export([getAllCapabilities/1, get_capability/2, get_all_groups/1]).
--define(TIMEOUT, infinity).
 
 %% ====================================================================
 %% External functions
 %% ====================================================================
 searchByCapabilities(Capabilities, Timestamp, Type) ->
-	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp, Type}, ?TIMEOUT).
+	gen_server:call(?MODULE, {search_by_capabilities, Capabilities, Timestamp, Type}).
 searchByUA(UserAgent, Device_Ids)->
-	gen_server:call(?MODULE, {search_by_ua, UserAgent, Device_Ids}, ?TIMEOUT).
+	gen_server:call(?MODULE, {search_by_ua, UserAgent, Device_Ids}).
 searchByDeviceId(Id)->
-	gen_server:call(?MODULE, {search_by_device_id, Id}, ?TIMEOUT).
+	gen_server:call(?MODULE, {search_by_device_id, Id}).
 check_device(Capabilities, Key, Id) ->
-	gen_server:call(?MODULE, {check_device, Capabilities, Key, Id}, ?TIMEOUT).
+	gen_server:call(?MODULE, {check_device, Capabilities, Key, Id}).
 getAllCapabilities(Device_Id) ->
 	gen_server:call(?MODULE, {get_all_capabilities, Device_Id}).
 
@@ -388,6 +386,8 @@ create_fun(CheckName, CheckValue, '>=')->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 search_by_ua_test() ->
 	search_by_ua("Mozilla/5.0 (Linux; U; Android 2.1-update1; de-ch; SonyEricssonX10i Build/2.0.A.0.504) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17",
 				 wurfler_db:find_os_device_id("Android"), new_state()).
@@ -519,15 +519,4 @@ get_all_capabilities_test() ->
 	Caps = get_all_capabilities(["generic","generic_xhtml","apple_generic","apple_ipad_ver1"]),
 	Model = get_capability("model_name", Caps),
 	?assertEqual("iPad", Model#capability.value).
-
-
-
-
-
-
-
-
-
-
-
-
+-endif.

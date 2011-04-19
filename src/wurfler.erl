@@ -24,7 +24,6 @@
 %% Include files
 %% --------------------------------------------------------------------
 -include("../include/wurfler.hrl").
--include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").
 %% --------------------------------------------------------------------
@@ -271,6 +270,8 @@ deleteDevice(Id) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 add_device_to_devices_test() ->
 	Devices=[xml_factory:create_device(#device{id="1", brand_name="brand_1", model_name="model_1"}), 
 			 xml_factory:create_device(#device{id="2", brand_name="brand_2", model_name="model_2"})],
@@ -300,12 +301,4 @@ wurfler_test_() ->
 setup() ->
 	wurfler_test_setup:setup(),
 	mnesia:load_textfile("data/test.data").
-
-
-
-
-
-	
-
-
-
+-endif.

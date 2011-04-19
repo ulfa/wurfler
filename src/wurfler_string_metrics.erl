@@ -23,7 +23,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
 %% External exports
@@ -115,7 +114,8 @@ get_id_ua(Key) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% -------------------------------------------------------------------
-	
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 levenshtein_test_() ->
 	{setup, 
 	 	fun() -> setup() end,
@@ -159,3 +159,4 @@ get_devices([Key|Keys], Acc) ->
 	Diff = levenshtein(string:to_lower(string:substr(A, 1, erlang:length(A))), string:to_lower(UA)),
 	io:format("~p, ~p, ~p ~n", [Diff, erlang:length(invalidate_number(UA)), invalidate_number(UA)]),
 	get_devices(Keys, Acc).
+-endif.

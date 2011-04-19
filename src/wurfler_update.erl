@@ -24,7 +24,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
 %% External exports
@@ -164,9 +163,11 @@ save_change_set(Caps, Key, Devices) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 insert_new_device_test() ->
 	D = #device{id="nokia_generic_series20"},
 	handle_cast({create_device, D}, #state{}).
 find_changes_test() ->
 	find_changes("01011970").
-	
+-endif.	

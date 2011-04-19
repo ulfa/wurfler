@@ -24,7 +24,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
 %% External exports
@@ -143,8 +142,9 @@ search_ua(User_Agent, Device_Ids) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 short_test() ->
 	UA = "Mozilla/5.0 (Linux; U; Android 1.1; en-us; T-Mobile G1 Build/PLAT-RC33) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2",
 	?assertMatch(_,parse_useragent(UA)).
-
-
+-endif.

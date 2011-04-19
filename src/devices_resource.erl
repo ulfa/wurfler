@@ -21,11 +21,7 @@
 %% Include files
 %%
 -include("../include/wurfler.hrl").
--include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
-
-
-
 %%
 %% Exported Functions
 %%
@@ -125,6 +121,8 @@ insertURI(device,ReqData, {'device', [{id, Id}, {model_name,Model_name}, {brand_
 %% --------------------------------------------------------------------
 %% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 test_insertURI() ->
  	ReqData= #wm_reqdata{req_headers=mochiweb_headers:make([{host, "localhost"}])},
  	D=[{'devices', [], [{'device', [{id, "Id_1"}, {model_name,"Model_name"}, {brand_name,"Brand_name"}], []},
@@ -183,3 +181,4 @@ setup() ->
 	mnesia:load_textfile("data/test.data").
 teardown() ->
 	wurfler_test_setup:teardown().
+-endif.

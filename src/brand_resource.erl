@@ -23,7 +23,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include("../include/wurfler.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
 -export([init/1, to_xml/2, to_html/2, content_types_provided/2, resource_exists/2]).
@@ -92,6 +91,9 @@ record_to_tuple(brand, [Brand]) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 record_to_tuple_test() ->
 	Brand = [{brand_index,"AI",[{"teleepoch_s570_ver1","S570"}]}] ,
 	?assertEqual([{brand, "AI"},{models, [{"teleepoch_s570_ver1","S570"}]}], record_to_tuple(brand, Brand)).
+-endif.

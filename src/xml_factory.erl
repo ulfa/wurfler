@@ -26,7 +26,6 @@
 %% Include files
 %%
 -include("../include/wurfler.hrl").
--include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
 %%
 %% Exported Functions
@@ -103,9 +102,11 @@ to_xml(Data) ->
 %%
 %% Local Functions
 %%
-%%
-%% Test Functions
-%%
+%% --------------------------------------------------------------------
+%%% Test functions
+%% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 create_xml_brand_test() ->
 	Brand = #brand_index{brand_name="RIM", models=[{"blackberry5820_ver1","BlackBerry 5820"},{"blackberry5810_ver1","BlackBerry 5810"}]},
 	A={brand,[{name,"RIM"}],
@@ -162,5 +163,4 @@ tto_xml(A)->
 log_xml(Element)->
 	B=lists:flatten(xmerl:export_simple_content(Element, xmerl_xml)),
 	io:format("Xml: ~n~p~n", [B]).
-	
-
+-endif.

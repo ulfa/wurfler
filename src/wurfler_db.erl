@@ -23,7 +23,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 -include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
@@ -224,6 +223,8 @@ delete(etag, Key) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 find_group_of_device_test() ->
 	?assertMatch([{group,"sound_format",_}],find_group_of_device(devicesTbl, "generic","sound_format")).
 
@@ -252,5 +253,5 @@ setup() ->
 	mnesia:load_textfile("data/test.data").
 teardown() ->
 	wurfler_test_setup:teardown().
-	
+-endif.
     

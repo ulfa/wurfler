@@ -24,7 +24,6 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
--include_lib("eunit/include/eunit.hrl").
 -include("../include/wurfler.hrl").
 %% --------------------------------------------------------------------
 %% External exports
@@ -161,4 +160,6 @@ create_capabilities_devices(Caps_Devices, Capabilities, Devices, Lastmodified) -
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
-
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
+-endif.

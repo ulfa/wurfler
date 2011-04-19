@@ -22,7 +22,6 @@
 %% Include files
 %%
 -include("../include/wurfler.hrl").
--include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
 %%
 %% Exported Functions
@@ -176,6 +175,8 @@ get_picture(Path, Id) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 delete_caps_from_groups_test() ->
 	A=[
 	   #group{id="a", capabilites=[#capability{name="test", value="value"}]},
@@ -226,3 +227,4 @@ setup() ->
 	mnesia:load_textfile("data/test.data").
 teardown() ->
 	wurfler_test_setup:teardown().
+-endif.

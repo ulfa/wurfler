@@ -28,7 +28,6 @@
 %% Include files
 %% --------------------------------------------------------------------
 -include("../include/wurfler.hrl").
--include_lib("eunit/include/eunit.hrl").
 -include_lib("xmerl/include/xmerl.hrl").
 %% --------------------------------------------------------------------
 %% External exports
@@ -224,6 +223,8 @@ get_capability(CapabilitiesDb, Capability_Name) ->
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
+-include_lib("eunit/include/eunit.hrl").
+-ifdef(TEST).
 merge_group_test() ->
 	GroupXml = xml_factory:parse_file("./data/group_xml"),
 	[Group] = xmerl_xpath:string ("/group", GroupXml),
@@ -281,4 +282,4 @@ get_device_test() ->
 process_device_test() ->
 	Wurfl_Patch = xml_factory:parse_file("./data/wurlfpatch.xml"),
 	Devices = xmerl_xpath:string ("/wurfl_patch/devices/device", Wurfl_Patch).
-
+-endif.

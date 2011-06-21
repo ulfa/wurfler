@@ -127,7 +127,8 @@ delete_caps_from_groups([Group|Groups], Group_Name, Acc) ->
 insertURI(ReqData, Device) ->
 	Device#device{id="http://" ++ wrq:get_req_header(?HOST, ReqData) ++ "/device/" ++ Device#device.id}.
 
-generate_etag(ReqData, #context{device = Device} = Context) ->  {wurfler_util:generate_etag(Device), ReqData, Context}.
+generate_etag(ReqData, #context{device = Device} = Context) ->  
+	{wurfler_util:generate_etag(Device), ReqData, Context}.
 
 %% --------------------------------------------------------------------
 %% internal functions
@@ -197,6 +198,7 @@ get_picture_test() ->
 	end,
 	{ok, Pwd} = file:get_cwd(),
 	?assertEqual("acer_e101_ver1.gif", get_picture(lists:append(Pwd, "/priv/www/lib/devices/"), "acer_e101_ver1")).
+
 record_to_tuple_test() ->
 	Device = #device{id="1", 
 					 user_agent="ua", 
@@ -218,7 +220,7 @@ device_resource_test_() ->
 	 	fun(_) ->
 			[
 			 ?_assertEqual([{nok, "unknown"}],delete_device("unknown")),
-			 ?_assertEqual(14,erlang:length(delete_device("generic_android")))		 
+			 ?_assertEqual(14,erlang:length(delete_device("generic_android")))				 
 			 ]
 	 	end
 	 }.

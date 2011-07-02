@@ -58,7 +58,8 @@ suite() -> [{timetrap, {seconds, 20}}].
 %%
 %% Description: Returns a list of test case group definitions.
 %%--------------------------------------------------------------------
-groups() -> [{device_get_requests, [parallel], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
+groups() -> [ {search_resource, [sequence], [search_by_caps]},
+			 {device_get_requests, [parallel], [get_device_by_id, get_device_by_id_404, get_device_by_ua]},
 			 {device_get_requests_html, [parallel], [get_device_by_id_to_html, get_device_by_ua_to_html, get_device_by_id_404_to_html]},
 			 {devices_post_requests, [sequence], [post_cap_query_no_caps, post_cap_query, post_cap_query_with_timestamp,
 												  post_cap_query_device_os_version, post_cap_android]},
@@ -192,6 +193,10 @@ get_device_by_ua(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/xml"}, {"User-Agent", "Mozilla/5.0 (Linux; U; Android 1.1; en-us; T-Mobile G1 Build/PLAT-RC33) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2"}], get).
 get_device_by_ua_to_html(_Config) ->
 	{ok, "200", _C, _D}=ibrowse:send_req("http://localhost:8000/device", [{"Content-Type", "text/html"}, {"Accept", "text/html"}, {"User-Agent", "Mozilla/5.0 (Linux; U; Android 1.1; en-us; T-Mobile G1 Build/PLAT-RC33) AppleWebKit/525.10+ (KHTML, like Gecko) Version/3.0.4 Mobile Safari/523.12.2"}], get).
+
+search_by_caps(_Config) ->
+	A="<?xml version=\"1.0\" encoding=\"utf-8\"?><query key=\"1110\"><capabilities><capability name=\"j2me_cldc_1_1\" value=\"true\" operator=\"=\"/><capability name=\"j2me_midp_1_0\" value=\"true\" operator=\"=\"/></capabilities></query>",
+	{ok, "200", _C, D}=ibrowse:send_req("http://localhost:8000/search", ?XML_CONTENT_TYPE, post, A).
 
 %% Tests for the device service (POST)
 post_cap_query(_Config) ->

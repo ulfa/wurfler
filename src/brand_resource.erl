@@ -84,7 +84,7 @@ redirect(Target, ReqData) ->
 delete_brand(Brand_name) ->
 	wurfler_db:delete_brand(Brand_name).
 get_brand(Brand_Name) ->
-	error_logger:info_msg("1... ~p~n", [Brand_Name]),
+	%%error_logger:info_msg("1... ~p~n", [Brand_Name]),
 	wurfler:get_brand(mochiweb_util:unquote(Brand_Name)).
 record_to_tuple(brand, [Brand]) ->
 	[{brand, element(2, Brand)}, {models ,lists:keysort(2,element(3, Brand))}].

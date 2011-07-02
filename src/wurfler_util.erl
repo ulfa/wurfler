@@ -49,4 +49,6 @@ split_list(List, 4) ->
 %% --------------------------------------------------------------------
 -include_lib("eunit/include/eunit.hrl").
 -ifdef(TEST).
+	split_list_test() ->
+		split_list([1,2,3,4,5,6],2).
 -endif.

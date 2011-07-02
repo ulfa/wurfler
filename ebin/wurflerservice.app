@@ -18,7 +18,6 @@
              static_resource,
              device_resource,
              devices_resource,
-             search_resource,
 	     brand_resource,
 	     brands_resource,
 	     changes_resource,

@@ -2,6 +2,9 @@
 -define(LOCATION, "Location").
 -define(HOST, "host").
 -define(DEBUG(Count, Value), io:format(Count ++ "... ~p~n", [Value])).
+-define(CPROFSTART, cprof:stop(),cprof:start()).
+-define(CPROFPAUSE, cprof:pause()).
+
 -record(capability, {name, value}).
 -record(group, {id, capabilites=[]}).
 -record(device, {id, user_agent=[], actual_device_root=false, fall_back=[],

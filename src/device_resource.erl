@@ -134,7 +134,7 @@ generate_etag(ReqData, #context{device = Device} = Context) ->  {wurfler_util:ge
 %% --------------------------------------------------------------------
 get_device_by_id(ReqData, Context, Device_Id) ->
 	case lookup_etag(wrq:get_req_header("If-None-Match", ReqData)) of
-		[] ->  case wurfler:getDeviceById(Device_Id) of
+		[] ->  case wurfler_search:searchByDeviceId(Device_Id) of
 					[] -> {false, ReqData, Context#context{device=[]}};
 					Device -> wurfler_etag_cache:put(wurfler_util:generate_etag(Device), Device), 
 							  {true, ReqData, Context#context{device=Device}}

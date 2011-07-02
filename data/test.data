@@ -15,6 +15,7 @@
           {attributes,
               [id,user_agent,actual_device_root,fall_back,brand_name,
                model_name,groups,created,lastmodified,filter]}]}]}.
+               
 {brand_index,"HTC",[{"htc_desire_a8181_ver1","Desire"}]}.
 {brand_index,"Samsung",[{"samsung_gt_i9000_ver1","GT-I9000"}]}.
 {devicesTbl,"htc_desire_a8181_ver1",

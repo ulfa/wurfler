@@ -34,7 +34,7 @@
 -include_lib("../deps/webmachine/include/webmachine.hrl").
 -include("../deps/webmachine/include/wm_reqstate.hrl").
 
--record(context, {device, group_name, id}).
+-record(context, {device, group_name, id,metadata=[]}).
 %%
 %% API Functions
 %%
@@ -126,6 +126,13 @@ delete_caps_from_groups([Group|Groups], Group_Name, Acc) ->
 
 insertURI(ReqData, Device) ->
 	Device#device{id="http://" ++ wrq:get_req_header(?HOST, ReqData) ++ "/device/" ++ Device#device.id}.
+
+%
+% undefined | YYYY,MM,DD, Hour,Min,Sec
+%
+last_modified(ReqData, #context{device = Device} = Context) ->
+	{Device#device.lastmodified, ReqData, Context#context{metadata=[{'last-modified',
+                    httpd_util:rfc1123_date(Device#device.lastmodified)}|Context#context.metadata]}}.
 
 generate_etag(ReqData, #context{device = Device} = Context) ->  
 	{wurfler_util:generate_etag(Device), ReqData, Context}.

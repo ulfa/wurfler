@@ -43,12 +43,27 @@ split_list(List, 4) ->
 	{L1, L2} = lists:split(length(List) div 2, List),
 	{L3, L4} = lists:split(length(L1) div 2, L1),
 	{L5, L6} = lists:split(length(L2) div 2, L2),
-	[L3,L4,L5,L6].
+	[L3, L4, L5, L6];
+split_list(List, 8) ->
+	{L1, L2} = lists:split(length(List) div 2, List),
+	{L3, L4} = lists:split(length(L1) div 2, L1),
+	{L5, L6} = lists:split(length(L2) div 2, L2),
+	
+	{L7, L8} = lists:split(length(L2) div 2, L3),
+	{L9, L10} = lists:split(length(L2) div 2, L4),
+	{L11, L12} = lists:split(length(L2) div 2, L5),
+	{L13, L14} = lists:split(length(L2) div 2, L6),
+	[L7, L8, L9, L10, L11, L12, L13, L14];
+
+split_list(List, _Count) ->
+	List.
 %% --------------------------------------------------------------------
 %%% Test functions
 %% --------------------------------------------------------------------
 -include_lib("eunit/include/eunit.hrl").
 -ifdef(TEST).
-	split_list_test() ->
-		split_list([1,2,3,4,5,6],2).
+	split_list_2_test() ->
+		?assertEqual([[1,2,3], [4,5,6]],split_list([1,2,3,4,5,6],2)),
+		?assertEqual([[1], [2,3], [4], [5,6]],split_list([1,2,3,4,5,6],4)),
+		?assertEqual([[1],[],[2],[3],[4],[],[5],[6]], split_list([1,2,3,4,5,6],8)).
 -endif.

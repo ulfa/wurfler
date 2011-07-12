@@ -2,10 +2,10 @@
 
 {% block title %}Device{% endblock %}
 {% block navigation %}
-<nav>
-		<ul>
+<nav class="menu">
+		<ul class="menu">
 			{% for group, caps in groups %}
-				<li><a href="/device/{{id}}/group/{{group}}">{{group}}</a></li>
+				<li><a class="menu" href="/device/{{id}}/group/{{group}}">{{group}}</a></li>
 			{% endfor %}
 		</ul>
 </nav>
@@ -21,13 +21,18 @@
 			<tr><td>Fallback :</label><td><a href="/device/{{fall_back}}">{{fall_back}}</a></td></tr>
 			<tr><td>Created</td><td>{{created|date:"r"}}</td></tr>
 			<tr><td>Last modified</td><td>{{lastmodified|date:"r"}}</td></tr>
-			
 		</table>
+    <div id="delete">
+      <form action="/device/{{id}}" method="post">
+        <button type="submit" id="delete-id" name="method" value="DELETE">Delete</button>
+      </form>
+    </div>
+
 		<br/><br/><br/>
+
 		<table>
 		{% for group, caps in groups %}
 			<ul style="list-style-type:none">
-			
 			{% for c, d in caps %}
 			<tr>
 				{% ifequal c "uaprof" %}
@@ -39,7 +44,5 @@
 			{% endfor %}
 		{% endfor %}
 		</table>
-		<form action="/device/{{id}}" method="post">
-			<button type="submit" id="delete-id" name="method" value="DELETE">Delete</button>
-		</form>		
+
 {% endblock %}

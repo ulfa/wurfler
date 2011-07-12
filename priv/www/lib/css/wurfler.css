@@ -5,12 +5,50 @@ hgroup.left { text-align:left; }
 #multicolumns {
 	-moz-column-width: 130px;;
 	-webkit-column-width: 130px;
-	-moz-column-gap: 20px;
 	-webkit-column-gap: 20px;
 	-moz-column-rule: 1px solid #ddccb5;
 	-webkit-column-rule: 1px solid #ddccb5;
 	list-style-type: none;
 	}
+
+#capslist {
+  -moz-column-width: 300px;;
+  -webkit-column-width: 300px;
+  -moz-column-gap: 10px;
+  -webkit-column-gap: 10px;
+  -moz-column-rule: 1px solid #ddccb5;
+  -webkit-column-rule: 1px solid #ddccb5;
+  height: 350px;
+  list-style-type: none;
+}
+
+li {
+  font-size: 12px;
+  font-color: #b8b8b8;
+  font-family: Trebuchet MS;
+}
+
+li.dtype {
+    list-style: none outside none;
+}
+
+li.dtype h4 {
+    display: inline;
+    float: left;
+    font-family: Trebuchet MS;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    width: auto;
+}
+
+li.typval {
+    font-family: Trebuchet MS;
+    font-size: 12px;
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
 
 /* ** ** Header Styles ** ** */
 h1, h2, h3, h4, h5 {margin:0 0 0.5em; line-height:1.1em;}
@@ -21,16 +59,13 @@ h4 {	font-size:1.452em;}
 h5 {	font-size:1.252em;} 
 h6 {	font-size:1.52em;}
 
+/* image size */
 #device {
 	height:72px;
 	width:72px;
 }
 
 body {
-  background: #fff;
-  font-size: 12px;
-  font-color: #444;
-  font-family: Verdana, Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
@@ -38,11 +73,11 @@ body {
 footer {
 	position:absolut;
 	font-size: 0.75em;
-  	text-align: center;
-  	clear: both;
-  	text-align: center;
-  	padding: 10px 15px;
-  	margin: 10px 0 0 0;
+ 	text-align: center;
+ 	clear: both;
+ 	text-align: center;
+ 	padding: 10px 15px;
+ 	margin: 10px 0 0 0;
   	
 }
 
@@ -61,3 +96,31 @@ footer {
 	float: left;
 }
 
+#delete {
+  position:relative;
+  top: 9px; left: 9px; width: 200px; }
+}
+
+nav.menu{
+  list-style: none;
+  width: 150px;
+  padding-top: 35px;
+  height: 214px;
+  padding-left: 50px;
+}
+
+ul.menu{
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+a.menu{
+  font-family: Trebuchet MS;
+  font-size: 12px;
+  height: 8px;
+  display:block;
+  text-decoration: none;
+  padding: 9px 0 0 0px;
+  font-weight:normal;
+}

@@ -155,7 +155,8 @@ get_devices([Key|Keys], Acc) ->
 	%%Diff = levenshtein(UA,A), %%28245692 on a core2duo macbookPro
 	erlang:spawn(fun() -> wurfler_string_metrics:levenshtein(UA, A)  end),
 	%%10121671 on a core2duo macbookPro
-	%%5009021 on my amd box
+	%% 5009021 on my amd box
+	%% 2683975 on my new macbookPro WOW
 	Diff = levenshtein(string:to_lower(string:substr(A, 1, erlang:length(A))), string:to_lower(UA)),
 	io:format("~p, ~p, ~p ~n", [Diff, erlang:length(invalidate_number(UA)), invalidate_number(UA)]),
 	get_devices(Keys, Acc).

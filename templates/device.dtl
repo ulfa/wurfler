@@ -2,35 +2,41 @@
 
 {% block title %}Device{% endblock %}
 {% block navigation %}
-<nav class="menu">
-		<ul class="menu">
-			{% for group, caps in groups %}
-				<li><a class="menu" href="/device/{{id}}/group/{{group}}">{{group}}</a></li>
-			{% endfor %}
-		</ul>
-</nav>
+<div class="component">
+
+<ul>
+	<li>Capabilites</li>
+	{% for group, caps in groups %}
+		<li><a href="/device/{{id}}/group/{{group}}">{{group}}</a></li>
+	{% endfor %}
+</ul>
+</div>
 {% endblock %}
 {% block content %}
+<div class="component">
 	<img id="device" src="/device_image/{{picture}}"/>
-		<table>
-			<tr><td>Id</td><td><a href="/device/{{id}}">{{id}}</a></td></tr>  
-			<tr><td>Brand name</td><td>{{brand_name}}</td></tr>
-			<tr><td>Model name</td><td>{{model_name}}</td></tr>
-			<tr><td>User Agent</td><td>{{user_agent}}</td></tr>
-			<tr><td>Actual device</td><td>{{actual_device_root}}</td></tr>
-			<tr><td>Fallback :</label><td><a href="/device/{{fall_back}}">{{fall_back}}</a></td></tr>
-			<tr><td>Created</td><td>{{created|date:"r"}}</td></tr>
-			<tr><td>Last modified</td><td>{{lastmodified|date:"r"}}</td></tr>
-		</table>
+	<table>
+		<thead><tr><td>Property</td><td>Value</td></tr></thead>
+		<tr><td>Id</td><td><a href="/device/{{id}}">{{id}}</a></td></tr>  
+		<tr><td>Brand name</td><td>{{brand_name}}</td></tr>
+		<tr><td>Model name</td><td>{{model_name}}</td></tr>
+		<tr><td>User Agent</td><td>{{user_agent}}</td></tr>
+		<tr><td>Actual device</td><td>{{actual_device_root}}</td></tr>
+		<tr><td>Fallback :</label><td><a href="/device/{{fall_back}}">{{fall_back}}</a></td></tr>
+		<tr><td>Created</td><td>{{created|date:"r"}}</td></tr>
+		<tr><td>Last modified</td><td>{{lastmodified|date:"r"}}</td></tr>
+		<tr><td></td><td></td></tr>
+	</table>
     <div id="delete">
       <form action="/device/{{id}}" method="post">
         <button type="submit" id="delete-id" name="method" value="DELETE">Delete</button>
       </form>
+      <br/>
     </div>
-
-		<br/><br/><br/>
-
-		<table>
+</div>
+<div class="component">
+	<table>
+		<thead><tr><td>Capability</td><td>Value</td></tr></thead>
 		{% for group, caps in groups %}
 			<ul style="list-style-type:none">
 			{% for c, d in caps %}
@@ -43,6 +49,6 @@
 			</tr>
 			{% endfor %}
 		{% endfor %}
-		</table>
-
+	</table>
+</div>
 {% endblock %}

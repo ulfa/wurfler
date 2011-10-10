@@ -1,7 +1,17 @@
 {% extends "base.dtl" %}
 
 {% block title %}Brands{% endblock %}
-<section> 
+
+{% block navigation %}
+	<div class="component">
+		<ul>
+			<li><a href="">search by capabilities<a/></li>
+			<li><a href="">search by User Agent<a/></li>
+		</ul>
+	</div>
+{% endblock %}
+
+
 {% block content %}        	
 		<ul id="multicolumns">
 		{% for brand, models in brands %}
@@ -10,4 +20,3 @@
 		</ul>
 		</br>
 {% endblock %}
-</section>

@@ -1,0 +1,122 @@
+body {
+  color: #222;
+  font-size: 14px;
+  font-family: 'Verdana', 'Arial', sans-serif;
+  letter-spacing: 0.1em;
+  background: #fff;
+}
+
+table { border-collapse: collapse; }
+
+table tr td { padding: 3px; height: 1em; }
+
+.head { position: relative; top:0; left: 0;}
+.head h1 {
+  font-family: 'Arial', sans-serif;
+  font-size: 72px;
+  letter-spacing: -0.08em;
+  position: absolute; bottom: -15px; left: 0;
+  color: #000;
+  margin:  0;
+}
+
+/* ******************************************************************************************/
+/* Default Classes **************************************************************************/
+/* ******************************************************************************************/
+
+.left { float: left; }
+
+/* ******************************************************************************************/
+/* Layout/Frame Classes *********************************************************************/
+/* ******************************************************************************************/
+
+.frame { width: 1024px; margin: 0 auto;  }
+
+.head, .footer {
+  height: 200px;
+}
+
+.middle { overflow: hidden; margin: 10px 0 10px 0; }
+
+.sidebar {
+  width: 230px;
+  min-height: 400px;
+  margin-right: 10px;
+  padding: 20px 0 20px 0;
+
+}
+
+.content {
+  width: 740px;
+  min-height: 1000px;
+  padding: 20px;
+}
+
+/* ******************************************************************************************/
+/* Components *******************************************************************************/
+/* ******************************************************************************************/
+
+/* BaseComponent ****************************************************************************/
+
+.component {
+  border: 1px solid #cecece;
+  overflow: hidden; /* float clearing of inner contents */
+  margin: 0 0 25px 0; /* margin: top right bottom left (clockwise) */
+  border-radius: 5px;
+  min-height: 60px;
+}
+
+.component ul li {
+    list-style: none;
+}
+
+/* ContainerComp ****************************************************************************/
+
+.container { overflow: hidden; }
+
+/* (740 - 40 - 4 - 10)/2 (base-width - comp-padding*2 - border*2 - center margin)/2 */
+.container .component { float: left; width: 363px; margin-left: 10px; }
+
+.container .component:nth-child(odd) { margin-left: 0; }
+
+/* (740 - 60 - 6 - 20)/3 (base-width - comp-padding*3 - border*3 - center margin*2)/3 */
+.container.presenter .component { width: 238px; }
+
+/* negating the old one (not presenter nthchild condition)*/
+.container.presenter .component:nth-child(2n+1) { margin-left: 10px; }
+
+/* setting the new one */
+.container.presenter .component:nth-child(3n+1) { margin-left: 0; }
+
+/* TableComp ********************************************************************************/
+.component table { width: 100%; }
+
+.component table tr td { padding: 3px 10px 3px 10px; }
+.component table thead tr td { background: #cecece; }
+
+/* Form *************************************************************************************/
+.component form ul { padding: 0; }
+
+.component form ul li {
+  position: relative; top: 0; left: 0;
+  height: 25px;
+}
+
+.component form ul li label { position: absolute; top: 0; left: 25px; width: 200px; }
+
+.component form ul li input { position: absolute; top: 0; left: 260px; width: 250px; }
+
+.component form ul li.actions { padding: 0 0 0 25px; }
+
+.component form ul li.actions input { position: static; width: auto; }
+
+#multicolumns {
+	-moz-column-width: 130px;;
+	-webkit-column-width: 130px;
+	-webkit-column-gap: 20px;
+	-moz-column-rule: 1px solid #ddccb5;
+	-webkit-column-rule: 1px solid #ddccb5;
+	list-style-type: none;
+	}
+
+

@@ -5,23 +5,18 @@
 		<title>{% block title %}Wurfler{% endblock %}</title>
 		<meta name="author" content="Ulf Angermann" />
 		<link rel="stylesheet" type="text/css" media="screen" href="/css/style.css">
-		<link rel="stylesheet" type="text/css" media="screen" href="/css/wurfler.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="/css/main.css">
 	</head>
-	<body>
-		<div id="wrapper">
-    		<header>
-				<hgroup>
-					<h1>Wurfler</h1>
-				</hgroup>							
-			</header>
-			<section id="navigation">		
-				{% block navigation %}{% endblock %}
-			</section>
-			<section id="left_content"> 
-				{% block aside %}{% endblock %}
-			</section>
-				{% block content %}{% endblock %}
-		</div> 
-	</body>
-	<footer>@2011 Ulf Angermann</footer>
+	<body>	
+<div class="frame">
+  <div class="head"><h1>Handy capabilities</h1></div>
+  <div class="middle">
+    <div class="sidebar left">
+      {% block navigation %}{% endblock %}
+    </div>
+    <div class="content left">
+		{% block content %}{% endblock %}
+	</div>
+</div>
+</body>
 </html>    

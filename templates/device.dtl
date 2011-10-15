@@ -1,17 +1,17 @@
 {% extends "base.dtl" %}
 
 {% block title %}Device{% endblock %}
+
 {% block navigation %}
 <div class="component">
-
-<ul>
-	<li>Capabilites</li>
-	{% for group, caps in groups %}
-		<li><a href="/device/{{id}}/group/{{group}}">{{group}}</a></li>
-	{% endfor %}
-</ul>
+	<ul>
+		{% for group, caps in groups %}
+			<li><a href="/device/{{id}}/group/{{group}}">{{group}}</a></li>
+		{% endfor %}
+	</ul>
 </div>
 {% endblock %}
+
 {% block content %}
 <div class="component">
 	<img id="device" src="/device_image/{{picture}}"/>
